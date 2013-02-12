@@ -1,0 +1,209 @@
+Output will go to directory '/nobackup/steveri/github/fftgen'.
+
+------------------------------------------------------------------------
+Checking the distribution list for continuity...
+
+Uncategorized files (should be NONE):
+    ./depend.list
+    ./genesis.log
+    ./README_files.txt
+    ./simv
+    ./simv.log
+    ./ucli.key
+    ./vcdplus.vpd
+
+Files in multiple categories (should be NONE):
+
+------------------------------------------------------------------------
+
+Building distribution 'dist.tar.gz':
+392 -r--r--r-- 1 steveri vlsi_group 396475 Oct 24 11:04 ./doc/specs/1024_FFTConflictFree_Oct242012.pdf
+360 -r--r--r-- 1 steveri vlsi_group 363197 Oct 23 08:46 ./doc/specs/Jarmo_FFT.pdf
+176 -r--r--r-- 1 steveri vlsi_group 172745 Oct  8 10:48 ./doc/specs/0925_FFTGeneratorProposal_Sept252012_rev.pdf
+156 -r--r--r-- 1 steveri vlsi_group 154608 Oct 16 14:31 ./doc/specs/1012_FFTGeneratorProposal_Oct122012.pdf
+ 56 -r--r--r-- 1 steveri users       50698 Nov 26 09:43 ./doc/BlockDiagrams_v2.pdf
+ 32 -r-xr-xr-x 1 steveri users       31142 Feb 12 11:07 ./rtl/fft_scheduler.pm
+ 32 -r--r--r-- 1 steveri users       31988 Feb 10 07:42 ./rtl/fftctl.vp
+ 20 -r--r--r-- 1 steveri users       17265 Feb 10 08:48 ./tst/top_fft.vp
+ 20 -r--r--r-- 1 steveri users       17262 Feb 10 07:40 ./rtl/fftram.vp
+ 16 -rw-r--r-- 1 steveri users       12408 Dec  6 11:29 ./doc/fft_timing_diagram.pdf
+ 16 -r--r--r-- 1 steveri vlsi_group  15398 Oct 13 08:31 ./Makefile.synth
+ 12 -r-xr-xr-x 1 steveri users       11748 Feb 11 14:42 ./Makefile
+ 12 -r--r--r-- 1 steveri users        9503 Feb 10 11:55 ./tst/sram_init.pm
+ 12 -r--r--r-- 1 steveri users        8423 Jan 27 09:21 ./rtl/butterfly.vp
+ 12 -r--r--r-- 1 steveri users       10386 Jan  7 13:53 ./rtl/twiddle_lib.pm
+  8 -r-xr-xr-x 1 steveri users        7444 Feb 12 11:19 ./bin/golden_test.pl
+  8 -r-xr-xr-x 1 steveri users        7384 Jan 23 10:19 ./bin/TEST5.bash
+  8 -r-xr-xr-x 1 steveri users        6425 Feb 12 10:45 ./bin/golden_test.csh
+  8 -r-xr-xr-x 1 steveri users        6021 Feb 12 11:02 ./bin/fft_golden_model.pl
+  8 -r-xr-xr-x 1 steveri users        4195 Jan 28 15:29 ./bin/summarize_analysis.csh
+  8 -r--r--r-- 1 steveri users        7291 Feb  4 13:15 ./rtl/swizzler.pm
+  8 -r--r--r-- 1 steveri users        7269 Feb 10 09:13 ./rtl/SRAM.vp
+  8 -r--r--r-- 1 steveri users        6931 Feb 11 14:06 ./README.txt
+  8 -r--r--r-- 1 steveri users        6887 Feb 10 11:19 ./rtl/swizzle.vp
+  8 -r--r--r-- 1 steveri users        5119 Feb 10 07:34 ./doc/timing_notes.txt
+  8 -r--r--r-- 1 steveri users        4139 Feb 10 09:41 ./rtl/twiddle.vp
+  4 -r-xr-xr-x 1 steveri users        2525 Feb 12 11:02 ./bin/test_scheduler.pl
+  4 -r-xr-xr-x 1 steveri users        2066 Feb 12 11:02 ./bin/test_swizzler.pl
+  4 -r--r--r-- 1 steveri users        3103 Feb 10 10:45 ./tst/clock.vp
+  4 -r--r--r-- 1 steveri users        3086 Feb  1 16:59 ./bin/process_test5.awk
+  4 -r--r--r-- 1 steveri users         186 Feb 11 14:27 ./Makefile.local
+  4 -r--r--r-- 1 steveri users        1716 Feb 10 10:56 ./rtl/fftclock.vp
+  4 -r--r--r-- 1 steveri users        1667 Nov 25 07:28 ./rtl/fftgen.pm
+
+
+./README.txt
+./Makefile
+./Makefile.local
+./Makefile.synth
+./bin/fft_golden_model.pl
+./bin/golden_test.csh
+./bin/golden_test.pl
+./bin/process_test5.awk
+./bin/summarize_analysis.csh
+./bin/TEST5.bash
+./bin/test_scheduler.pl
+./bin/test_swizzler.pl
+./doc/BlockDiagrams_v2.pdf
+./doc/fft_timing_diagram.pdf
+./doc/timing_notes.txt
+./doc/specs/0925_FFTGeneratorProposal_Sept252012_rev.pdf
+./doc/specs/1012_FFTGeneratorProposal_Oct122012.pdf
+./doc/specs/1024_FFTConflictFree_Oct242012.pdf
+./doc/specs/Jarmo_FFT.pdf
+./rtl/butterfly.vp
+./rtl/fftclock.vp
+./rtl/fftctl.vp
+./rtl/fftgen.pm
+./rtl/fftram.vp
+./rtl/fft_scheduler.pm
+./rtl/SRAM.vp
+./rtl/swizzler.pm
+./rtl/swizzle.vp
+./rtl/twiddle_lib.pm
+./rtl/twiddle.vp
+./tst/top_fft.vp
+./tst/clock.vp
+./tst/sram_init.pm
+
+-rw-r--r-- 1 steveri users 1046881 Feb 12 15:16 /nobackup/steveri/github/fftgen/dist.tar.bz
+
+==============================================================================
+Building distribution 'dev.tar.gz':
+1964 -r--r--r-- 1 steveri users      2005236 Dec 21 12:06 ./ref/fft_algs/fft_scheduler.DBG.out.ref
+ 764 -r--r--r-- 1 steveri users       775856 Dec 21 12:14 ./ref/fft_algs/fft_scheduler.out.ref
+ 244 -r--r--r-- 1 steveri users       242478 Nov 26 09:44 ./doc/BlockDiagrams_v2.ps
+ 224 -r--r--r-- 1 steveri users       223605 Nov 12 09:17 ./ref/swizzle_inits_out.ref
+  60 -r--r--r-- 1 steveri users        53275 Nov 27 08:58 ./doc/fft_timing_diagram.ps
+  56 -rw-r--r-- 1 steveri users        50145 Jan 14 09:22 ./doc/dve_print.ps
+  40 -r--r--r-- 1 steveri users        36165 Nov 26 09:43 ./doc/BlockDiagrams_v2.odg
+  20 -r-xr-xr-x 1 steveri users        19897 Jan 30 14:28 ./bin/analyze_reads_and_writes.pl
+  16 -r--r--r-- 1 steveri users        15628 Feb  5 15:17 ./tst/top_fftram.vp
+  12 -r-xr-xr-x 1 steveri users         8914 Feb 12 09:34 ./bin/check_distribution_list.pl
+  12 -r-xr-xr-x 1 steveri users        11209 Oct 30 13:15 ./ref/fft_algs/rev_out_algs/alg_rev_out.pl
+  12 -r-xr-xr-x 1 steveri users        10747 Nov 18 11:14 ./ref/fft_algs/gen_swizzle_sched.pl
+  12 -r--r--r-- 1 steveri users         8853 Feb  5 15:11 ./tst/top_swizzle.vp
+   8 -r-xr-xr-x 1 steveri users         8112 Nov 12 10:00 ./ref/swizzle_inits.pl
+   8 -r-xr-xr-x 1 steveri users         7900 Nov 11 07:42 ./ref/fft_algs/alg_rev_in.pl
+   8 -r-xr-xr-x 1 steveri users         6364 Nov 11 10:33 ./ref/swizzle.pl
+   8 -rwxr-xr-x 1 steveri users         6719 Oct 24 15:09 ./ref/misc/fft_ref.pl
+   8 -rw-r--r-- 1 steveri vlsi_group    6617 Oct 14 07:34 ./ref/misc/fft1_16_4
+   8 -rw-r--r-- 1 steveri users         4260 Oct 14 07:32 ./ref/misc/fft1_16_1
+   8 -r--r--r-- 1 steveri users         7927 Oct 30 13:15 ./ref/fft_algs/rev_out_algs/csharp-reference-algorithm.txt
+   8 -r--r--r-- 1 steveri users         4822 Feb 11 14:21 ./doc/current_status.txt
+   4 -r-xr-xr-x 1 steveri users          971 Nov  3 08:03 ./bin/swizzle0_test1.bash
+   4 -r-xr-xr-x 1 steveri users           73 Oct 13 11:30 ./bin/test0_clock.csh
+   4 -r-xr-xr-x 1 steveri users          421 Oct 13 12:55 ./bin/test1_fftclock.csh
+   4 -r-xr-xr-x 1 steveri users         3128 Nov 11 10:14 ./ref/swizzle_reductio.pl
+   4 -r-xr-xr-x 1 steveri users         3108 Nov 17 07:16 ./ref/fft_algs/gen_twiddles.pl
+   4 -r-xr-xr-x 1 steveri users         1681 Nov 11 10:11 ./bin/swizzle0_buildtable.pl
+   4 -r-xr-xr-x 1 steveri users          167 Dec 22 09:00 ./ref/fft_algs/fft_scheduler.pl
+   4 -rwxr-xr-x 1 steveri users         3721 Feb 12 11:43 ./bin/make_distribution.csh
+   4 -rw-r--r-- 1 steveri users         2874 Feb 12 11:46 ./distribution_list.txt
+   4 -rw-r--r-- 1 steveri users         2834 Oct 24 14:17 ./ref/misc/fft-algs-in-c-and-basic-etc.txt
+   4 -rw-r--r-- 1 steveri users         1712 Oct 22 09:53 ./ref/waveform-notes.txt
+   4 -rw-r--r-- 1 steveri users         1223 Oct 24 11:38 ./ref/misc/fft.pl
+   4 -rw-r--r-- 1 steveri users         1170 Nov  1 11:32 ./doc/coverletter_121101.txt
+   4 -rw-r--r-- 1 steveri users         1135 Oct 24 14:42 ./ref/misc/dft-alg.txt
+   4 -r--r--r-- 1 steveri users          895 Oct 13 12:57 ./tst/top_fftclock.vp
+   4 -r--r--r-- 1 steveri users          711 Oct 30 13:18 ./ref/fft_algs/README_algs.txt
+   4 -r--r--r-- 1 steveri users          361 Oct 13 11:30 ./tst/top_clock.vp
+   4 -r--r--r-- 1 steveri users         2626 Oct 30 09:51 ./ref/fft_algs/alg_rev_in.ref.c
+   4 -r--r--r-- 1 steveri users         2229 Nov 26 08:49 ./tst/top_fftctl.vp
+   4 -r--r--r-- 1 steveri users         2064 Nov  4 16:54 ./tst/top_fftram0.vp
+   4 -r--r--r-- 1 steveri users         1994 Nov  2 22:03 ./bin/swizzle0_test1.out.ref
+   4 -r--r--r-- 1 steveri users         1960 Nov  3 07:38 ./tst/top_swizzle0.vp
+   4 -r--r--r-- 1 steveri users         1571 Nov 14 10:25 ./doc/README_doc.txt
+
+
+./distribution_list.txt
+./bin/analyze_reads_and_writes.pl
+./bin/check_distribution_list.pl
+./bin/make_distribution.csh
+./bin/swizzle0_buildtable.pl
+./bin/swizzle0_test1.bash
+./bin/swizzle0_test1.out.ref
+./bin/test0_clock.csh
+./bin/test1_fftclock.csh
+./doc/BlockDiagrams_v2.odg
+./doc/BlockDiagrams_v2.ps
+./doc/dve_print.ps
+./doc/coverletter_121101.txt
+./doc/current_status.txt
+./doc/fft_timing_diagram.ps
+./doc/README_doc.txt
+./ref/swizzle_inits_out.ref
+./ref/swizzle_inits.pl
+./ref/swizzle.pl
+./ref/swizzle_reductio.pl
+./ref/waveform-notes.txt
+./ref/fft_algs/alg_rev_in.pl
+./ref/fft_algs/alg_rev_in.ref.c
+./ref/fft_algs/fft_scheduler.DBG.out.ref
+./ref/fft_algs/fft_scheduler.out.ref
+./ref/fft_algs/fft_scheduler.pl
+./ref/fft_algs/gen_swizzle_sched.pl
+./ref/fft_algs/gen_twiddles.pl
+./ref/fft_algs/README_algs.txt
+./ref/fft_algs/rev_out_algs/alg_rev_out.pl
+./ref/fft_algs/rev_out_algs/csharp-reference-algorithm.txt
+./ref/misc/dft-alg.txt
+./ref/misc/fft1_16_1
+./ref/misc/fft1_16_4
+./ref/misc/fft-algs-in-c-and-basic-etc.txt
+./ref/misc/fft.pl
+./ref/misc/fft_ref.pl
+./tst/top_clock.vp
+./tst/top_fftclock.vp
+./tst/top_fftctl.vp
+./tst/top_fftram0.vp
+./tst/top_fftram.vp
+./tst/top_swizzle0.vp
+./tst/top_swizzle.vp
+
+-rw-r--r-- 1 steveri users 364515 Feb 12 15:16 /nobackup/steveri/github/fftgen/dev.tar.bz
+
+==============================================================================
+Building distribution 'gui.tar.gz':
+4 -r-xr-xr-x 1 steveri users  887 Dec  7 10:46 ./bin/vlsiweb_hack.csh
+4 -r-xr-xr-x 1 steveri users  821 Dec 10 14:02 ./bin/gui_hello.csh
+4 -r-xr-xr-x 1 steveri users 3917 Jan  8 13:44 ./bin/gui_test5.csh
+4 -rwxr-xr-x 1 steveri users  385 Dec  6 08:54 ./bin/stanford_vcs_hack
+4 -r--r--r-- 1 steveri users 1884 Dec  6 11:38 ./bin/gui_extras.template
+
+
+./bin/gui_extras.template
+./bin/gui_hello.csh
+./bin/gui_test5.csh
+./bin/stanford_vcs_hack
+./bin/vlsiweb_hack.csh
+
+-rw-r--r-- 1 steveri users 3051 Feb 12 15:16 /nobackup/steveri/github/fftgen/gui.tar.bz
+
+==============================================================================
+Tarfiles built:
+
+1024 -rw-r--r-- 1 steveri users 1046881 Feb 12 15:16 /nobackup/steveri/github/fftgen/dist.tar.bz
+ 356 -rw-r--r-- 1 steveri users  364515 Feb 12 15:16 /nobackup/steveri/github/fftgen/dev.tar.bz
+   4 -rw-r--r-- 1 steveri users    3051 Feb 12 15:16 /nobackup/steveri/github/fftgen/gui.tar.bz
+
