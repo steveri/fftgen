@@ -1,0 +1,5 @@
+# If things were organized better, all the LOCAL settings for Makefile would be in here.
+
+# PERL5LIB := $(PERL5LIB):$(DESIGN_HOME)/rtl
+# $(warning Added $(DESIGN_HOME)/rtl to PERL5LIB)
+

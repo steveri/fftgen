@@ -1,0 +1,379 @@
+//;# push (@INC, "./rtl"); # Now this happens when "Makefile.local" (sets PERL5LIB)
+//; require fftgen;        # log2(), iterate()
+//;
+// ---------------- Begin default Genesis2 parameter summary ----------------
+//
+//; # parameter() calls send default Genesis output to top of .v file
+//;
+//; my $nunits = parameter
+//;    (Name=>'n_butterfly_units', Val=>4,
+//;     Doc=>'Number of butterfly units.');
+//; 
+//; my $npoints = parameter
+//;    (Name=>'n_fft_points', Val=>16,
+//;     Doc=>'Number of complex data values to process.');
+//;
+//; my $op_width = parameter
+//;    (Name=>'op_width', Val=>32,
+//;     Doc=>'E.g. 64 (bits) for 32b each complex real+imaginary');
+//;
+//; my $SRAM_TYPE = parameter
+//;    (Name=>'SRAM_TYPE', Val=>"1PORT_DBLPUMP",
+//;     List=>["TRUE_1PORT", "TRUE_2PORT", "1PORT_DBLPUMP"],
+//;     Doc=>'What kind of SRAM should the FFT use?');
+//;
+//; my $test_mode = parameter
+//;    (Name=>'test_mode', Val=>"TEST1",
+//;     List=>["TEST0", "TEST1", "TEST2", "TEST3", "TEST4", "TEST5"],
+//;     Doc=>'TEST0: integer adds; TEST1: complex adds; TEST2: complex mults');
+//;
+// ---------------- End default Genesis2 parameter summary ----------------
+
+//; my $n_sram_ports = ($SRAM_TYPE eq "TRUE_1PORT") ? 1 : 2;
+//; my $nbanks = 4*$nunits;               # Number of mem banks (SRAMs) we need.
+//; my $nrows = $npoints/$nbanks;         # Number of rows per mem bank.
+//; my $bwidth = fftgen::log2($nbanks);   # Number of bits in bank address.
+//; my $rwidth = fftgen::log2($nrows);    # Number of bits in row address.
+//; my $bbits = ($bwidth-1).":0";         # Bit range for bank address.
+//; my $rbits = ($rwidth-1).":0";         # Bit range for row address.
+//; 
+//; # Number of bits in a data point (e.g. two 32-bit complex values => "[63:0]")
+//; my $obits = ($op_width-1).":0";       
+// nunits=`$nunits` npoints=`$npoints` nbanks=`$nbanks` nrows=`$nrows`
+
+//; # Quick error check
+//; (($nbanks <= $npoints) || ($n_sram_ports == 2)) # next must be "or" and not "and"
+//;    or $self->error("Too many butterfly units! Must be <= (n_fft_points/4)");
+//;
+// Generating SRAMs (SRAM000, SRAM001, SRAM002...SRAM015...)
+//; my %sram = ();
+//; for (my $i=0; $i<$nbanks; $i++) {
+//;     my $sname = sprintf("SRAM%03d", $i);
+//;     $sram{$i} = generate('SRAM', $sname,
+//;                          nwords=>$nrows,
+//;                          SRAM_TYPE =>$SRAM_TYPE,
+//;                          data_width=>$op_width,
+//;                          test_mode=>$test_mode);
+//; }
+
+////////////////////////////////////////////////////////////////////////
+// module `mname`
+//
+// Usage: fftram(n_butterfly_units, n_fft_points, op_width, test_mode), where
+//
+//   n_butterfly_units is the number of butterfly units to build (1,2,4,8,...)
+//   n_fft_points can be any power of two greater than 8;
+//   op_width is number of bits per FFT data point, e.g. 64 for 32b real + 32b imaginary
+//   test_mode tells what kind of FFT test to build and run e.g. "TEST5"
+
+module `mname`
+    (
+     input logic clk_i
+
+     // in1, in2 addresses from fftram - bank (SRAM) number bnum
+     //;# E.g. ", input logic [3:0] BFLY0_op1_bnum_i, input logic [3:0] BFLY0_op2_bnum_i";
+     //;# for (1 to $nunits-1) (e.g. BFLY0, BFLY1, BFLY2, BFLY3)
+     //; print fftgen::iterate($nunits,
+     //;                       "     ,input logic [$bbits] BFLY%d_op1_bnum_i  ",
+     //;                       "     ,input logic [$bbits] BFLY%d_op2_bnum_i\n");
+
+     // in1, in2 addresses from fftram - row (index) number rnum
+     //; print fftgen::iterate($nunits,
+     //;                       "     ,input logic [$rbits] BFLY%d_op1_rnum_i  ",
+     //;                       "     ,input logic [$rbits] BFLY%d_op2_rnum_i\n");
+
+     // Data from fftram to butterfly units: in1, in2
+     //; print fftgen::iterate($nunits,
+     //;                       "     ,output logic [$obits] BFLY%d_in1_data_o  ",
+     //;                       "     ,output logic [$obits] BFLY%d_in2_data_o\n");
+
+     // Data from butterfly units to fftram: out1, out2
+     //; print fftgen::iterate($nunits,
+     //;                       "     ,input logic [$obits] BFLY%d_out1_data_i  ",
+     //;                       "     ,input logic [$obits] BFLY%d_out2_data_i\n");
+
+     // Only used for TRUE_1PORT.  Otherwise, gets eliminated automatically, right?
+     // ...or...? Shold they be ifdef'ed?
+     // Bypass controls
+     //; my $lastbank = 4*$nunits - 1;
+     //; my $bufbits = ($nunits==4)?"[1:0]":"     ";
+     ,input logic [`$lastbank`:0] suppress_wz_i  // one bit per bank, set 100 ps after posedge
+     ,input logic [`$lastbank`:0] bypass_read_i  // one bit per bank, set 100 ps after posedge
+     ,input logic `$bufbits` bufnum_i[0:`$lastbank`]  // which buffer do we use for bypass?
+
+     ,input logic fft_started
+  );
+
+   // BEGIN WIRE DECLARATIONS__________________________________________________
+
+   //;# Just printing a comment to make the verilog more readable:
+   //; my $plural = ($nunits == 1) ? "" : "s";
+   // Wires to/from SRAMs:
+   // `$nunits` butterfly unit`$plural` means we need 4x`$nunits` = `$nbanks` single-port SRAM's named e.g. {SRAM000, SRAM001,...SRAM015}
+
+   //;# Wires to/from SRAMs, e.g.
+   //;# logic [3:0] SRAM000_ix; logic [63:0] SRAM000_rd_data; ...
+   //;# logic [3:0] SRAM001_ix; logic [63:0] SRAM001_rd_data; ...
+   //; for (my $i=0; $i<$nbanks; $i++) {
+   //;     my $sname = sprintf("SRAM%03d", $i);  # "000", "001", ... "015" etc.
+   logic [`$rbits`] `$sname`_ix;   logic [`$op_width-1`:0] `$sname`_rd_data;   logic [`$op_width-1`:0] `$sname`_wr_data;   logic `$sname`_ez;   logic `$sname`_wz;
+   //; }
+
+   //;##################################################################################
+   // (op1,op2)_"match" wires TRUE iff (op1,op2) address matches SRAM id ([0], [1], ...)
+   // `$nunits` butterfly unit`$plural` means we need 4x`$nunits` = `$nbanks` single-port SRAM's named e.g. {SRAM000, SRAM001,...SRAM015}
+   //;
+   //;# E.g.:  "logic BFLY0_op1_match[0:7];   logic BFLY0_op2_match[0:7];"
+   //; for (my $i=0; $i < $nunits; $i++) {
+   //;     my $bfly = "BFLY$i";
+   //;     my $nn = sprintf("%2d", $nbanks-1);
+   logic `$bfly`_op1_match[0:`$nn`];    logic `$bfly`_op2_match[0:`$nn`];
+   //; }
+
+   // Bypass controls
+   //; my $nbanks = 4 * $nunits;
+   //; my $lastbank = $nbanks - 1;
+   //; my $bufbits = ($nunits==4)?"[1:0]":"     ";
+
+   //////////////////////////////////////////////////////////////////////////////
+   // Need one bypass buffer for each butterfly unit.
+   //; if ($nunits==1) {
+   logic [`$obits`] bypass_buffer;         // Bypass buffer
+   //;
+   //; } elsif ($nunits==2) {   
+   logic [`$obits`] bypass_buffer[0:1];    // Two bypass buffers
+   //;
+   //; } else {   
+   logic [`$obits`] bypass_buffer[0:3];    // Four bypass buffers
+   //; }
+
+   // For debugging the bypass buffer contents.
+   logic [31:0]     bbr[0:`$lastbank`];  // Real part of value in bypass buffer.
+   logic [31:0]     bbi[0:`$lastbank`];  // Imag part of value in bypass buffer.
+
+
+
+
+   // For a clean waveform view...
+   initial bypass_buffer = {default:'x}; // Tricky...!
+
+   // END WIRE DECLARATIONS____________________________________________________
+
+   // Instantiate SRAM's (SRAM000, SRAM001, SRAM002...SRAM015) (.remote(local))
+   //;# E.g.: SRAM_unq1  SRAM000( .clk_i(clk_i), .ez_i(SRAM000_ez), .wz_i(SRAM000_wz), .addr_i(SRAM000_ix), .rd_data_o(SRAM000_rd_data), .wr_data_i(SRAM000_wr_data) );
+   //;# E.g.: SRAM_unq1  SRAM001( .clk_i(clk_i), .ez_i(SRAM001_ez), .wz_i(SRAM001_wz), .addr_i(SRAM001_ix), .rd_data_o(SRAM001_rd_data), .wr_data_i(SRAM001_wr_data) );
+   //;# TODO: should probably be an array...!
+   //; for (my $i=0; $i<$nbanks; $i++) {
+   //;     my $sname = sprintf("SRAM%03d", $i);
+   `$sram{$i}->instantiate()`( .clk_i(clk_i), .ez_i(`$sname`_ez), .wz_i(`$sname`_wz), .addr_i(`$sname`_ix), .rd_data_o(`$sname`_rd_data), .wr_data_i(`$sname`_wr_data) );
+   //; }
+
+   //////////////////////////////////////////////////////////////////////////////
+   // ez signals for SRAMs
+   //; my $new_timing = 0;
+   //; my ($open_paren, $close_paren) = ("(", ")"); # Yeah, this is readable.
+   //;
+   //; for (my $snum=0; $snum<$nbanks; $snum++) {
+   //;     my $sram = sprintf("SRAM%03d", $snum);
+   assign `$sram`_ez = ~fft_started | ~`$open_paren`
+   //;     for (my $i=0; $i < $nunits; $i++) {
+   //;         if ($i < ($nunits-1)) {
+        (BFLY`$i`_op1_bnum_i == `$snum` ) | (BFLY`$i`_op2_bnum_i == `$snum` ) |
+   //;         } else {
+        (BFLY`$i`_op1_bnum_i == `$snum` ) | (BFLY`$i`_op2_bnum_i == `$snum` ) | ~`${sram}`_wz `$close_paren`;
+   //;         }
+   //;     }
+   //; }
+
+   //;#    //; if (1 || $SRAM_TYPE eq "TRUE_1PORT") { # BUG/FIXME/TODO
+   // 
+   //////////////////////////////////////////////////////////////////////////////
+   // Bypass buffer control signals.  Only used for TRUE_1PORT.
+   // Otherwise...what...gets eliminated automatically, right?  BUG/FIXME/TODO
+
+//;#    // Big trouble if don't initialize bypass_buffer control signals.
+//;#    always @(posedge fft_started) begin
+//;#       suppress_wz <= 0;
+//;#    end
+
+   //; my $real="63:32"; # Real part
+   //; my $imag="31: 0"; # Imaginary part
+   //; sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
+   //; sub r { my $s = shift; return sr("${s}[$real]"); }
+   //; sub i { my $s = shift; return sr("${s}[$imag]"); }
+   //; sub ri{ my $s = shift; return r($s).", ".i($s); }
+
+   // Ugly but necessary...solely for debugging the bypass buffer...
+
+   //; for (my $i = 0; $i < $nbanks; $i++) {
+   //;     my $nn  = sprintf("%2d", $i);
+   //;     my $nnn = sprintf("%03d", $i);
+   //;     my $buffer = ($nunits==1) ? "bypass_buffer" : "bypass_buffer[bufnum_i[$nn]]";
+   assign {bbr[`$nn`], bbi[`$nn`]} = `$buffer`; // Separate 64bit complex into two 32bit components.
+   //; }
+
+   // TODO: could probably replace ugly repetitive "$display" calls w/single beautiful "task".
+   always @ (posedge clk_i) begin 
+      //; for (my $i = 0; $i < $nbanks; $i++) {
+      //;     my $nn  = sprintf("%2d", $i);
+      //;     my $bufnum = ($nunits==1) ? "0" : "bufnum_i[$nn]";
+      if (bypass_read_i[`$nn`]) $display("FOOG %6d Bypassed SRAM `$i`, read  (%9.6f,%9.6f) from bypass_buffer[%d]",
+                                    $time, $bitstoshortreal(bbr[`$nn`]), $bitstoshortreal(bbi[`$nn`]), `$bufnum`);
+      //; }
+   end
+
+   //////////////////////////////////////////////////////////////////////////////////
+   // If suppress_wz was set (at posedge clk above), we suppress write to the
+   // indicated SRAM.  Contents originally destined for SRAM now go to bypass_buffer.
+
+   // If I were more paranoid, maybe each case would get its own "@ (negedge clk)"?
+   always @ (posedge clk_i) begin
+      //;#
+      //;#  if (suppress_wz[ 0]) bypass_buffer[bufnum_i[ 0]] <= SRAM000_wr_data;
+      //;#  if (suppress_wz[ 1]) bypass_buffer[bufnum_i[ 1]] <= SRAM001_wr_data;
+      //;#  ...
+      //;#  if (suppress_wz[15]) bypass_buffer[bufnum_i[15]] <= SRAM015_wr_data;
+
+      // TODO again, replace ugly repetitive $display w/a task.
+      // if nunits == 1 this (suppress_wz) is one-hot (or zero)
+      //; for (my $i = 0; $i < $nbanks; $i++) {
+      //;     my $nn  = sprintf("%2d", $i);
+      //;     my $nnn = sprintf("%03d", $i);
+      //;     my $bufnum = ($nunits==1) ? "" : "[bufnum_i[$nn]]";
+      //;     my $bufnum2 = ($nunits==1) ? "0" : "bufnum_i[$nn]";
+      if (suppress_wz_i[`$nn`]) begin
+         bypass_buffer`$bufnum` <= SRAM`$nnn`_wr_data;
+         $display("FOOG %6d Bypassed SRAM `$i`, wrote (%9.6f,%9.6f) to bypass_buffer[%d]",
+               $time, `ri("SRAM${nnn}_wr_data")`, `$bufnum2`);
+      end
+      //; }
+    end
+
+   //////////////////////////////////////////////////////////////////////////////
+   // wz signals.  If Anyone wants to access a given bank n (op1_bnum==1),
+   // set wz(n) (to zero), unless suppress_wz says not to.
+
+   //;# The timing changes according to whether we have a 1port or a 2port SRAM.
+   //; my ($wz_event, $wz_value);
+//;#    //; my $swz = "suppress_wz";
+   //;
+   //; my ($open_paren, $close_paren) = ("(", ")"); # Yeah, this is readable.
+   //; for (my $snum=0; $snum<$nbanks; $snum++) {
+   //;     my $sram = sprintf("SRAM%03d", $snum);
+   //;     if ($n_sram_ports == 2) {
+   //;         $wz_event = "clk_i";
+   //;         $wz_value = "clk_i";
+   //;     }
+   //;     elsif ($n_sram_ports == 1) {
+   //;         $wz_event = "posedge clk_i";
+   //;         $wz_value = "suppress_wz_i[$snum]";
+   //;     }
+   //;
+   //;     print "   always @ ($wz_event) begin\n";
+   //;     print "      if ( fft_started & (\n";
+   //;
+   //;     my $i; for ($i=0; $i < ($nunits-1); $i++) {
+   //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum ) |\n";
+   //;     }
+   //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
+   //;
+   //;     print "     )) begin\n";
+   //;     print "         ${sram}_wz = $wz_value;\n";
+   //;     print "   end else begin\n";
+   //;     print "         ${sram}_wz = 1;\n";
+   //;     print "      end\n";
+   //;     print "   end\n";
+   //;     print "\n";
+   //; }
+
+   always @(clk_i) if (fft_started) begin
+      $display("");
+      $display("fftram %1d: fft_started = %1d", $time, fft_started);
+      $display("fftram %1d: BFLY0_op1_bnum_i = %1d", $time, BFLY0_op1_bnum_i);
+      $display("");
+      $display("fftram %1d: SRAM000_ez = %1d", $time, SRAM000_ez);
+      $display("fftram %1d: SRAM001_ez = %1d", $time, SRAM001_ez);
+      $display("fftram %1d: SRAM002_ez = %1d", $time, SRAM002_ez);
+      $display("fftram %1d: SRAM003_ez = %1d", $time, SRAM003_ez);
+      $display("");
+      $display("fftram %1d: SRAM000_wz = %1d", $time, SRAM000_wz);
+      $display("fftram %1d: SRAM001_wz = %1d", $time, SRAM001_wz);
+      $display("fftram %1d: SRAM002_wz = %1d", $time, SRAM002_wz);
+      $display("fftram %1d: SRAM003_wz = %1d", $time, SRAM003_wz);
+      $display("");
+   end
+
+   //////////////////////////////////////////////////////////////////////////////
+   // SRAM address (ix) to access.
+   //; for (my $snum=0; $snum<$nbanks; $snum++) {
+   //;     my $sram = sprintf("SRAM%03d", $snum);
+   assign `$sram`_ix = 
+   //;     for (my $i=0; $i < $nunits; $i++) {
+   //;         my $term = ($i == ($nunits-1)) ? ": 'x;" : ":";
+        (BFLY`$i`_op1_bnum_i  == `$snum` ) ? BFLY`$i`_op1_rnum_i  : (BFLY`$i`_op2_bnum_i  == `$snum` ) ? BFLY`$i`_op2_rnum_i `$term`
+   //;     }
+   //;     print "\n";
+   //; }
+
+   //; foreach my $p ("1", "2") {
+   //////////////////////////////////////////////////////////////////////////////
+   // op`$p` match signals
+   //
+   //;     for (my $i=0; $i < $nunits; $i++) { my $bfly = "BFLY$i";
+   //;         for (my $snum=0; $snum<$nbanks; $snum++) {
+   //;             my $m = sprintf("match[%03d]", $snum);
+   //;             my $s = sprintf("%2d", $snum);
+   assign `$bfly`_op`$p`_match[`$s`] = (`$bfly`_op`$p`_bnum_i == `$s`) ? 1'b1 : 1'b0;
+   //;         }
+   //;     print "\n";
+   //;     }
+   //;     print "\n";
+   //; }
+
+   //; foreach my $p ("1", "2") {
+   //////////////////////////////////////////////////////////////////////////////
+   // SRAM data in`$p` OUT from sram (or bypass buffer) to butterfly unit
+   //
+   //;#   assign BFLY0_in1_data_o =                   <=  BUG/FIXME/TODO inaccurate
+   //;#      ( BFLY0_op1_match[0] ) ? (bypass000 ? (buf000 : SRAM000_rd_data)) :
+   //;#      ( BFLY0_op1_match[1] ) ? (bypass001 ? (buf001 : SRAM001_rd_data) :
+   //;#      ( BFLY0_op1_match[2] ) ? (bypass002 ? (buf002 : SRAM002_rd_data) :
+   //;#      ( BFLY0_op1_match[3] ) ? (bypass003 ? (buf003 : SRAM003_rd_data) : 'x;
+   //;     for (my $i=0; $i < $nunits; $i++) { my $bfly = "BFLY$i";
+   assign `$bfly`_in`$p`_data_o =
+   //;         for (my $snum=0; $snum<$nbanks; $snum++) {
+   //;             my $nn = sprintf("%2d", $snum);
+   //;             my $nnn = sprintf("%03d", $snum);
+   //;             my $term = ($snum == ($nbanks-1)) ? ": 'x;" : ":";
+   //;             my $bufnum = ($nunits==1)? "" : "[bufnum_i[$nn]]";
+      `$bfly`_op`$p`_match[`$nn`] ? (bypass_read_i[`$nn`] ? bypass_buffer`$bufnum` : SRAM`$nnn`_rd_data) `$term`
+   //;         }
+   //;         print "\n";
+   //;     }
+   //; }
+
+   //////////////////////////////////////////////////////////////////////////////
+   // SRAM data (out1,out2) IN to sram (or bypass buffer) from butterfly unit
+
+   //;     for (my $snum=0; $snum<$nbanks; $snum++) {
+   //;         my $nnn = sprintf("%03d", $snum);
+   //;         my $nn  = sprintf("%2d", $snum);
+   //;
+   assign SRAM`$nnn`_wr_data =
+   //;         for (my $i=0; $i < $nunits; $i++) { my $bfly = "BFLY$i";
+   //;             my $term = ($i == ($nunits-1)) ? " 'x;" : "";
+        `$bfly`_op1_match[`$snum`] ? `$bfly`_out1_data_i : `$bfly`_op2_match[`$snum`] ? `$bfly`_out2_data_i :`$term`
+   //;         }
+   //;     }
+
+   always @(posedge clk_i) begin
+      // Along for the ride...
+      $display("");
+      $display("fftram %1d: BFLY0_op1_match[0] = %1d", $time, BFLY0_op1_match[0]);
+      $display("fftram %1d: BFLY0_out1_data_i = %16x", $time, BFLY0_out1_data_i);
+//;#  $display("fftram %1d: SRAM000_wr_data   = %16x", $time, SRAM000_wr_data);
+      $display("");
+   end
+                                
+endmodule
+
