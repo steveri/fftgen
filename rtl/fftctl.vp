@@ -227,9 +227,10 @@ module `mname`
    logic [0:`$lastbank`] precomputed_bypass_read [0:`$nops`];      // {0,1}
    logic `$bufbits` precomputed_bufnum[0:`$lastbank`][0:`$nops`];      // {0,1,2,3}
 
+   //; my $cycle_num_bits = fftgen::log2($ncalcs_per_unit);
    // Need to count through array(s) from 0 to `$ncalcs_per_unit-1`
    // May need to count a cycle or two beyond minimum!  (Why?)
-   logic [`fftgen::log2($ncalcs_per_unit)`:0] cycle_num;
+   logic [`$cycle_num_bits`:0] cycle_num;
 
    // out2_offset is used to calculate op2 from op1.\n");
    logic [`fftgen::log2($npoints)`:0] out2_offset;
@@ -577,7 +578,7 @@ module `mname`
    // INIT BLOCKS
 
    initial begin
-      cycle_num   <= 0;
+      cycle_num   <= `$cycle_num_bits+1`'b0;
       STARTED     <= 0;
       LAST        <= 1;
       stageno     <= 0;
