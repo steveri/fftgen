@@ -1,0 +1,410 @@
+An area-efficient minimum-time FFT schedule using single-ported SRAM.
+
+Because of the exhaustive repairing of data between successive stages
+of a typical FFT implementation, memory access patterns occur with
+contantly-changing strides, making it difficult to interleave the data
+for reliable conflict-free access of operand pairs.  We introduce a
+method of "swizzling" the data locations so as to guarantee
+conflict-free access within any given stage and, with minimal support
+for buffering, conflict-free access between adjoining stages as well.
+
+As a result, implementations that would naively require either a
+fully-associative, or at the very least a multiported, register file,
+can be implemented using four single-ported banks of memory per
+butterfly unit, plus one bypass buffer.  Because, for each cycle of
+operation, a butterfly unit has to read two inputs and write two
+results, we believe this is close to the most efficient memory
+configuration for a resource-constrained FFT.
+
+----------------------------------------------------------------------
+
+FFT aficionados will readily recognize the familiar butterfly network
+of Figure FIXME.
+
+         0     0       0             0
+          \_._/ \     / \           /
+          /   \  \_._/   \         /
+         1     1 /   \ 1  \       /  1
+                X     X \  \     /  /
+         2     2 \_._/ 2 \  \_._/  / 2
+          \_._/  /   \  \ \ /   \ / /
+          /   \ /     \  \ X     X /
+         3     3       3  X \_._/ X  3
+                        \/ \/   \/ \/
+                        /\ /\_._/\ /\
+         4     4       4  X /   \ X  4
+          \_._/ \     /  / X     X \  
+          /   \  \_._/  / / \_._/ \ \
+         5     5 /   \ 5 /  /   \  \ 5
+                X     X /  /     \  \ 
+         6     6 \_._/ 6  /       \  6
+          \_._/  /   \   /         \
+          /   \ /     \ /           \
+         7     7       7             7
+
+
+Figure FIXME: DIT variant of common FFT butterfly network.  Each
+"butterfly unit" takes in two operands and produces two results.
+[cite wikipedia maybe].
+
+To compute an n-point Fourier transform in minimum time, a standard
+FFT conceptually requires n/2 butterfly units operating in parallel
+for each of log(n) successive stages of computation.  Figure FIXME has
+8 data points being transfomred by a total of 12 butterfly units over
+three stages.  Each stage conceptually reads all n operands at once,
+transforms them and then passes the n results through to the next
+stage of computation.  The FFT requires only enough memory to hold the
+intermediate results as they pass from one stage to the next, for
+which n registers suffice.
+
+However, it's not always possible or efficient to implement enough
+butterfly units to "fully resource" an FFT, especially as n becomes
+large.  A 1024-point FFT would require 512 butterfly units.  This
+problem can be solved by building fewer butterfly units and using each
+one multiple times within a given stage of computation.  In the limit,
+we could have a single butterfly unit successively reading operands
+and writing back results until the operation has been completed.  
+
+At the point where we're using a small number of butterfly units to
+iterate over a large set of data, we no longer need the complete set of
+n registers as intermediate storage between stages and can consider
+more efficient forms of memory such as block RAM.
+
+In the example of Figure 2, a single butterfly unit B0 performs an
+eight-point transform over thirteen successive cycles of operation,
+B0(0) through B0(11).  In cycle 0, B0 reads operands 0 and 1.  In
+cycle 1, B0 writes operands 0 and 1 back to memory and reads operands
+2 and 3, and so on.  Steady state operation requires two reads and two
+writes per cycle, all to separate locations, thus the most naive
+implementation would require four-ported memory.  In the best case,
+however, we could use four banks of single-ported memory---but that
+requires extreme trickiness.
+
+To successfully use single-ported memory in the example of Figure 2,
+we have to guarantee that, of the four memory accesses that occur in
+any given cycle, each operand resides in a different memory bank than
+the other three.  We could interleave the operands across the four
+banks of memory, i.e. operands 0 and 4 in bank 0, operands 1 and 5 in
+bank 1 and so on.  This guarantees conflict-free access for a little
+while, at least (Figure 3).  In cycle 4, however, the bank-2 writeback
+of data-point 6 calculated in the previous cycle conflicts with the
+read of data-point 2, also residing in bank 2.  Conflicts continue
+every cycle thereafter until termination of the complete transform in
+cycle 11.
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Figure 3
+
+//---------------------------- Stage 0 ----------------------------//
+
+//  0. Data points ( 0, 1) => banks ( 0, 1)
+//  1. Data points ( 2, 3) => banks ( 2, 3)
+//  2. Data points ( 4, 5) => banks ( 0, 1)
+//  3. Data points ( 6, 7) => banks ( 2, 3)
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  4. Data points ( 0, 2) => banks ( 0, 2) * RW conflict on bank 2 vs. prev cycle (RW2)
+//  5. Data points ( 4, 6) => banks ( 0, 2) * RW conflicts on banks 0,2 (RW0, RW2)
+//  6. Data points ( 1, 3) => banks ( 1, 3) * RW1, RW3
+//  7. Data points ( 5, 7) => banks ( 1, 3) * RW1, RW3
+
+//---------------------------- Stage 2 ----------------------------//
+
+//  8. Data points ( 0, 4) => banks ( 0, 0) * RR conflict on bank 0 (RR0)
+//  9. Data points ( 1, 5) => banks ( 1, 1) * WW0, RR1
+// 10. Data points ( 2, 6) => banks ( 2, 2) * WW1, RR2
+// 11. Data points ( 3, 7) => banks ( 3, 3) * WW2, RR3 (plus WW3 on final writeback)
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Figure 4
+
+/////////////////////////////////////////////////////////////////////
+// 8 FFT data points; one butterfly unit.
+
+//---------------------------- Stage 0 ----------------------------//
+
+//  0. Data points ( 0, 1) => banks ( 0, 3)
+//  1. Data points ( 2, 3) => banks ( 2, 1)
+//  2. Data points ( 4, 5) => banks ( 1, 2) * RW1, RW2
+//  3. Data points ( 6, 7) => banks ( 3, 0)
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  4. Data points ( 0, 2) => banks ( 0, 2) * RW0
+//  5. Data points ( 4, 6) => banks ( 1, 3)
+//  6. Data points ( 1, 3) => banks ( 3, 1) * RW3, RW1
+//  7. Data points ( 5, 7) => banks ( 2, 0)
+
+//---------------------------- Stage 2 ----------------------------//
+
+//  8. Data points ( 0, 4) => banks ( 0, 1) * RW0
+//  9. Data points ( 1, 5) => banks ( 3, 2)
+// 10. Data points ( 2, 6) => banks ( 2, 3) * RW2, RW3
+// 11. Data points ( 3, 7) => banks ( 1, 0)
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+
+
+
+Fortunately, FIXME shows a more sophisticated mapping of banks to data
+poihnts, such that the operand pairs never conflict during a given
+read or write (Figure 4).  Note that, although there are no read-read
+conflicts and no write-write conflicts within the same cycle, there are still occasional
+cross-cycle read-write conflicts, where the writeback from a previous
+cycle conflicts in the same bank with an overlapping current-cycle read.  
+
+Although it may not yet be obvious, the ability to limit conflicts to
+only cross-cycle collisions is enormously helpful.  Note that, within
+a given stage, the order of computation is not important.  Thus, we
+can reorder the sequence of operation to try and miminimize cross
+cycle computation.  For instance, in Figure 4, we can swap the
+third and fourth computations in each stage, thus eliminating six
+conflicts, as seen in the new schedule of Figure 5.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Figure 5: Almost conflict free.
+
+/////////////////////////////////////////////////////////////////////
+// 8 FFT data points; one butterfly unit.
+
+//---------------------------- Stage 0 ----------------------------//
+
+//  0. Data points ( 0, 1) => banks ( 0, 3)
+//  1. Data points ( 2, 3) => banks ( 2, 1)
+//  3. Data points ( 6, 7) => banks ( 3, 0)
+//  2. Data points ( 4, 5) => banks ( 1, 2)
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  4. Data points ( 0, 2) => banks ( 0, 2) * RW0
+//  5. Data points ( 4, 6) => banks ( 1, 3)
+//  7. Data points ( 5, 7) => banks ( 2, 0)
+//  6. Data points ( 1, 3) => banks ( 3, 1)
+
+//---------------------------- Stage 2 ----------------------------//
+
+//  8. Data points ( 0, 4) => banks ( 0, 1) * RW0
+//  9. Data points ( 1, 5) => banks ( 3, 2)
+// 11. Data points ( 3, 7) => banks ( 1, 0)
+// 10. Data points ( 2, 6) => banks ( 2, 3)
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+
+Thanks to FIXME's algorithm, we have eliminated all intrastage bank
+conflicts, leaving only a single conflict at each interstage
+boundary.  How did this happen?
+
+It turns out that FIXME's algorithm has the property that, within a
+given stage, data-point pairs always map to pairs that are disjoint
+within themselves, i.e. two data points in a pair never map to the
+same bank.  More importantly however, the pairs form disjoint sets
+such that *half the pairs belong to one set and half to the other.*
+For example, in Stage 1 of Figures 4 and 5, half the pairs are *odd* (0,2)
+and half are *even* (1,3).  Odd pairs will never conflict with even pairs.
+Thus if we schedule odd and even alternately, we guarantee
+collision-free operation.  In Stages 0 and 2, half the pairs are *lo*
+(0,1) and half are *hi* (2,3).
+
+In fact, it appears that FIXME's algorithm guarantees that a given
+stage will always pairs that are either *odd-even* pairs or *hi-lo*
+pairs, with a third possibility that there can be *in-out* pairs, as
+defined in Figure 6.
+
+Figure 6
+
+Type  Member of what group  Example  Defined by 
+even  odd-even              (0,2)    LSB(i)==0
+odd   odd-even              (1,3)    LSB(i)==1
+
+lo    hi-lo                 (0,1)    i <  n/2
+hi    hi-lo                 (2,3)    i >= n/2
+
+out   in-n-out              (0,3)    XOR(i)==0
+in    in-n-out              (1,2)    XOR(i)==1
+
+
+It is obvious that, if any given stage is a member of one of these
+groups (odd-even, hi-lo or in-n-out), there will be no intrastage
+conflicts and that there need be at most one interstage conflict,
+always caused when the writeback from the last cycle of stage i
+happens at the same time as the read during the first cycle of stage
+i+1.  We can show that this property holds not only for n=8 datapoints
+but for any power of 2 up to 1024; for example, Figure 7 shows part of
+the schedule for n=32, where stage 0 is in-out, stage 1 is odd-even
+and stage 2 is hi-lo.  We can probably prove that the property
+continues to hold for powers of 2 above 1024, but we're too lazy to do
+that proof ourselves.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Figure 7
+
+//---------------------------- Stage 0 in-out ----------------------------//
+
+//  0. Index ( 0, 1) => banks ( 0, 3)
+//  1. Index ( 2, 3) => banks ( 2, 1)
+//  2. Index ( 4, 5) => banks ( 1, 2)
+//  3. Index ( 6, 7) => banks ( 3, 0)
+...
+// 12. Index (24,25) => banks ( 3, 0)
+// 13. Index (26,27) => banks ( 1, 2)
+// 14. Index (28,29) => banks ( 2, 1)
+// 15. Index (30,31) => banks ( 0, 3)
+
+//---------------------------- Stage 1 odd-even ----------------------------//
+
+// 16. Index ( 0, 2) => banks ( 0, 2) * RW collision on bank 0
+// 17. Index ( 4, 6) => banks ( 1, 3)
+// 18. Index ( 8,10) => banks ( 2, 0)
+// 19. Index (12,14) => banks ( 3, 1)
+...
+// 28. Index (17,19) => banks ( 2, 0)
+// 29. Index (21,23) => banks ( 3, 1)
+// 30. Index (25,27) => banks ( 0, 2)
+// 31. Index (29,31) => banks ( 1, 3)
+
+//---------------------------- Stage 2 ----------------------------//
+
+// 32. Index ( 0, 4) => banks ( 0, 1) * RW collision on bank 1
+// 33. Index ( 8,12) => banks ( 2, 3)
+// 34. Index (16,20) => banks ( 1, 0)
+// 35. Index (24,28) => banks ( 3, 2)
+...
+// 44. Index ( 3, 7) => banks ( 1, 0)
+// 45. Index (11,15) => banks ( 3, 2)
+// 46. Index (19,23) => banks ( 0, 1)
+// 47. Index (27,31) => banks ( 2, 3)
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+
+Note the implications for parallel operation of more than one
+butterfly unit at a time.  So long as we have four times the number of
+banks as we have butterfly units, and so long as the butterfly units
+all access nonredundant operand pairs of the same type, we can
+interleave types (i.e. odd vs. even) for nonconflicting parallel access.
+FIXME's algorithm conveniently provides operands having the right
+properties, all we have to do is supply the intrastage gruoping and
+ordering.  Figure 8 shows a complete schedule for two butterfly units
+operating in parallel to transform 16 data points.  here we see two
+cconflicts at each of two interstage boundaries; first when in-out
+stage 0 transitions to odd-even stage 1, and then later when odd-even
+stage 2 transitions to hi-lo stage 3.  Naturally no conflicts occur
+between stages 1 and 2, both of which are of the same (odd-even) type.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Figure 8
+
+//---------------------------- Stage 0 ----------------------------//
+
+//  0 (cy 0) Data points ( 0, 1) => banks ( 0, 3)
+//  1 (cy 0) Data points ( 6, 7) => banks ( 2, 1)
+
+//  2 (cy 1) Data points ( 4, 5) => banks ( 4, 7)
+//  3 (cy 1) Data points ( 2, 3) => banks ( 6, 5)
+
+//  4 (cy 2) Data points ( 8, 9) => banks ( 1, 2)
+//  5 (cy 2) Data points (14,15) => banks ( 3, 0)
+
+//  6 (cy 3) Data points (12,13) => banks ( 5, 6) * op2 (ix13) to buf0
+//  7 (cy 3) Data points (10,11) => banks ( 7, 4) * op2 (ix11) to buf1
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  8 (cy 4) Data points ( 0, 2) => banks ( 0, 6)
+//  9 (cy 4) Data points ( 4, 6) => banks ( 4, 2)
+
+// 10 (cy 5) Data points ( 8,10) => banks ( 1, 7)
+// 11 (cy 5) Data points (12,14) => banks ( 5, 3)
+
+// 12 (cy 6) Data points ( 9,11) => banks ( 2, 4) * op2 (ix11) from buf1
+// 13 (cy 6) Data points (13,15) => banks ( 6, 0) * op1 (ix13) from buf0
+
+// 14 (cy 7) Data points ( 1, 3) => banks ( 3, 5)
+// 15 (cy 7) Data points ( 5, 7) => banks ( 7, 1)
+
+//---------------------------- Stage 2 ----------------------------//
+
+// 16 (cy 8) Data points ( 0, 4) => banks ( 0, 4)
+// 17 (cy 8) Data points ( 9,13) => banks ( 2, 6)
+
+// 18 (cy 9) Data points ( 1, 5) => banks ( 3, 7)
+// 19 (cy 9) Data points ( 8,12) => banks ( 1, 5)
+
+// 20 (cy 10) Data points ( 2, 6) => banks ( 6, 2)
+// 21 (cy 10) Data points (11,15) => banks ( 4, 0)
+
+// 22 (cy 11) Data points ( 3, 7) => banks ( 5, 1) * op2 (ix07) to buf0
+// 23 (cy 11) Data points (10,14) => banks ( 7, 3) * op2 (ix14) to buf1
+
+//---------------------------- Stage 3 ----------------------------//
+
+// 24 (cy 12) Data points ( 0, 8) => banks ( 0, 1)
+// 25 (cy 12) Data points ( 1, 9) => banks ( 3, 2)
+
+// 26 (cy 13) Data points ( 2,10) => banks ( 6, 7)
+// 27 (cy 13) Data points ( 3,11) => banks ( 5, 4)
+
+// 28 (cy 14) Data points ( 6,14) => banks ( 2, 3) * op2 (ix14) from buf1
+// 29 (cy 14) Data points ( 7,15) => banks ( 1, 0) * op1 (ix07) from buf0
+
+// 30 (cy 15) Data points ( 4,12) => banks ( 4, 5)
+// 31 (cy 15) Data points ( 5,13) => banks ( 7, 6)
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+We note that, of 24 configurations studied (datapoints n=8 to 1024 by
+powers of two; one, two or four butterfly units operating in
+parallel), conflicts will only occur on interstage boundaries, and
+they only occur when the two stages are of different types
+(i.e. odd-even versus hi-lo).  Moreover, it turns out that where
+conflicts do occur, there is exactly one conflict for each butterfly
+unit.  In Figure 8 there are two butterfly units and thus two
+conflicts at each of the two mismatched-stage-type transitions.
+
+Given the limited nature of bank conflicts, we can implement minimal
+bypass storage in the form of one buffer per butterfly unit.  When a
+collision occurs, one of the two conflicting locations can live in the
+bypass buffer until its next use.  Thus in Figure 8, at cycle 3, the
+writeback of datapoints 11 and 13, to banks 6 and 4 respectively,
+collide with the cycle-4 reads of datapoints 2 and 4.  Therefore,
+instead of writing datapoints 11 and 13 to SRAM, we place them
+temporarily in bypass buffers until they are needed later, in cycle 6.
+
+We believe, but have not yet attempted to prove, that this property
+holds for datapoints n>1024 and butterfly units b>4.
+
+An automatic FFT generator at Stanford University uses this algorithm
+to generate single-port SRAM solutions for any combination of
+datapoints from n=8 to 1024 and either one, two or four butterfly
+units running in parallel [ref].  The generator can also produce
+solutions for dual-port SRAM or single-port double-pumped SRAM
+(virtual dual-porting).
+
+Analysis / Tradeoffs / Future work
+
+Single-port RAM is faster and requires less area to implement versus
+two-port RAM.  Our single-port solution, however, requires one extra
+bypass buffer per butterfly unit.  Also, 2-port scheduling is fairly
+straightforward and can be implemented on-the-fly using a small amount
+of logic, whereas the single-port solution as currently implemented
+uses a precomputed schedule that must be stored in a lookup table.
+
+It would perhaps be interesting to build a scatter plot of solutions
+using various numbers of butterfly units in single-port and dual-port
+implementations, to build perhpas a pareto-optimal curve showing
+energy efficiency versus area, speed, etc.
+
+
+
+
+
+
+[For more see how-it-works-notes-trash.txt]

@@ -1,0 +1,749 @@
+How does this help us?  Well, certainly we
+could separate the reads and writes to happen on successive cycles,
+but that seems unnecessarily wasteful.  More importantly however, we
+now have the option of *rearranging the order* of operations within a
+given stage so as to minimize conflicts.  For example:
+
+
+
+
+
+Stage      Cycle     Operands                      Banks
+  0          0         Read (0,1)                   0,3
+  0          1         Write (0,1)/read (2,3)       0,3/2,1
+  0          2         Write (2,3)/read (4,5)       2,1/1,2 * RW conflict on bank 2
+  0          3         Write (4,5)/read (6,7)       1,2/3,0
+
+  1          4         Write (6,7)/read (0,2)       3,0/0,2 * RW conflict on bank 0
+  1          5         Write (0,2)/read (1,3)       0,2/1,3
+  1          6         Write (1,3)/read (4,6)       1,3/3,1 * RW conflict on bank 1
+  1          7         Write (4,6)/read (5,7)       3,1/2,0
+
+  2          8         Write (5,7)/read (0,4)       2,0/0,1
+  2          9         Write (0,4)/read (1,5)       0,1/3,2
+  2          10        Write (1,5)/read (2,6)       3,2/2,3
+  2          11        Write (2,6)/read (3,7)       2,3/1,0
+
+  2          12        Write (3,7)                  1,0
+ ...        ...
+
+
+//---------------------------- Stage 0 ----------------------------//
+
+//  0 (cy 0). 1   Index ( 0, 1) => banks ( 0, 3),  twid(c,s) = ( 1.000,  0.000)
+//  1 (cy 1). 1   Index ( 2, 3) => banks ( 2, 1),  twid(c,s) = ( 1.000,  0.000)
+//  2 (cy 2). 1   Index ( 4, 5) => banks ( 1, 2),  twid(c,s) = ( 1.000,  0.000)
+//  3 (cy 3). 1   Index ( 6, 7) => banks ( 3, 0),  twid(c,s) = ( 1.000,  0.000)
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  4 (cy 4). 1   Index ( 0, 2) => banks ( 0, 2),  twid(c,s) = ( 1.000,  0.000)
+//  5 (cy 5). 1   Index ( 4, 6) => banks ( 1, 3),  twid(c,s) = ( 1.000,  0.000)
+//  6 (cy 6). 1   Index ( 1, 3) => banks ( 3, 1),  twid(c,s) = ( 0.000, -1.000)
+//  7 (cy 7). 1   Index ( 5, 7) => banks ( 2, 0),  twid(c,s) = ( 0.000, -1.000)
+
+//---------------------------- Stage 2 ----------------------------//
+
+//  8 (cy 8). 1   Index ( 0, 4) => banks ( 0, 1),  twid(c,s) = ( 1.000,  0.000)
+//  9 (cy 9). 1   Index ( 1, 5) => banks ( 3, 2),  twid(c,s) = ( 0.707, -0.707)
+// 10 (cy 10). 1   Index ( 2, 6) => banks ( 2, 3),  twid(c,s) = ( 0.000, -1.000)
+// 11 (cy 11). 1   Index ( 3, 7) => banks ( 1, 0),  twid(c,s) = (-0.707, -0.707)
+
+
+
+
+
+
+
+Memory access is less of a problem when the FFT is fully resourced,
+that is if there are enough butterfly units operating in parallel.
+For instance, the FFT of Figure 1 uses four butterfly units to
+transform eight data points.  Butterfly units B0 through B3 read
+eight operands from memory simultaneously, then in the next cycle
+they feed through a network back to the same four units in a different
+order, and so on through all three stages after which all eight
+operands are written back to memory.
+
+However, it's not always possible or efficient to implement enough
+butterfly units to fully resource the FFT, especially as n becomes
+large.  A 1024-point FFT would require 512 butterfly units.  We solve
+this problem by building fewer butterfly units and reusing them.
+
+Figure 2 shows a single butterfly unit B0 being used to perform an
+eight-point transform over thirteen successive cycles of operation,
+B0(0) through B0(11).  In cycle 0, B0 reads operands 0 and 1.  In
+cycle 1, B0 writes operands 0 and 1 back to memory and reads operands
+2 and 3, and so on.  Steady state operation requires two reads and two
+writes per cycle, all to separate locations, thus the most naive
+implementation would require four-ported memory.
+
+
+
+
+
+
+
+
+
+Given n data points, the standard method for implementing an FFT
+conceptually requires (n/2)log(n) butterfly units and can complete in
+time log(n).  Figure 1 illustrates the conceptual implementation,
+where butterfly units BU0-BU3 produce a first set of results in
+parallel, which then feed through BU4-BU7 to produce a second set of
+results, and then on through BU8-BU11 to produce the final set of
+fully transformed data points.
+
+More practically, the whole operation can be pipelined such that the
+same four butterfly units operate over three successive stages, as
+shown in Figure 2.
+
+
+
+
+The FFT, or Fast Fourier Transform, is a widely-implemented algorithm
+frequently used in digital circuit design.  The FFT performs
+successive pairwise operations on a set of input data points,
+resulting in a set of output data points representing the Fourier
+transform of the input.  For n data points, the complete transfrom
+requires log(n) stages, each of which does n/2 independent pairwise
+operations in parallel.
+
+
+A Perl script "fft_scheduler.pm" generates the complete schedule for
+an FFT butterfly network.  The generic schedule for an 8-point FFT
+calculation is shown in Figure 1 below:
+
+         0     0       0             0
+          \_._/ \     / \           /
+          /   \  \_._/   \         /
+         1     1 /   \ 1  \       /  1
+                X     X \  \     /  /
+         2     2 \_._/ 2 \  \_._/  / 2
+          \_._/  /   \  \ \ /   \ / /
+          /   \ /     \  \ X     X /
+         3     3       3  X \_._/ X  3
+                        \/ \/   \/ \/
+                        /\ /\_._/\ /\
+         4     4       4  X /   \ X  4
+          \_._/ \     /  / X     X \  
+          /   \  \_._/  / / \_._/ \ \
+         5     5 /   \ 5 /  /   \  \ 5
+                X     X /  /     \  \ 
+         6     6 \_._/ 6  /       \  6
+          \_._/  /   \   /         \
+          /   \ /     \ /           \
+         7     7       7             7
+
+Technically, this is a blah-blah-blah (DFT?) network in which the
+operands begin in blah-blah ("bit-reverse"?) order
+
+To complete in a single cycle, this network requires 12 butterfly
+units acting simultaneously.  This is fast but expensive.
+Alternatively, we could build just one butterfly unit and have it
+process each pair of operands in order, finishing after twelve
+(thirteen) cycles, with an extra cycle at the end to write back the
+final pair of results.
+
+
+ /////////////////////////////////////////////////////////////////////
+ // 8 FFT data points; one butterfly unit.
+
+ //------------------------ Stage 0 ------------------------//
+
+   Cycle  0:  Read and process operands (0,1)
+   Cycle  1:  Overwrite (0,1) w/ results; read operands (2,3)
+   Cycle  2:  Overwrite (2,3) w/ results; read operands (4,5)
+   Cycle  3:  Overwrite (4,5) w/ results; read operands (6,7)
+
+ //------------------------ Stage 1 ------------------------//
+
+   Cycle  4:  Overwrite (6,7) w/ results; read operands (0,2)
+   Cycle  5:  Overwrite (0,2) w/ results; read operands (1,3)
+   Cycle  6:  Overwrite (1,3) w/ results; read operands (4,6)
+   Cycle  7:  Overwrite (4,6) w/ results; read operands (5,7)
+
+ //------------------------ Stage 2 ------------------------//
+
+   Cycle  8:  Overwrite (5,7) w/ results; read operands (0,4)
+   Cycle  9:  Overwrite (0,4) w/ results; read operands (1,5)
+   Cycle 10:  Overwrite (1,5) w/ results; read operands (2,6)
+   Cycle 11:  Overwrite (2,6) w/ results; read operands (3,7)
+
+   Cycle 12:  Overwrite (3,7) w/ results.
+
+
+The twelve-butterfly solution reads 24 operands from memory and writes
+24 results back to memory, requiring either a very wide bus and/or 48
+registers.  One obvious advantage of the one-butterfly solution is its
+greatly reduced memory bandwidth requirements; each cycle it needs to
+read two operands and write two results.  In theory, this requirement
+could be fulfilled with a single four-ported SRAM bank, two two-ported
+SRAM's or four single-ported SRAM's.  Four single-ported SRAM's have
+the lowest area requirement.  However, there's a problem regarding how
+the memory is accessed.
+
+Obviously, given the schedule above, the operands cannot be
+distributed linearly across four SRAM banks (Figure 3).  Operands 0
+and 1 live in the same SRAM, but both have to be accessed in the same
+cycle (cycle 0 above), an impossibility if the SRAM has only a single
+port.
+
+Similarly, if we interleave the operands across the four banks (Figure
+4), then problems arise throughout stage 2 where the operands are
+accessed with a stride of four.
+
+Can we find a mapping of data points to SRAM's that remains
+conflict-free for the duration of the transform?  Yes we can, thanks
+to an algorithm published in <year-FIXME> by <author-FIXME>.  This
+algorithm maps data points to SRAM banks as shown in Figure 5, with
+the resulting schedule of Figure 6.
+
+Did this solve our problem?  Not quite.  Yes, the accesses are
+conflict-free for any given pair of reads or writes.  However, because
+of the pipelined operation, we do two reads and two writes *every
+cycle.*  Thus, in e.g. Cycle 2 we access banks 2 and 1 for the reads
+and banks 1 and 2 for the writes.  This solution works for two-ported
+SRAM's; but what about single-ported memory?
+
+ /////////////////////////////////////////////////////////////////////
+ // 8 FFT data points; one butterfly unit.
+
+ //------------------------ Stage 0 ------------------------//
+
+   Cycle  0:  Read and process operands (0,1)                 banks (0,3)
+   Cycle  1:  Overwrite (0,1) w/ results; read operands (2,3) banks (0,3)(2,1)
+   Cycle  2:  Overwrite (2,3) w/ results; read operands (4,5) banks (2,1)(1,2)
+   Cycle  3:  Overwrite (4,5) w/ results; read operands (6,7) banks (1,2)(3,0)
+
+ //------------------------ Stage 1 ------------------------//
+
+   Cycle  4:  Overwrite (6,7) w/ results; read operands (0,2) banks (3,0)(0,2)
+   Cycle  5:  Overwrite (0,2) w/ results; read operands (1,3) banks (0,2)(3,1)
+   Cycle  6:  Overwrite (1,3) w/ results; read operands (4,6) banks (3,1)(1,3)
+   Cycle  7:  Overwrite (4,6) w/ results; read operands (5,7) banks (1,3)(2,0)
+
+ //------------------------ Stage 2 ------------------------//
+
+   Cycle  8:  Overwrite (5,7) w/ results; read operands (0,4) banks (2,0)(0,1)
+   Cycle  9:  Overwrite (0,4) w/ results; read operands (1,5) banks (0,1)(3,2)
+   Cycle 10:  Overwrite (1,5) w/ results; read operands (2,6) banks (3,2)(2,3)
+   Cycle 11:  Overwrite (2,6) w/ results; read operands (3,7) banks (2,3)(1,0)
+
+   Cycle 12:  Overwrite (3,7) w/ results.                     banks (1,0)
+
+
+Look what happens if we change the order of operations slightly, as
+shown below in Figure FIXME.  Here we've swapped the last two
+operations in each stage.  Now, each cycle accesses four mutually-
+exclusive SRAM banks 0,1,2 and 3, with no redundancies and no con-
+flicts.  EXCEPT on the first operation of each stage, i.e. cycle 4 and
+cycle 8, each of which must make two simultaneous accesses to bank 0.
+
+ /////////////////////////////////////////////////////////////////////
+ // 8 FFT data points; one butterfly unit.
+
+ //------------------------ Stage 0 ------------------------//
+
+   Cycle  0:  Read and process operands (0,1)                 banks (0,3)
+   Cycle  1:  Overwrite (0,1) w/ results; read operands (2,3) banks (0,3)(2,1)
+   Cycle  3:  Overwrite (4,5) w/ results; read operands (6,7) banks (2,1)(3,0)
+   Cycle  2:  Overwrite (2,3) w/ results; read operands (4,5) banks (3,0)(1,2)
+
+ //------------------------ Stage 1 ------------------------//
+
+   Cycle  4:  Overwrite (6,7) w/ results; read operands (0,2) banks (3,0)(0,2)
+   Cycle  5:  Overwrite (0,2) w/ results; read operands (1,3) banks (0,2)(3,1)
+   Cycle  7:  Overwrite (4,6) w/ results; read operands (5,7) banks (3,1)(2,0)
+   Cycle  6:  Overwrite (1,3) w/ results; read operands (4,6) banks (2,0)(1,3)
+
+ //------------------------ Stage 2 ------------------------//
+
+   Cycle  8:  Overwrite (5,7) w/ results; read operands (0,4) banks (2,0)(0,1)
+   Cycle  9:  Overwrite (0,4) w/ results; read operands (1,5) banks (0,1)(3,2)
+   Cycle 11:  Overwrite (2,6) w/ results; read operands (3,7) banks (3,2)(1,0)
+   Cycle 10:  Overwrite (1,5) w/ results; read operands (2,6) banks (1,0)(2,3)
+
+(notes: in table above do e.g. strikethrough-3 => 2 etc.)
+
+
+So why is this important?  Because of cycles 4 and 8, we still need
+two-ported SRAM.  However: we've reduced the number of collisions to
+*one per stage*, specifically at the first operation in each stage.
+Thus, we can remove the two-port requirement and use single-port
+SRAM's if we implement a single *bypass buffer* that can hold the
+conflicting value until its next use.  This results in the slightly
+modified schedule of Figure FIXME.
+
+
+ /////////////////////////////////////////////////////////////////////
+ // 8 FFT data points; one butterfly unit.
+
+ //------------------------ Stage 0 ------------------------//
+                                                                      W    R
+   Cycle  0:  Read and process operands (0,1)                 banks      (0,3)
+   Cycle  1:  Overwrite (0,1) w/ results; read operands (2,3) banks (0,3)(2,1)
+   Cycle  3:  Overwrite (4,5) w/ results; read operands (6,7) banks (2,1)(3,0)
+   Cycle  2:  Overwrite (2,3) w/ results; read operands (4,5) banks (3,0)(1,2)
+
+ //------------------------ Stage 1 ------------------------//
+
+   Cycle  4:  Overwrite (6,7) w/ results; read operands (0,2) banks (3,x)(0,2) op7 (bank 0) => bypass buffer
+   Cycle  5:  Overwrite (0,2) w/ results; read operands (1,3) banks (0,2)(3,1)
+   Cycle  7:  Overwrite (4,6) w/ results; read operands (5,7) banks (3,1)(2,x) op7 (bank 0) <= bypass buffer
+   Cycle  6:  Overwrite (1,3) w/ results; read operands (4,6) banks (2,0)(1,3)
+
+ //------------------------ Stage 2 ------------------------//
+
+   Cycle  8:  Overwrite (5,7) w/ results; read operands (0,4) banks (2,x)(0,1) op7 (bank 0) => bypass buffer
+   Cycle  9:  Overwrite (0,4) w/ results; read operands (1,5) banks (0,1)(3,2)
+   Cycle 11:  Overwrite (2,6) w/ results; read operands (3,7) banks (3,2)(1,x) op7 (bank 0) <= bypass buffer
+   Cycle 10:  Overwrite (1,5) w/ results; read operands (2,6) banks (1,0)(2,3)
+
+So...okay.  That's cute I guess.  It works for one butterfly unit and
+eight data points.  What about more data points, and/or multiple
+butterfly units working in parallel?  Things can get pretty
+complicated pretty fast.  Can this algorithm scale nicely to
+accomodate?  Yes it can.
+
+Figure FIXME shows the schedule for a 16-point FFT using address
+remappings from FIXME's algorithm.  Note that each pair of bank
+accesses can be categorized as one of these six types:
+
+  even pair, e.g. (0,2),(2,0)  (even-odd group)
+  odd pair,  e.g. (1,3),(3,1)  (even-odd group)
+
+  hi pair,   e.g. (2,3),(3,2)  (hi-lo group)
+  lo pair,   e.g. (0,1),(1,0)  (hi-lo group)
+
+  outer pair, e.g. (0,3),(3,0) (in-out group)
+  inner pair, e.g. (1,2),(1,2) (in-out group)
+
+the bank accesses in each stage can be placed into one of three
+groups: even-odd, hi-lo or in-out.  Within the group, alternating
+between the two group subtypes guarantees collision-free access.  That
+is, within e.g. the odd-even group, odd-bank accesses will never
+collide with even-bank accesses etc.
+
+So, with regard to Figure FIXME above, stages 0 consists solely of
+inner-outer accesses; stage 1 consists solely of odd-even accesses;
+and stage 2 consists of hi-lo accesses.  By interleaving inner and
+outer in stage 0, odd and even in stage 1, and hi vs. lo in stage 2,
+we guarantee conflict-free access within each stage, with conflicts
+happening only on stage boundaries.
+
+Importantly, FIXME's algorithm appears to guarantee that, as the
+number of data points increases, each stage continues to have the
+property that all accesses within that stage falls into one of the
+three groups odd-even, hi-lo or in-out.  Equally important is that
+fact that exactly half of the accesses in the stage will be of one
+subtype (odd, hi, or in) and half will be of the opposite subtype
+(even, lo or out).  This is crucial for the scheduling of multiple
+butterfly units operating in parallel.
+
+Each time we double the number of butterfly units operating in
+parallel, we double the number of memory accesses required per cycle
+and thus must double the number of SRAM banks.  Fortunately, FIXME's
+algorithm appears to guarantee that the banks continue to obey the
+grouping proeprties described above.  Conflict resolution means that,
+within any given stage, enough operations of a given subtype alternate
+with the opposite subtype such that dual-porting never becomes
+necessary.
+
+As an illustration, Figure FIXME shows what happens for four butterfly
+units operating in parallel to transform sixteen data points.  Here,
+we need sixteen SRAM banks numbered 0 through F.
+
+Cycle 0 of stage 0 reads 8 operands from the LO banks
+(0,1,2,3,4,5,6,7).  Cycle 1 writes results back to the LO banks and
+reads from the HI banks (8,9,10,11,12,13,14,15).  Stages 1 and 2,
+coincidentally, are also HI-LO type stages, so conflict-free operation
+continues on through the four cycles required to complete stages 1 and
+2.
+
+Stage 3 is an even-odd stage; by grouping the four even-pair accesses
+together in the first cycle of stage 3 we avoid collision with the
+four odd-pair accesses in the second cycle.  However because stage 2
+was hi-lo (and not even-odd) we must use bypass buffers to hold the
+four conflicting locations that occur between the last cycle of stage
+2 and the first cycle of stage 3.  (It appears to be necessary and
+sufficient to have one bypass buffer for each butterfly unit).
+
+
+//---------------------------- Stage 0 ----------------------------//
+
+//  0 (cy 0). 4   Index ( 0, 1) => banks ( 0, 1),  twid(c,s) = ( 1.000,  0.000)
+//  1 (cy 0). 4   Index ( 2, 3) => banks ( 2, 3),  twid(c,s) = ( 1.000,  0.000)
+//  2 (cy 0). 4   Index ( 4, 5) => banks ( 4, 5),  twid(c,s) = ( 1.000,  0.000)
+//  3 (cy 0). 4   Index ( 6, 7) => banks ( 6, 7),  twid(c,s) = ( 1.000,  0.000)
+
+//  4 (cy 1). 4   Index ( 8, 9) => banks ( 8, 9),  twid(c,s) = ( 1.000,  0.000)
+//  5 (cy 1). 4   Index (10,11) => banks (10,11),  twid(c,s) = ( 1.000,  0.000)
+//  6 (cy 1). 4   Index (12,13) => banks (12,13),  twid(c,s) = ( 1.000,  0.000)
+//  7 (cy 1). 4   Index (14,15) => banks (14,15),  twid(c,s) = ( 1.000,  0.000)
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  8 (cy 2). 4   Index ( 0, 2) => banks ( 0, 2),  twid(c,s) = ( 1.000,  0.000)
+//  9 (cy 2). 4   Index ( 4, 6) => banks ( 4, 6),  twid(c,s) = ( 1.000,  0.000)
+// 10 (cy 2). 4   Index ( 1, 3) => banks ( 1, 3),  twid(c,s) = ( 0.000, -1.000)
+// 11 (cy 2). 4   Index ( 5, 7) => banks ( 5, 7),  twid(c,s) = ( 0.000, -1.000)
+
+// 12 (cy 3). 4   Index ( 8,10) => banks ( 8,10),  twid(c,s) = ( 1.000,  0.000)
+// 13 (cy 3). 4   Index (12,14) => banks (12,14),  twid(c,s) = ( 1.000,  0.000)
+// 14 (cy 3). 4   Index ( 9,11) => banks ( 9,11),  twid(c,s) = ( 0.000, -1.000)
+// 15 (cy 3). 4   Index (13,15) => banks (13,15),  twid(c,s) = ( 0.000, -1.000)
+
+//---------------------------- Stage 2 ----------------------------//
+
+// 16 (cy 4). 4   Index ( 0, 4) => banks ( 0, 4),  twid(c,s) = ( 1.000,  0.000)
+// 17 (cy 4). 4   Index ( 1, 5) => banks ( 1, 5),  twid(c,s) = ( 0.707, -0.707)
+// 18 (cy 4). 4   Index ( 2, 6) => banks ( 2, 6),  twid(c,s) = ( 0.000, -1.000)
+// 19 (cy 4). 4   Index ( 3, 7) => banks ( 3, 7),  twid(c,s) = (-0.707, -0.707)
+
+// 20 (cy 5). 4   Index ( 8,12) => banks ( 8,12),  twid(c,s) = ( 1.000,  0.000) * op1 (ix08) to buf0; op2 (ix12) to buf1
+// 21 (cy 5). 4   Index (10,14) => banks (10,14),  twid(c,s) = ( 0.000, -1.000) * op1 (ix10) to buf2; op2 (ix14) to buf3
+// 22 (cy 5). 4   Index ( 9,13) => banks ( 9,13),  twid(c,s) = ( 0.707, -0.707)
+// 23 (cy 5). 4   Index (11,15) => banks (11,15),  twid(c,s) = (-0.707, -0.707)
+
+//---------------------------- Stage 3 ----------------------------//
+
+// 24 (cy 6). 4   Index ( 0, 8) => banks ( 0, 8),  twid(c,s) = ( 1.000,  0.000) * op2 (ix08) from buf0
+// 25 (cy 6). 4   Index ( 2,10) => banks ( 2,10),  twid(c,s) = ( 0.707, -0.707) * op2 (ix10) from buf2
+// 26 (cy 6). 4   Index ( 4,12) => banks ( 4,12),  twid(c,s) = ( 0.000, -1.000) * op2 (ix12) from buf1
+// 27 (cy 6). 4   Index ( 6,14) => banks ( 6,14),  twid(c,s) = (-0.707, -0.707) * op2 (ix14) from buf3
+
+// 28 (cy 7). 4   Index ( 1, 9) => banks ( 1, 9),  twid(c,s) = ( 0.924, -0.383)
+// 29 (cy 7). 4   Index ( 5,13) => banks ( 5,13),  twid(c,s) = (-0.383, -0.924)
+// 30 (cy 7). 4   Index ( 3,11) => banks ( 3,11),  twid(c,s) = ( 0.383, -0.924)
+// 31 (cy 7). 4   Index ( 7,15) => banks ( 7,15),  twid(c,s) = (-0.924, -0.383)
+
+
+The algorithm for conflict-free resolution thus becomes as follows:
+
+  * use Tukey-Cooley (or whoever) to come up with an initial FFT
+    schedule of operation
+
+  * use FIXME's algorithm to map array indices to SRAM banks
+
+  * for each stage, decide whether bank accesses are even-odd, hi-lo,
+    or in-out.  Within the stage, alternate b operations of subtype 1
+    with b operations of subtype 2, where b is the number of butterfly
+    units operating in parallel.  For instance if the stage is
+    even-odd and there are two butterfly units, alternate two even
+    operations with two odd operations until the stage is completed.
+
+  * on stage boundaries, determine which accesses will collide and use
+    bypass buffers to resolve the conflict.
+
+This algorithm has been shown to work correctly for 8, 16, 32,
+64, 128, 256, 512 and 1024 data points as well as for 1, 2 and 4
+butterfly units operating in parallel.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+two equal-sized
+groups based on whether each pairwise access is part of an odd-even
+group, a hi-lo group, or an inside-outside group.  Furthermore because 
+
+
+In the example of 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//---------------------------- Stage 0 ----------------------------//
+
+//  0 (cy 0). 1   Index ( 0, 1) => banks ( 0, 3),  twid(c,s) = ( 1.000,  0.000)
+//  1 (cy 1). 1   Index ( 2, 3) => banks ( 2, 1),  twid(c,s) = ( 1.000,  0.000)
+//  2 (cy 2). 1   Index ( 6, 7) => banks ( 3, 0),  twid(c,s) = ( 1.000,  0.000)
+//  3 (cy 3). 1   Index ( 4, 5) => banks ( 1, 2),  twid(c,s) = ( 1.000,  0.000)
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  4 (cy 4). 1   Index ( 0, 2) => banks ( 0, 2),  twid(c,s) = ( 1.000,  0.000)
+//  5 (cy 5). 1   Index ( 4, 6) => banks ( 1, 3),  twid(c,s) = ( 1.000,  0.000)
+//  6 (cy 6). 1   Index ( 5, 7) => banks ( 2, 0),  twid(c,s) = ( 0.000, -1.000)
+//  7 (cy 7). 1   Index ( 1, 3) => banks ( 3, 1),  twid(c,s) = ( 0.000, -1.000)
+
+//---------------------------- Stage 2 ----------------------------//
+
+//  8 (cy 8). 1   Index ( 0, 4) => banks ( 0, 1),  twid(c,s) = ( 1.000,  0.000)
+//  9 (cy 9). 1   Index ( 1, 5) => banks ( 3, 2),  twid(c,s) = ( 0.707, -0.707)
+// 10 (cy 10). 1   Index ( 3, 7) => banks ( 1, 0),  twid(c,s) = (-0.707, -0.707)
+// 11 (cy 11). 1   Index ( 2, 6) => banks ( 2, 3),  twid(c,s) = ( 0.000, -1.000)
+
+
+
+
+
+Reading and writing off-chip memory is expensive, so the operands can
+more cheaply live on-chip in registers or SRAM.  
+
+
+
+
+Note another obvious advantage of
+one butterfly unit versus twelve:  A twelve-butterfly solution
+completing in one cycle would need to read 24 operands from memory and
+write 24 results back to memory, all in a single cycle, requiring a
+48-port SRAM!
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+// 8 FFT data points; one butterfly unit.
+
+//-------------------- Stage 0 --------------------//
+
+      Cycle  0:  Read and write operands (0,1)
+      Cycle  1:  Read and write operands (2,3)
+      Cycle  2:  Read and write operands (6,7)
+      Cycle  3:  Read and write operands (4,5)
+
+//-------------------- Stage 1 --------------------//
+
+      Cycle  4:  Read and write operands (0,2)
+      Cycle  5:  Read and write operands (4,6)
+      Cycle  6:  Read and write operands (5,7)
+      Cycle  7:  Read and write operands (1,3)
+
+//-------------------- Stage 2 --------------------//
+
+      Cycle  8:  Read and write operands (0,4)
+      Cycle  9:  Read and write operands (1,5)
+      Cycle 10:  Read and write operands (3,7)
+      Cycle 11:  Read and write operands (2,6)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Alternatively, if we only wanted to
+build say four butterfly units, we could pipeline the operation such
+that the first cycle would read and process operands 0 through 7 in
+pairwise order (0,1),(2,3),(4,5),(6,7) and then write them back to
+memory locations 0 through 7.  In the second cycle, the same four
+butterfly units would read and process (0,2),(1,3),(4,6),(5,7) and
+write them back.  In the third and final cycle, the butterfly units
+read and process (0,4),(1,5),(2,6) and (3,7).
+
+
+
+
+
+
+
+
+
+
+
+
+Our scheduler produces networks for 1, 2 or 4 butterfly units running
+in parallel.  For the example given above, with four butterfly units
+processing eight data points, the scheduler produces a schedule that
+looks something like this:
+
+/////////////////////////////////////////////////////////////////////
+// 8 FFT data points; 4 butterfly units.
+//---------------------------- Stage 0 ----------------------------//
+
+//  0 (cy 0)  Index ( 0, 1)
+//  1 (cy 0)  Index ( 2, 3)
+//  2 (cy 0)  Index ( 4, 5)
+//  3 (cy 0)  Index ( 6, 7)
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  4 (cy 1)  Index ( 0, 2)
+//  5 (cy 1)  Index ( 1, 3)
+//  6 (cy 1)  Index ( 4, 6)
+//  7 (cy 1)  Index ( 5, 7)
+
+//---------------------------- Stage 2 ----------------------------//
+
+//  8 (cy 2)  Index ( 0, 4)
+//  9 (cy 2)  Index ( 2, 6)
+// 10 (cy 2)  Index ( 1, 5)
+// 11 (cy 2)  Index ( 3, 7)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+// 8 FFT data points; 2 butterfly units.
+//---------------------------- Stage 0 ----------------------------//
+
+//  0 (cy 0)  Index ( 0, 1) => banks ( 0, 1),  twid(c,s) = ( 1.000,  0.000)
+//  1 (cy 0)  Index ( 2, 3) => banks ( 2, 3),  twid(c,s) = ( 1.000,  0.000)
+//  2 (cy 0)  Index ( 4, 5) => banks ( 4, 5),  twid(c,s) = ( 1.000,  0.000)
+//  3 (cy 0)  Index ( 6, 7) => banks ( 6, 7),  twid(c,s) = ( 1.000,  0.000)
+
+//---------------------------- Stage 1 ----------------------------//
+
+//  4 (cy 1)  Index ( 0, 2) => banks ( 0, 2),  twid(c,s) = ( 1.000,  0.000)
+//  5 (cy 1)  Index ( 1, 3) => banks ( 1, 3),  twid(c,s) = ( 0.000, -1.000)
+//  6 (cy 1)  Index ( 4, 6) => banks ( 4, 6),  twid(c,s) = ( 1.000,  0.000)
+//  7 (cy 1)  Index ( 5, 7) => banks ( 5, 7),  twid(c,s) = ( 0.000, -1.000)
+
+//---------------------------- Stage 2 ----------------------------//
+
+//  8 (cy 2)  Index ( 0, 4) => banks ( 0, 4),  twid(c,s) = ( 1.000,  0.000)
+//  9 (cy 2)  Index ( 2, 6) => banks ( 2, 6),  twid(c,s) = ( 0.000, -1.000)
+// 10 (cy 2)  Index ( 1, 5) => banks ( 1, 5),  twid(c,s) = ( 0.707, -0.707)
+// 11 (cy 2)  Index ( 3, 7) => banks ( 3, 7),  twid(c,s) = (-0.707, -0.707)
+
+This fully-resourced FFT is very expensive, however, in terms of
+area.  Not only do we need, for example 512 butterfly units to fully
+resource a 1024-point FFT, but we also need 1024 intermediate
+registers, the equivalent of a 1024-ported register file.

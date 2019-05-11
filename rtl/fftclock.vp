@@ -1,0 +1,75 @@
+// Copyright 2013, all rights reserved.
+// See below (end of file) for extended copyright information.
+//
+// Description:
+//
+// fftclock #(DIV) (clock_in, clock_out)
+//
+// Given input clock signal "clock_in", divide the clock by
+// parameter DIV and produce resulting slower clock "clock_out".
+
+//; my $DIV = parameter(Name=>'DIV', Val=>1, Min=>1, Step=>1,
+//; 			       Doc=>'clock_out = clock_in/DIV');
+
+module `mname` // fftclock
+  (input        clock_in,
+   output logic clock_out);
+   
+//;##############################################################################
+//; if ($DIV == 1) {
+   // (DIV==1) => (clock_out == clock_in)
+   assign clock_out = clock_in;
+//; }
+//;##############################################################################
+//; elsif ($DIV == 2) {
+   // (DIV==2) => (clock_out = clock_in/2) using simple toggle.
+
+   initial begin
+      clock_out = 1'b0;
+      $display("\n`mname`.v: clock_out=0\n");
+   end
+   
+   always @(posedge clock_in) begin
+      clock_out = ~clock_out;
+      $display("                                  `mname`.v: clock_out=%1d", clock_out);
+   end
+//;##############################################################################
+//; } else {
+   //; # DIV={4,8,16...} => DIV/2={2,4,8...} => dw={0,1,2...}
+   //; my $DIV_WIDTH = 1; while (2**$DIV_WIDTH != ($DIV/2)) { $DIV_WIDTH++; }
+   
+   // (DIV > 2) => (clock_out = clock_in/DIV) using a counter.
+
+   logic [0:`$DIV_WIDTH-1`] count;
+   
+   initial begin
+      $display("\n`mname`.v: Initialize count=0, clock_out=0\n");
+      count = 0;
+      clock_out = 1'b0;
+   end
+   
+   always @(posedge clock_in) begin
+      if (count == 0) begin clock_out = ~clock_out; end
+      $display("                                  `mname`.v: count=%1d, clock_out=%1d", count, clock_out);
+      count++;
+   end
+//; }
+
+endmodule
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Copyright Stephen Richardson and Stanford University.  All rights reserved.
+//              Exclusively Licensed by Chip Genesis Inc.
+//
+// The code, the algorithm, or any part of it is not to be copied/reproduced.
+// The code, the algorithm, or results from running this code may not be used
+// for any commercial use unless legally licensed.
+//
+// For more information please contact
+//   Ofer Shacham (Stanford Univ./Chip Genesis)   shacham@alumni.stanford.edu
+//   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu
+//
+// Genesis2 is patent pending. For information regarding the patent please
+// contact the Stanford Technology Licensing Office.
+///////////////////////////////////////////////////////////////////////////////

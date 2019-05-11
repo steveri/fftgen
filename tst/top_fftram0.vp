@@ -1,0 +1,82 @@
+// Copyright 2013, all rights reserved.
+// See below (end of file) for extended copyright information.
+//
+//; ########################################################################
+//; # PARAMETERS cause default Genesist output to .v file
+//; ########################################################################
+// ---------------- Begin default Genesis2 parameter summary ----------------
+
+//; my $nunits = parameter
+//;    (Name=>'n_butterfly_units', Val=>4,
+//;     Doc=>'Number of butterfly units.');
+//; 
+//; my $npoints = parameter
+//;    (Name=>'n_fft_points', Val=>64,
+//;     Doc=>'Number of complex data values to process.');
+//;
+//; ########################################################################
+//;
+// ---------------- End default Genesis2 parameter summary ----------------
+
+//; my $fftram = generate
+//;    ('fftram','fftram'
+//;    , n_butterfly_units=>$nunits
+//;    , n_fft_points     =>$npoints
+//; );
+//;
+//;# //; my $nbanks = 4*$nunits;
+//;# //; my $awidth = fftgen::log2($npoints);
+//;# //; my $bwidth = fftgen::log2($nbanks);
+//;# //; my $rwidth = fftgen::log2($npoints/$nbanks);
+
+module `mname` ();
+
+//;#    logic started;
+//;#    logic [`$awidth-1`:0] addr;
+//;#    logic [`$rwidth-1`:0] rnum;
+//;#    logic [`$bwidth-1`:0] bnum;
+//;#    
+//;#    initial begin
+//;#       $display("\nBEGIN");
+//;#       started=0; addr = -1; #2 started = 1;
+//;# 
+//;#       //; for (my $i=0; $i<$npoints; $i += 4) {
+//;#       //;     my $a0 = sprintf("%2d", $i+0);
+//;#       //;     my $a1 = sprintf("%2d", $i+1);
+//;#       //;     my $a2 = sprintf("%2d", $i+2);
+//;#       //;     my $a3 = sprintf("%2d", $i+3);
+//;#       #2 addr = `$a0`;    #2 addr = `$a1`;    #2 addr = `$a2`;    #2 addr = `$a3`;    #2 $display("");
+//;#       //; }
+//;# 
+//;#       #1 $display("END\n");
+//;#    end
+
+   `$fftram->instantiate()`
+     (                            //.remote(local)
+//;#       .addr_i(addr),
+//;#       .rnum_o(rnum),
+//;#       .bnum_o(bnum)
+      );
+
+//;#    always @(addr) begin
+//;#       if (started === 1) begin
+//;#          #1 $display("   address %2d => bank %1d row %1d", addr, bnum, rnum);
+//;#       end
+//;#    end
+
+endmodule
+//////////////////////////////////////////////////////////////////////////////
+// Copyright Stephen Richardson and Stanford University.  All rights reserved.
+//              Exclusively Licensed by Chip Genesis Inc.
+//
+// The code, the algorithm, or any part of it is not to be copied/reproduced.
+// The code, the algorithm, or results from running this code may not be used
+// for any commercial use unless legally licensed.
+//
+// For more information please contact
+//   Ofer Shacham (Stanford Univ./Chip Genesis)   shacham@alumni.stanford.edu
+//   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu
+//
+// Genesis2 is patent pending. For information regarding the patent please
+// contact the Stanford Technology Licensing Office.
+///////////////////////////////////////////////////////////////////////////////

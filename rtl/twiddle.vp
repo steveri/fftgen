@@ -1,0 +1,120 @@
+// Copyright 2013, all rights reserved.
+// See below (end of file) for extended copyright information.
+//
+//;# push (@INC, "./rtl"); # Now this happens in "Makefile.local"
+//; require fftgen;       # log2(), iterate()
+//; require twiddle_lib;  # setglobals(), printwires(), gen_twiddle_mem_decl(), fft_gen_twiddles()
+//;
+// ---------------- Begin default Genesis2 parameter summary ----------------
+//
+//; # parameter() calls send default Genesis output to top of .v file
+//; my $npoints = parameter
+//;    (Name=>'n_fft_points', Val=>16,
+//;     Doc=>'Number of complex data values to process.');
+//;
+//; my $upc = parameter
+//;    (Name=>'units_per_cycle', Val=>1.0, List=>[0.25, 0.5, 1.0, 2.0, 4.0],
+//;     Doc=>'Number active butterfly units per cycle (.25 means one unit at 1/4 speed)');
+//; 
+//; my $data_width = parameter
+//;    (Name=>'data_width', Val=>32, List=>[32, 64],
+//;     Doc=>'32 for sp float (shortreal), 64 for dp (real)');
+//;
+// ---------------- End default Genesis2 parameter summary ----------------
+
+////////////////////////////////////////////////////////////////////////
+// module `mname`
+//
+// Usage: twiddle(n_fft_points, units_per_cycle), where
+//
+//   n_fft_points can be any power of two greater than 8;
+//   units_per_cycle can be 0.25, 0.5, 1.0, 2.0 or 4.0
+//
+// Example(s):  twiddle n=16 upc=1.0
+//
+//;##############################################################################
+// Parameters:
+//; foreach my $p (@{$self->{ParametersList}}) {
+//;     my $val = $self->{Parameters}->{$p}->{Val};
+//;     my $doc = $self->{Parameters}->{$p}->{Doc};
+//;     printf("//     %-20s %8s %s\n", $p, "($val)", $doc);
+//; }
+//
+//;##############################################################################
+// Derived values:
+//; 
+//; my $timestep = 1;
+//; my $nunits   = 1;
+//; 
+//; if ($upc <= 1.0) {      # One butterfly__________________________
+//;     $timestep = 1/$upc;
+//;     printf("// Building twiddles for ONE butterfly unit\n");
+//;     printf("// local_clock = global_clock/%d\n", 1/$upc);
+//; }
+//; else {                  # More than one butterfly________________
+//;     $nunits = $upc;
+//;     printf("// Building twiddles for %d butterfly units\n", $upc);
+//;     printf("// local_clock = global_clock\n", 1/$upc);
+//; }
+//    $timestep (`$timestep`) = time it takes (cycles) for butterfly unit to complete one operation
+//    $nunits   (`$nunits`)   = number of butterfly units we have to build (four maximum)
+//;
+//; my $nlevels = fftgen::log2($npoints);            
+//; my $ncalcs_per_unit = ($nlevels * ($npoints/2))/$nunits;
+//; if ($nunits > 4) { print "\n\nERROR (twiddle.vp): Too many butterfly units ($nunits > 4)\n\n"; }
+//    $nlevels  (`$nlevels`)  = levels (columns) in the (virtual) bfly network
+//    $ncalcs_per_unit (`$ncalcs_per_unit`) = total ncalcs to be performed by each bfly unit
+//
+//; # Inform the twiddle perl libraries about the parameters we've settled on.
+//; twiddle_lib::setglobals($npoints, $nlevels, $nunits, $ncalcs_per_unit, $data_width);
+
+//; ####################################################################
+//; # Generate submodules.
+//; #
+//; my $lclock = generate('fftclock','LCLK', DIV=>$timestep); # Divide by two
+//; 
+//; ####################################################################
+//; # Verilog code starts here:
+//;
+// Will produce `$nlevels` levels (columns) in the (virtual) butterfly network.
+
+module `mname`
+  (
+   //;   twiddle_lib::printwires("   ", "io_list");
+   );
+   
+   //////////////////////////////////////////////////////////////////////////////
+   // DECLARATIONS
+   //;    twiddle_lib::gen_twiddle_mem_decl();
+   
+   //////////////////////////////////////////////////////////////////////////////////////
+   // INIT BLOCKS
+   initial begin
+      //;#    twiddle_lib::fft_gen_twiddles("      ", $npoints, $nunits, $data_width);
+      //;#    twiddle_lib::fft_gen_twiddles2("//FOOP ", $npoints, $nunits, $data_width);
+
+      //;    twiddle_lib::fft_gen_twiddles2("      ", $npoints, $nunits, $data_width);
+   end
+
+   //; for (my $i=0; $i<$nunits; $i++) {
+   assign BFLY`$i`_twiddle_cos_o = BFLY`$i`_twiddle_mem_cos[cycle_num_i];
+   assign BFLY`$i`_twiddle_sin_o = BFLY`$i`_twiddle_mem_sin[cycle_num_i];
+
+   //; }
+endmodule
+
+//////////////////////////////////////////////////////////////////////////////
+// Copyright Stephen Richardson and Stanford University.  All rights reserved.
+//              Exclusively Licensed by Chip Genesis Inc.
+//
+// The code, the algorithm, or any part of it is not to be copied/reproduced.
+// The code, the algorithm, or results from running this code may not be used
+// for any commercial use unless legally licensed.
+//
+// For more information please contact
+//   Ofer Shacham (Stanford Univ./Chip Genesis)   shacham@alumni.stanford.edu
+//   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu
+//
+// Genesis2 is patent pending. For information regarding the patent please
+// contact the Stanford Technology Licensing Office.
+///////////////////////////////////////////////////////////////////////////////

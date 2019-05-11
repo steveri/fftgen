@@ -1,0 +1,84 @@
+// Copyright 2013, all rights reserved.
+// See below (end of file) for extended copyright information.
+//
+//;# push (@INC, "./rtl"); # Now this happens in "Makefile.local"
+//; require fftgen;        # log2(), iterate()
+//;
+//; ########################################################################
+//; # PARAMETERS cause default Genesist output to .v file
+//; ########################################################################
+// ---------------- Begin default Genesis2 parameter summary ----------------
+//
+//; my $npoints = parameter
+//;    (Name=>'n_fft_points', Val=>16,
+//;     Doc=>'Number of complex data values to process.');
+//;
+//; my $upc = parameter
+//;    (Name=>'units_per_cycle', Val=>4.0, List=>[0.25, 0.5, 1.0, 2.0, 4.0],
+//;     Doc=>'Number active butterfly units per cycle (.25 means one unit at 1/4 speed)');
+//; 
+//; ########################################################################
+//;
+// ---------------- End default Genesis2 parameter summary ----------------
+
+//; # To finish, must go through at least log2(npoints) stages
+//; # of ($npoints/2) calcs at $nunits = min(1,$upc) calcs per
+//; # cycle ($upc < 1 is taken care of by clock division).
+
+//; my $nunits = ($upc < 1) ? 1 : $upc;
+//; my $ncy = fftgen::log2($npoints) * ($npoints/2)/$nunits;
+
+//; # E.g. npoints=16, upc=4 => 4 * (8/4) =>  8 total (check!)
+//; # E.g. npoints=16, upc=1 => 4 * (8/1) => 32 total (check!)
+
+//; my $gclock = generate
+//;    ('clock','GCLK',
+//;     CLK_PERIOD=>1000, # 5 ns clock period
+//;     RST_PERIOD=>   1, # Currently not used
+//;     MAX_CYCLES=>  ($ncy + 6)  # End simulation after 16 cycles
+//; );
+
+//; my $fftctl = generate
+//;    ('fftctl', 'fftctl',
+//;     n_fft_points   =>$npoints,
+//;     units_per_cycle=>$upc
+//; );
+
+module `mname`
+  ();
+   //; $fftctl->printwires("   ", "wire_list");
+
+   `$gclock->instantiate()`(.clk(clk_i), .reset(rst_n_i));
+
+   `$fftctl->instantiate()`(
+       //; $fftctl->printconnections("      ");
+    );
+
+   initial begin
+      $vcdpluson(   0  , `($self->get_top())->mname`);
+      //start_i <= 0; // It's STUPID to use "<=" in an initial block (right!??)
+      start_i = 0; // It's STUPID to use "<=" in an initial block (right!??)
+   end
+
+   always @(negedge rst_n_i) begin
+      start_i = 1;
+      @(posedge clk_i) begin start_i = 0; end
+   end
+   
+
+endmodule
+//////////////////////////////////////////////////////////////////////////////
+// Copyright Stephen Richardson and Stanford University.  All rights reserved.
+//              Exclusively Licensed by Chip Genesis Inc.
+//
+// The code, the algorithm, or any part of it is not to be copied/reproduced.
+// The code, the algorithm, or results from running this code may not be used
+// for any commercial use unless legally licensed.
+//
+// For more information please contact
+//   Ofer Shacham (Stanford Univ./Chip Genesis)   shacham@alumni.stanford.edu
+//   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu
+//
+// Genesis2 is patent pending. For information regarding the patent please
+// contact the Stanford Technology Licensing Office.
+///////////////////////////////////////////////////////////////////////////////
