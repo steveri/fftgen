@@ -484,8 +484,8 @@ module `mname`
          //; $which_i = "i_reordered"; # Use wire "i_reordered" instead of "i"
          //; } # if ($REORDER_I == 1)
 
-         op1 = `$which_i` & ~(1 << StageNo);  // To guarantee that op1 < op2.
-         op2 = `$which_i` |  (1 << StageNo);
+         op1 = `$which_i` & ~(1'b1 << StageNo);  // To guarantee that op1 < op2.
+         op2 = `$which_i` |  (1'b1 << StageNo);
 
          $display("GENOPS2");
          $display("GENOPS2 (t=%06d) > op1= %08b", $time, {8'h0,op1});
