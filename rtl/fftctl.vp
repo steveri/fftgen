@@ -154,7 +154,10 @@
 //; #       "[2:0]", "BFLY3_access_type", "",
 //; #       "[2:0]", "BFLY0_access_type", "")
 //;
-//; my $cnbits = sprintf("[%d:0]", fftgen::log2($ncalcs_per_unit)-1);  # Weird?  Contrived?
+//; # my $cnbits = sprintf("[%d:0]", fftgen::log2($ncalcs_per_unit)-1);  # Weird?  Contrived?
+//; # May need to count a cycle or two beyond minimum!  (Why?)
+//; my $cnbits = sprintf("[%d:0]", fftgen::log2($ncalcs_per_unit));  # Weird?  Contrived?
+//; 
 //; my @outputs = (
 //;     $cnbits, "fftctl_cycle_num", "// 0, 1, 2, ...",
 //;     "     ",      "busy",           "         // hi while busy computing fft",
@@ -751,7 +754,7 @@ module `mname`
 
          // Must make cycle_num available to twiddle LUT so as to generate the right twid at the right time.
          fftctl_cycle_num_o <= cycle_num;
-         cycle_num          <= cycle_num + 1;
+         cycle_num          <= cycle_num + 1'b1;
          $display("fftctl %1d: cycle_num = %1d", $time, cycle_num); 
       end
    end
