@@ -468,7 +468,7 @@ module `mname`
             $display("FLOOF %1d prev was 1, swz is 0 (suppress) - I predicted it!!!", $time);
             //assert (1) $fatal("ERROR ha ha JK\n\n");
             
-            bypass_valid[`$snum`]  <= 1;              // True (1) means bypassed_data is valid
+            bypass_valid[`$snum`]  <= 1'b1;              // True (1) means bypassed_data is valid
             bypassed_rnum[`$snum`] <= `$sram`_ix;     // Use target row number (index) of valid data as an ID.
             bypassed_data[`$snum`] <= `$sram`_wr_data; // Valid data lives here instead of 'rnum' in SRAM.
             $display("fftram %6d Bypassed SRAM `$snum`, wrote (%9.6f,%9.6f) to bypassed_data[`$snum`] BTOF row %1d", $time,
