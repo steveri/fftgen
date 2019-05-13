@@ -38,6 +38,10 @@
 //; 
 // ---------------- End default Genesis2 parameter summary ----------------
 
+//; # Should match identical line(s) in fftram.vp
+//; my $BYPASS_MECHANISM = 'old';
+//; my $BYPASS_MECHANISM = 'new';
+
 //; # TEST can override op_width, etc. settings.
 //; if ($test_mode eq "TEST0") { $op_width = 32; }
 //; if ($test_mode =~ "TEST[1-9]") { $op_width = 64; }  # TEST1, TEST2, TEST3, TEST4, TEST5...
@@ -280,8 +284,10 @@ module `mname`();
 
      // Bypass controls
      ,.suppress_wz_i(suppress_wz)  // one bit per bank, set 100 ps after posedge
+     //; if ($BYPASS_MECHANISM eq 'old') {
      ,.bypass_read_i(bypass_read)  // one bit per bank, set 100 ps after posedge
      ,.bufnum_i(bufnum)            // which buffer do we use for bypass?
+     //; }
 
      ,.fft_started(busy | start)
      );

@@ -111,8 +111,10 @@ module `mname`
      //; my $lastbank = 4*$nunits - 1;
      //; my $bufbits = ($nunits==4)?"[1:0]":"     ";
      ,input logic [`$lastbank`:0] suppress_wz_i  // one bit per bank, set 100 ps after posedge
+     //; if ($BYPASS_MECHANISM eq 'old') {
      ,input logic [`$lastbank`:0] bypass_read_i  // one bit per bank, set 100 ps after posedge
      ,input logic `$bufbits` bufnum_i[0:`$lastbank`]  // which buffer do we use for bypass?
+     //; }
 
      ,input logic fft_started
   );
@@ -527,7 +529,7 @@ module `mname`
    //;     for (my $snum=0; $snum<$nbanks; $snum++) {
    //;         my $nn = sprintf("%2d", $snum);
    //;         my $nnn = sprintf("%03d", $snum);
-   //;         my $bufnum = ($nunits==1)? "" : "[bufnum_i[$nn]]";
+   //;         my $bufnum = ($nunits==1)? "" : "[bufnum_i[$nn]]"; # FIXME this $bufnum not used, right?
    assign sram_or_buf[`$nn`] = SRAM`$nnn`_rd_data;
    //;     }
    //; }
