@@ -227,16 +227,18 @@ module `mname`
    logic [0:`$lastbank`] precomputed_bypass_read [0:`$nops`];      // {0,1}
    logic `$bufbits` precomputed_bufnum[0:`$lastbank`][0:`$nops`];      // {0,1,2,3}
 
-   //; my $cycle_num_bits = fftgen::log2($ncalcs_per_unit);
+   //; my $n_cycle_num_bits = fftgen::log2($ncalcs_per_unit);
    // Need to count through array(s) from 0 to `$ncalcs_per_unit-1`
    // May need to count a cycle or two beyond minimum!  (Why?)
-   logic [`$cycle_num_bits`:0] cycle_num;
+   logic [`$n_cycle_num_bits`:0] cycle_num;
 
+   //; my $n_out2_offset_bits = fftgen::log2($npoints);
    // out2_offset is used to calculate op2 from op1.\n");
-   logic [`fftgen::log2($npoints)`:0] out2_offset;
+   logic [`$n_out2_offset_bits`:0] out2_offset;
 
+   //; my $n_stageno_bits = fftgen::log2($npoints)-1;
    // Looks like we're (finally!) going to need a stage number.
-   logic [`fftgen::log2($npoints)-1`:0] stageno;
+   logic [`$n_stageno_bits`:0] stageno;
 
    // Control signals.
    logic       STARTED;
@@ -578,11 +580,11 @@ module `mname`
    // INIT BLOCKS
 
    initial begin
-      cycle_num   <= `$cycle_num_bits+1`'b0;
-      STARTED     <= 0;
-      LAST        <= 1;
-      stageno     <= 0;
-      out2_offset <= 1;
+      cycle_num   <= `$n_cycle_num_bits  +1`'b0;
+      STARTED     <= `                    1`'b0;
+      LAST        <= `                    1`'b1;
+      stageno     <= `$n_stageno_bits    +1`'b0;
+      out2_offset <= `$n_out2_offset_bits+1`'b1;
       $display("GENOPS2 -----------------------------------------------------");
       $display("GENOPS2 (t=%06d) STAGE 0", $time);
    end
@@ -630,11 +632,12 @@ module `mname`
    // Initialize loop variables.
 
    always @(posedge start_i) if (~rst_n_i) begin
-      cycle_num     <= 0;
-      STARTED       <= 1;
-      LAST          <= 0;
-      out2_offset   <= 1;
+      cycle_num   <= `$n_cycle_num_bits  +1`'b0;
+      STARTED     <= `                    1`'b1;
+      LAST        <= `                    1`'b0;
+      out2_offset <= `$n_out2_offset_bits+1`'b1;
       suppress_wz_o <= 0;
+      # suppress_wz_o <= `$nbanks-1        +1`'b0;
    end
 
    assign busy_o = ~LAST;
