@@ -273,7 +273,7 @@ module `mname`
    // "default" means "set all bits to this value", see "verilog array assignment patterns"
    initial begin
    //; for (my $i=0; $i<$nbanks; $i++) {
-      bypass_valid[`$i`]<=1'b0;    bypassed_rnum[`$i`]<=`$rwidth`'b0;    bypassed_data[`$i`]<={default:'x}; // Tricky...!
+      bypass_valid[`$i`] <= 1'b0;    bypassed_rnum[`$i`]<=`$rwidth`'b0;    bypassed_data[`$i`]<={default:'x}; // Tricky...!
    //; }
    end
    //; } else {
@@ -288,7 +288,7 @@ module `mname`
 
    //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    always @(posedge clk_i) begin
-     if (fft_started == 1) cycle_num <= cycle_num + 1;
+     if (fft_started == 1) cycle_num <= cycle_num + 1'b1;
      else cycle_num <= `$nbits_cycle_num`'b0;
    end
 
@@ -386,11 +386,11 @@ module `mname`
    //;     my $sname = sprintf("SRAM%03d", $s);  # "000", "001", ... "015" etc.
    //;# if ((`$sname`_ix == bypassed_rnum[`$s`]) && (bypass_valid[`$s`] == 1)) begin
 
-      if ((bypass_valid[`$s`] == 1) &&
+      if ((bypass_valid[`$s`] == 1'b1) &&
           (`$sname`_active == 1) &&
           (`$sname`_ix == bypassed_rnum[`$s`])
       ) begin
-         bypass_valid[`$s`] = 0;
+         bypass_valid[`$s`] = 1'b0;
          $display("fftram %6d Bypassed SRAM `$s`, read  (%9.6f,%9.6f) from bypassed_data[`$s`] BOTF", $time,
                    $bitstoshortreal(bypassed_data[`$s`][`$real_bits`]), // Real part
                    $bitstoshortreal(bypassed_data[`$s`][`$imag_bits`])); // Imaginary part
@@ -553,7 +553,7 @@ module `mname`
    //;         my $sname = sprintf("SRAM%03d", $snum);
    //;         my $bufnum = ($nunits==1)? "" : "[bufnum_i[$nn]]";
    assign sram_or_buf[`$nn`] = (
-      (bypass_valid[`$snum`] == 1) &&
+      (bypass_valid[`$snum`] == 1'b1) &&
       (`$sname`_active  == 1) &&
       (`$sname`_ix     == bypassed_rnum[`$snum`])
       ) ? bypassed_data[`$snum`] : `$sname`_rd_data;
