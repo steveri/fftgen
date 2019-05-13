@@ -174,8 +174,10 @@ module `mname`
    always @ (clk_i or ez_i or wz_i) begin
       if ($time > 500) begin // Skip first clock cycle to get past initialization weirdness...
          // Must use '===' (below) because '==' fails if either (or both) are 'x'
-         assert (ez_at_posedge_clk === ez_at_ez) else $fatal("ERROR SRAM is trying to cheat (ez)!");
-         assert (wz_at_posedge_clk === wz_at_wz) else $fatal("ERROR SRAM is trying to cheat (wz)!");
+         ez_check: assert (ez_at_posedge_clk === ez_at_ez) else
+                   $fatal("ERROR SRAM is trying to cheat (ez)!");
+         wz_check: assert (wz_at_posedge_clk === wz_at_wz) else
+                   $fatal("ERROR SRAM is trying to cheat (wz)!");
       end
    end
 

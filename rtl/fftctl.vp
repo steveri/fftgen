@@ -492,7 +492,9 @@ module `mname`
             //;     my $type = ($s <= ($nstages-$ntoggles)) ? "NORMAL" : "OVERLAP";
             `$s`: i_reordered = `$perstage_ir[$s]`; // `$type`
             //; }
-            default: assert (0) $fatal("ERROR fftctl could not generate the craaaaaazy eye\n\n");
+            // default: assert (0) $fatal("ERROR fftctl could not generate the craaaaaazy eye\n\n");
+            // default: no_crazy: assert (0) $fatal("ERROR fftctl could not generate the craaaaaazy eye\n\n");
+            // default: $fatal("ERROR fftctl could not generate the craaaaaazy eye\n\n");
          endcase
          $display("GENOPS2 (t=%06d) > ir= %08b", $time, i_reordered);
          //;
