@@ -229,8 +229,20 @@ module `mname`
 
    //; my $n_cycle_num_bits = fftgen::log2($ncalcs_per_unit);
    // Need to count through array(s) from 0 to `$ncalcs_per_unit-1`
+
    // May need to count a cycle or two beyond minimum!  (Why?)
    logic [`$n_cycle_num_bits`:0] cycle_num;
+
+   // Try it without, see what happens
+   // logic [`$n_cycle_num_bits-1`:0] cycle_num;
+   // NOPE 7 of 48 regression tests FAIL 
+   // TR FAIL: 2 mismatched results --- 16 1 dpump
+   // TR FAIL: 2 mismatched results --- 16 2 2port
+   // TR FAIL: 2 mismatched results --- 16 4 2port
+   // TR FAIL: 2 mismatched results --- 256 1 2port
+   // TR FAIL: 2 mismatched results --- 256 2 dpump
+   // TR FAIL: 2 mismatched results --- 256 4 2port
+
 
    //; my $n_out2_offset_bits = fftgen::log2($npoints);
    // out2_offset is used to calculate op2 from op1.\n");
@@ -733,7 +745,7 @@ module `mname`
          //; my $ncy_per_level = $calcs_per_level/$nunits;  
          if ((cycle_num & `($ncy_per_level-1)`) == `($ncy_per_level-1)`) begin
             out2_offset <= (out2_offset << 1);
-            stageno     <= (stageno + 1);
+            stageno     <= (stageno + 1'b1);
             $display("GENOPS2 (t=%06d) STAGE %1d", $time, stageno+1);
          end
 
