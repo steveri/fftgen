@@ -172,7 +172,7 @@ module `mname`
 
    always @(fftclk) if (ready) begin
 
-      #2;
+      #2
       $display("%m t5 ------------------------");
       $display("%m t5 %5d: in1(r,i)= (%9.6f,%9.6f)", $time, `ri("in1")`);
       $display("%m t5 %5d: in2(r,i)= (%9.6f,%9.6f)", $time, `ri("in2")`);

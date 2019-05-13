@@ -239,7 +239,7 @@ module `mname`();
    
    // DEBUG/TEST info: show swizzle translations.
    always @(posedge fftclk) begin   // 602,1602,2602...
-      #102;
+      #102
       //; foreach my $io ("op1", "op2") {
       //;    for (my $i=0; $i<$nunits; $i++) {
       //;        my $pfx = "BFLY${i}_${io}";    # BFLY0_op1, BFLY0_op2, BFLY1_op1...
