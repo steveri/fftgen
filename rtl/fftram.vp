@@ -270,9 +270,10 @@ module `mname`
    // bypassed_rnum: Use target row number (index) of valid data as an ID.
    // bypassed_data: Valid data lives here instead of 'rnum' in SRAM.
    //; # ...
+   // "default" means "set all bits to this value", see "verilog array assignment patterns"
    initial begin
    //; for (my $i=0; $i<$nbanks; $i++) {
-      bypass_valid[`$i`]<=0;    bypassed_rnum[`$i`]<=0;    bypassed_data[`$i`]<={default:'x}; // Tricky...!
+      bypass_valid[`$i`]<=1'b0;    bypassed_rnum[`$i`]<=`$rwidth`'b0;    bypassed_data[`$i`]<={default:'x}; // Tricky...!
    //; }
    end
    //; } else {
