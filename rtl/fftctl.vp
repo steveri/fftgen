@@ -750,13 +750,13 @@ module `mname`
      //; my $last_cycle = $ncalcs_per_unit + 1;             # Need one extra cycle to complete (why?)
      //; if ($SRAM_TYPE eq "TRUE_1PORT") { $last_cycle++; } # Plus one cycle for the final write.
      //;
-     if (cycle_num == `$last_cycle-1`) LAST <= 1;
+     if (cycle_num == `$last_cycle-1`) LAST <= 1'b1;
 
       if (LAST==1) begin  // TODO probably don't need LAST somehow...
          // We're done, turn everything off.
-         STARTED <= 0;
+         STARTED <= 1'b0;
          //; for (my $i = 0; $i < $nunits; $i++) {
-             BFLY`$i`_op1_ix_o <= 'X; // Turn off output, for pretty waveform end.  TODO what about in2, out[12]?
+             BFLY`$i`_op1_ix_o <= {`fftgen::log2($npoints)`{1'bx}}; // Turn off output, for pretty waveform end.  TODO what about in2, out[12]?
          //; }
       end
   end
