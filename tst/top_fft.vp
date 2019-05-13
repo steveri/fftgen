@@ -395,14 +395,14 @@ module `mname`();
       // 1024 4 1port w/o vcdplusmemon: real 43.93 user 25.86 sys 2.99
       $vcdplusmemon();
 
-      start <= 0;
+      start <= 1'b0;
    end
 
    // BUG/FIXME/TODO this is wrong and you know why!
    // At reset, start pulses high until next clk posedge.  BUG/FIXME/TODEO
    always @(negedge rst_n) begin
-      start <= 1;
-      @(posedge fftclk) begin start <= 0; end
+      start <= 1'b1;
+      @(posedge fftclk) begin start <= 1'b0; end
    end
 
 endmodule
