@@ -49,6 +49,13 @@
 //; # Number of bits in a data point (e.g. two 32-bit complex values => "[63:0]")
 //; my $obits = ($op_width-1).":0";       
 // nunits=`$nunits` npoints=`$npoints` nbanks=`$nbanks` nrows=`$nrows`
+//; 
+//; # Number of bits for cycle_num (when used)
+//; # i.e. when (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1))
+//; my $nlevels = fftgen::log2($npoints);            
+//; my $ncalcs_per_unit = ($nlevels * ($npoints/2))/$nunits;
+//; # (Note $ncalcs_per_unit may not always be a power of two.)
+//; my $nbits_cycle_num=0; while ((2**$nbits_cycle_num) <= ($ncalcs_per_unit+1)) { $nbits_cycle_num++; }
 
 //; my $real_bits = "63:32";
 //; my $imag_bits = "31: 0";
@@ -142,11 +149,7 @@ module `mname`
    // FIXME Or something smarter.
    // Need to count from 0 to [log2(npoints) x (npoints/2) / (nbutts)]
    // plus at least one beyond that.
-   //; my $nlevels = fftgen::log2($npoints);            
-   //; my $ncalcs_per_unit = ($nlevels * ($npoints/2))/$nunits;
-   //;# Note $ncacls_per_unit may not always be a power of two.
-   //; my $nbits=0; while ((2**$nbits) <= ($ncalcs_per_unit+1)) { $nbits++; }
-   logic [`$nbits-1`:0] cycle_num;
+   logic [`$nbits_cycle_num-1`:0] cycle_num;
    logic bypass_time;              // Bypass_time==1 when cycle_time says it is time to bypass.
    //; } else {
    // Placeholder for optional BOTF signals, unused in this configuration (cycle_num).
@@ -256,7 +259,7 @@ module `mname`
 
    //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    // Initialize BOTF (bypass on the fly) signals (cycle_num)
-   initial cycle_num <= 0;
+   initial cycle_num <= `$nbits_cycle_num`'b0;
    //; } else {
    // Placeholder for initialization of optional BOTF signals, unused in this configuration (cycle_num).
    //; }
@@ -285,7 +288,7 @@ module `mname`
    //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    always @(posedge clk_i) begin
      if (fft_started == 1) cycle_num <= cycle_num + 1;
-     else cycle_num <= 0;
+     else cycle_num <= `$nbits_cycle_num`'b0;
    end
 
    always @(posedge clk_i) begin
