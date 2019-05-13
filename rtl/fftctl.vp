@@ -636,8 +636,7 @@ module `mname`
       STARTED     <= `                    1`'b1;
       LAST        <= `                    1`'b0;
       out2_offset <= `$n_out2_offset_bits+1`'b1;
-      suppress_wz_o <= 0;
-      # suppress_wz_o <= `$nbanks-1        +1`'b0;
+      suppress_wz_o <= `$nbanks-1        +1`'b0;
    end
 
    assign busy_o = ~LAST;
@@ -718,7 +717,7 @@ module `mname`
          //; for (my $i=0; $i<$nbanks; $i++) {
          //;     my $ii = sprintf("%2d", $i);
          //;     if ($nunits == 1) {
-         bufnum_o[`$ii`] <= 0;
+         bufnum_o[`$ii`] <= 1'b0;
          //;     } else {
          bufnum_o[`$ii`] <= precomputed_bufnum[`$ii`][cycle_num];
          //;     }
