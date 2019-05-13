@@ -479,7 +479,7 @@ module `mname`
    //;     }
    end
    else begin
-         `${sram}`_wz = 1;
+         `${sram}`_wz = 1'b1;
       end
    end
    //; }
