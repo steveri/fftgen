@@ -5,7 +5,7 @@
 //; require fftgen;        # log2(), iterate()
 //;
 //; ########################################################################
-//; # PARAMETERS cause default Genesist output to .v file
+//; # PARAMETERS cause default Genesis output to .v file
 //; ########################################################################
 // ---------------- Begin default Genesis2 parameter summary ----------------
 //;
@@ -31,7 +31,6 @@
 //; if ($test_mode eq "TEST4") { $op_width = 64; }
 //; if ($test_mode eq "TEST5") { $op_width = 64; }
 
-
 ////////////////////////////////////////////////////////////////////////
 // module `mname`
 //
@@ -45,15 +44,15 @@ module `mname`
      input logic fftclk,
      input logic ready,
 
-      input logic [`$op_width-1`:0] in1,
-      input logic [`$op_width-1`:0] in2,
+     input logic [`$op_width-1`:0] in1,
+     input logic [`$op_width-1`:0] in2,
  
-      input logic [`$op_width/2-1`:0] twc, // twiddle (cos)
-      input logic [`$op_width/2-1`:0] tws, // twiddle (sin)
+     input logic [`$op_width/2-1`:0] twc, // twiddle (cos)
+     input logic [`$op_width/2-1`:0] tws, // twiddle (sin)
 
-      output logic [`$op_width-1`:0] out1,
-      output logic [`$op_width-1`:0] out2
-     );
+     output logic [`$op_width-1`:0] out1,
+     output logic [`$op_width-1`:0] out2
+    );
 
    //; my $real="63:32"; # Real
    //; my $imag="31: 0"; # Imaginary
@@ -84,12 +83,13 @@ module `mname`
    assign out2[`$real`] = in2[`$real`];                 // Doesn't change, always == 1
 
    // out1[`$imag`] = in1[`$real`] * in1[`$imag`];
-   DW_fp_mult #(23, 8, 1)// #(sig, exp, compliance (0 or 1)) 
-   spmult1 (.a(in1[`$real`]), .b(in1[`$imag`]), .z(out1[`$imag`]), .rnd(3'b000), .status(status1));
+   //; my $spmult_t1 = generate('fpu', 'spmult_t1', op=>"mul");
+   `$spmult_t1->instantiate` (.a(in1[`$real`]), .b(in1[`$imag`]), .z(out1[`$imag`]));
 
-   // out1[`$imag`] = in1[`$real`] * in1[`$imag`];
-   DW_fp_mult #(23, 8, 1)// #(sig, exp, compliance (0 or 1)) 
-   spmult2 (.a(in2[`$real`]), .b(in2[`$imag`]), .z(out2[`$imag`]), .rnd(3'b000), .status(status2));
+   // out2[`$imag`] = in2[`$real`] * in2[`$imag`];
+   //; my $spmult_t2 = generate('fpu', 'spmult_t2', op=>"mul");
+   `$spmult_t2->instantiate` (.a(in2[`$real`]), .b(in2[`$imag`]), .z(out2[`$imag`]));
+
    //; }
    //; elsif ($op_type eq "TEST4") {     # twiddles only
       assign out1[`$imag`] = twc;     // twiddle_cos
@@ -120,13 +120,14 @@ module `mname`
    logic [7:0] status_o2r;
    logic [7:0] status_o2i;
 
-
    //; my $add_op = "1'b0"; my $sub_op = "1'b1";
 
    //;# my $t1 = $c * $in2_real - $s * $in2_imag; =>
    //;#    my $t1a = $c * $in2_real;
-   DW_fp_mult #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spmult_t1a (.a(twc), .b(in2[`$real`]), .z(t1a), .rnd(3'b000), .status(status_t1a));
+
+   //fpu spmult_t1a (.op(MUL), .a(twc), .b(in2[`$real`]), .z(t1a));
+   //; my $spmult_t1a = generate('fpu', 'spmult_t1a', op=>"mul");
+   `$spmult_t1a->instantiate` (.a(twc), .b(in2[`$real`]), .z(t1a));
 
    //;#    my $t1b = $s * $in2_imag;
    DW_fp_mult #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver

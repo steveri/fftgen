@@ -1,0 +1,179 @@
+1905 (May 2019)
+
+TODO
+- separate fpu from butterfly.v, maybe like fpu.vp
+- verify with regressions
+- copy fpu to rtl dir as fpu_danshanley.v maybe
+- add switch to fpu.vp for DW vs. danshanley
+- verify with regressions
+- put attribution, license terms, in README file
+- send a note to dan?
+- ask mark or somebody about copyrights
+- stackoverflow request for FPU's see far below
+
+
+EXECUTIVE SUMMARY
+- found three promising open source single-precision verilog fpu's
+-- https://github.com/danshanley/FPU
+-- https://github.com/dawsonjon/fpu (part of Chips 2.0 project)
+-- https://github.com/CruzeBurada/Floating-Point-ALU-in-Verilog
+- of the three, danshanley seems simplest / most straightforward, will try that first
+
+
+
+
+
+TRY THIS ONE FIRST seems simplest.
+
+https://github.com/danshanley/FPU
+IEEE 754 floating point unit in Verilog [appears to be single precision]
+GNU General Public License v3.0
+
+RPI maybe
+
+-----
+
+
+https://github.com/dawsonjon/fpu
+Synthesiseable IEEE 754 floating point library in Verilog.
+MIT License
+
+        Provides Divider, Multiplier and Adder
+        Provides float_to_int and int_to_float
+        Supports Denormal Numbers
+        Round-to-nearest (ties to even)
+        Optimised for area
+        Over 100,000,000 test vectors (for each function)
+
+Each arithmetic module accepts two 32-bit data streams a and b, and
+outputs a data stream z. The stream interface is decribed in the chips
+manual manual.
+
+
+A short and simple permissive license with conditions only requiring
+preservation of copyright and license notices. Licensed works,
+modifications, and larger works may be distributed under different
+terms and without source code.
+
+https://pypi.org/project/Chips/
+
+
+"You might find the approach taken by Jon Dawson with his CHIPS 2.0
+approach to FPGA design an interesting alternative. Look up the
+TCP_SOCKET project on OpenCores. He has code available on Github but
+curiously the Ethernet example is missing from that resource. There
+are alternatives available from various sources but you may have to
+kiss a lot of frogs to find your dream ( sorry, can't think of a
+gender-neutral title to replace prince/princess ). It really does
+matter what it is that you need to do with your Ethernet interface and
+you have chosen to keep that a mystery. If you look around most of the
+FPGA vendors offer demo code to help with their development boards."
+
+-----
+
+
+https://github.com/CruzeBurada/Floating-Point-ALU-in-Verilog
+
+
+
+32-Bit Algorithms of Floating Point Operations are implemented on
+Verilog with logic Operations.
+
+
+Algorithms for 32-BIT floating point operations based on standard IEEE
+754 has been designed using HDL language Verilog and verified by
+applying test vectors for all cases including exceptions.
+
+-----
+
+
+http://www.codeforge.com/article/214325
+
+This document describes the Verilog double precision floating point
+core, these cores are designed to meet the IEEE 754 standard for
+double precision floating point arithmetic.  Floating Point IP Core
+(Verilog)
+
+[double precision of course]
+
+-----
+
+http://www.codeforge.com/article/220444
+
+
+FPU Floating point unit verilog VHDL FPU (Floating Point Unit) is very
+useful in the moden ASIC and SOC designs. This module has been
+verified by FPGA and EDA env. But if you want to use it in a real
+project, please verify it with some formal method.
+
+-----
+
+http://www.codeforge.com/article/139344
+
+note FPU algorithm-and floating-point operations of arithmetic [vhdl]
+
+-----
+
+http://www.codeforge.com/article/284169
+
+
+Double precision floating point core Verilog
+
+IEEE-754 compliant double-precision floating point unit. 4 operations
+(addition, subtraction, multiplication, division) are supported, as
+are the 4 rounding modes (nearest, 0, +inf, -inf). This unit also
+supports denormalized numbers, which is rare because most floating
+point units treat denormalized numbers as zero. The unit can run at
+clock frequencies up to 185 MHz for a Virtex5 target device.
+
+-----
+
+
+David Bishop, Kodak, dbishop@vhdl.org built a floating point library
+in VHDL and it is available on the Internet. You can easily get it by
+Google it.
+
+
+
+
+
+
+==============================================================================
+https://stackoverflow.com/questions/47403029/floating-point-unit-open-source-hardware-implementation
+
+What I've come across, taking a peak into two open source digital
+design projects that include the FPU - Rocket Chip and LowRISC is that
+they pull on the same repository originated from Berkeley -
+hardfloat. These are all developed based on the RISCV ISA, but this
+question is not limited to that particular ISA.
+
+A very interesting resource, to put a nice, theoretical framework
+around all of the coding is this PhD thesis.
+
+
+-----
+https://github.com/ucb-bar/berkeley-hardfloat
+This repository contains hardware floating-point units written in Chisel.
+
+==============================================================================
+Parsing library directory file '/hd/cad/synopsys/dc_shell/latest/dw/sim_ver/DW_fp_addsub.v'
+Parsing library directory file '/hd/cad/synopsys/dc_shell/latest/dw/sim_ver/DW_fp_mult.v'
+//
+//       This confidential and proprietary software may be used only
+//     as authorized by a licensing agreement from Synopsys Inc.
+//     In the event of publication, the following notice is applicable:
+//
+//                    (C) COPYRIGHT 2005 - 2015 SYNOPSYS INC.
+//                           ALL RIGHTS RESERVED
+//
+
+
+oh crap it uses designware... :(
+# 
+# Lint-[ULCO] Unequal length in comparison operator
+# /hd/cad/synopsys/dc_shell/latest/dw/sim_ver/DW_fp_addsub.v, 219
+# DW_fp_addsub, "(E_Large === ((((1 << (exp_width - 1)) - 1) * 2) + 1))"
+#   A left 8-bit expression is compared to a right 32-bit expression.
+#   Comparing 'E_Large' of type reg [(exp_width - 1):0]
+#   with '((((1 << (exp_width - 1)) - 1) * 2) + 1)' of type int.
+
