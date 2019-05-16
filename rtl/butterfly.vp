@@ -122,54 +122,57 @@ module `mname`
 
    //; my $add_op = "1'b0"; my $sub_op = "1'b1";
 
-   //;# my $t1 = $c * $in2_real - $s * $in2_imag; =>
-   //;#    my $t1a = $c * $in2_real;
+   ////////////////////////////////////////////////////////////////////////
+   // $t1 = $c * $in2_real - $s * $in2_imag
+     // $t1 = $t1a - $t1b
+     // $t1a = $c * $in2_real
+     // $t1b = $s * $in2_imag
 
-   //fpu spmult_t1a (.op(MUL), .a(twc), .b(in2[`$real`]), .z(t1a));
-   //; my $spmult_t1a = generate('fpu', 'spmult_t1a', op=>"mul");
-   `$spmult_t1a->instantiate` (.a(twc), .b(in2[`$real`]), .z(t1a));
+     //; my $spsub_t1 = generate('fpu', 'spsub_t1', op=>'sub');
+     //; my $spmult_t1a = generate('fpu', 'spmult_t1a', op=>"mul");
+     //; my $spmult_t1b = generate('fpu', 'spmult_t1b', op=>'mul');
 
-   //;#    my $t1b = $s * $in2_imag;
-   DW_fp_mult #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spmult_t1b (.a(tws), .b(in2[`$imag`]), .z(t1b), .rnd(3'b000), .status(status_t1b));
+     `$spsub_t1->instantiate` (.a(t1a), .b(t1b), .z(t1));
+     `$spmult_t1a->instantiate` (.a(twc), .b(in2[`$real`]), .z(t1a));
+     `$spmult_t1b->instantiate` (.a(tws), .b(in2[`$imag`]), .z(t1b));
 
-   //;#    my $t1 = $t1a - $t1b;
-   DW_fp_addsub #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spsub_t1 (.a(t1a), .b(t1b), .z(t1), .op(`$sub_op`), .rnd(3'b000), .status(status_t1));
+   ////////////////////////////////////////////////////////////////////////
+   // $t2 = $s * $in2_real + $c * $in2_imag;
+     // $t2  = $t2a + $t2b;
+     // $t2a = $s * $in2_real;
+     // $t2b = $c * $in2_imag;
 
-   //;# my $t2 = $s * $in2_real + $c * $in2_imag;
-   //;#    my $t2a = $s * $in2_real;
-   DW_fp_mult #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spmult_t2a (.a(tws), .b(in2[`$real`]), .z(t2a), .rnd(3'b000), .status(status_t2a));
+     //; my $spadd_t2 = generate('fpu', 'spadd_t2', op=>'add');
+     //; my $spmult_t2a = generate('fpu', 'spmult_t2a', op=>'mul');
+     //; my $spmult_t2b = generate('fpu', 'spmult_t2b', op=>'mul');
 
-   //;#    my $t2b = $c * $in2_imag;
-   DW_fp_mult #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spmult_t2b (.a(twc), .b(in2[`$imag`]), .z(t2b), .rnd(3'b000), .status(status_t2b));
+     `$spadd_t2->instantiate` (.a(t2a), .b(t2b), .z(t2));
+     `$spmult_t2a->instantiate` (.a(tws), .b(in2[`$real`]), .z(t2a));
+     `$spmult_t2b->instantiate` (.a(twc), .b(in2[`$imag`]), .z(t2b));
 
-   //;#    my $t2  = $t2a + $t2b;
-   DW_fp_addsub #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spadd_t2 (.a(t2a), .b(t2b), .z(t2), .op(`$add_op`), .rnd(3'b000), .status(status_t2));
+   ////////////////////////////////////////////////////////////////////////
 
-   //;#    my $out2_real = $in1_real - $t1;
-   DW_fp_addsub #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spsub_o2r (.a(in1[`$real`]), .b(t1), .z(out2[`$real`]), .op(`$sub_op`), .rnd(3'b000), .status(status_o2r));
+     // $out1_real = $in1_real + $t1;
+     // $out1_imag = $in1_imag + $t2;
+     // $out2_real = $in1_real - $t1;
+     // $out2_imag = $in1_imag - $t2;
 
-   //;#    my $out2_imag = $in1_imag - $t2;
-   DW_fp_addsub #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spsub_o2i (.a(in1[`$imag`]), .b(t2), .z(out2[`$imag`]), .op(`$sub_op`), .rnd(3'b000), .status(status_o2i));
+     //; my $spadd_o1r = generate('fpu', 'spadd_o1r', op=>'add');
+     //; my $spadd_o1i = generate('fpu', 'spadd_o1i', op=>'add');
+     //; my $spsub_o2r = generate('fpu', 'spsub_o2r', op=>'sub');
+     //; my $spsub_o2i = generate('fpu', 'spsub_o2i', op=>'sub');
 
-   //;#    my $out1_real = $in1_real + $t1;
-   DW_fp_addsub #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spadd_o1r (.a(in1[`$real`]), .b(t1), .z(out1[`$real`]), .op(`$add_op`), .rnd(3'b000), .status(status_o1r));
+     `$spadd_o1r->instantiate` (.a(in1[`$real`]), .b(t1), .z(out1[`$real`]));
+     `$spadd_o1i->instantiate` (.a(in1[`$imag`]), .b(t2), .z(out1[`$imag`]));
+     `$spsub_o2r->instantiate` (.a(in1[`$real`]), .b(t1), .z(out2[`$real`]));
+     `$spsub_o2i->instantiate` (.a(in1[`$imag`]), .b(t2), .z(out2[`$imag`]));
 
-   //;#    my $out1_imag = $in1_imag + $t2;
-   DW_fp_addsub #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
-   spadd_o1i (.a(in1[`$imag`]), .b(t2), .z(out1[`$imag`]), .op(`$add_op`), .rnd(3'b000), .status(status_o1i));
 
-         //; sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
-         //; sub r { my $s = shift; return sr("${s}[$real]"); }
-         //; sub i { my $s = shift; return sr("${s}[$imag]"); }
-         //; sub ri{ my $s = shift; return r($s).", ".i($s); }
+   ////////////////////////////////////////////////////////////////////////
+   //; sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
+   //; sub r { my $s = shift; return sr("${s}[$real]"); }
+   //; sub i { my $s = shift; return sr("${s}[$imag]"); }
+   //; sub ri{ my $s = shift; return r($s).", ".i($s); }
 
    always @(fftclk) if (ready) begin
 
