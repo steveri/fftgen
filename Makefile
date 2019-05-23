@@ -157,11 +157,13 @@ VERILOG_FILES :=  	$(VERILOG_ENV)	$(VERILOG_DESIGN)
 
 SYNOPSYS := /hd/cad/synopsys/dc_shell/latest
 
-VERILOG_LIBS := 	-y $(RUNDIR) +incdir+$(RUNDIR)			\
-			-y $(SYNOPSYS)/dw/sim_ver/			\
-			+incdir+$(SYNOPSYS)/dw/sim_ver/			\
-			-y $(SYNOPSYS)/packages/gtech/src_ver/		\
-			+incdir+$(SYNOPSYS)/packages/gtech/src_ver/
+# rtl/lib is where I put my home-growed fpu 5/2019
+VERILOG_LIBS := \
+  -y $(RUNDIR) +incdir+$(RUNDIR) \
+  -y      $(SYNOPSYS)/dw/sim_ver \
+  +incdir+$(SYNOPSYS)/dw/sim_ver \
+  -y      $(DESIGN_HOME)/rtl/lib \
+  +incdir+$(DESIGN_HOME)/rtl/lib
 
 ifndef TCBN45GS_VERILOG
   $(warn WARNING TCBN45GS_VERILOG not defined)
@@ -248,7 +250,7 @@ $(GENESIS_VLOG_LIST) $(GENESIS_SYNTH_LIST) $(GENESIS_VERIF_LIST): $(GENESIS_INPU
 	# Check for existence of Genesis2.pl
 	@if ! `command -v Genesis2.pl > /dev/null`; then echo;\
 	 echo 'ERROR Cannot find Genesis2.pl';\
-         echo 'ERROR Did you source /horowitz/users/steveri/gui/configs/setup_stanford.cshrc?';\
+         echo 'ERROR Did you source bin/setup_genesis.sh?';\
 	 echo; false; fi
 	@echo ""
 	@echo Making $@ because of $?
@@ -350,7 +352,8 @@ cleanall: clean
 	\rm -rf DVE*
 	\rm -rf vcdplus.vpd
 
-# should not need
-# 	\rm -rf genesis*
-# 	\rm -f TEST_PASS
-# 	\rm -f TEST_FAIL
+# 1905 regression tests
+regress:
+	test -d tmp.regress || mkdir tmp.regress
+	cd tmp.regress; make -f ../Makefile cleanall
+	cd tmp.regress; ../bin/golden_test.csh |& tee regress.log.$$
