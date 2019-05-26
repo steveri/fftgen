@@ -253,24 +253,24 @@ module srsub(
 // if ((a != 0) && (b != 0)) begin
 // if ((a != 0) && (b == 32'h40000000)) begin
   
-      $display("srsub %m");
-      $display("srsub %m a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
+      $display("%m");
+      $display("%m a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
       $bitstoshortreal(a), a, $bitstoshortreal(b), b, $bitstoshortreal(z), z);
 
  `ifdef DBG9
-        $display("srsub %m    ae=%02x be=%02x", ae, be);
-        $display("srsub %m    ae+bias=%1d be+bias=%1d", ae - 8'd127, be - 8'd127);
-        $display("srsub %m    ediff=%2d", ediff);
-        $display("srsub %m    am=%06X bm=%06X", am,     bm);
-        $display("srsub %m    am_adj=%012X", am_adj);
-        $display("srsub %m    bm_adj=%012X", bm_adj);
-        $display("srsub %m    a>b = %1b", am_adj >= bm_adj);
-        $display("srsub %m    |am-bm| == %012X", abs_am_minus_bm);
-        $display("srsub %m    ze      =%02X", ze);
-        $display("srsub %m    ze_final=%02X", ze_final);
-        $display("srsub %m    zm      =%06X", zm);
-        $display("srsub %m    zm_final=%06X", zm_final);
-        $display("srsub %m  ");
+        $display("%m    ae=%02x be=%02x", ae, be);
+        $display("%m    ae+bias=%1d be+bias=%1d", ae - 8'd127, be - 8'd127);
+        $display("%m    ediff=%2d", ediff);
+        $display("%m    am=%06X bm=%06X", am,     bm);
+        $display("%m    am_adj=%012X", am_adj);
+        $display("%m    bm_adj=%012X", bm_adj);
+        $display("%m    a>b = %1b", am_adj >= bm_adj);
+        $display("%m    |am-bm| == %012X", abs_am_minus_bm);
+        $display("%m    ze      =%02X", ze);
+        $display("%m    ze_final=%02X", ze_final);
+        $display("%m    zm      =%06X", zm);
+        $display("%m    zm_final=%06X", zm_final);
+        $display("%m  ");
      `endif // DBG9
     end // if ((a != 0) && (b != 0))
   end // always @ (*)
@@ -279,16 +279,16 @@ module srsub(
 endmodule
 
 // OLD DBG9 prints
-//        $display("srsub %m  as=%1x bs=%1x zs=%1x", a[`sign], b[`sign], z[`sign]);
-//        $display("srsub %m  ae8=%09b be8=%09b ze8=%09b", a[`exponent], b[`exponent], z[`exponent]);
-//        $display("srsub %m  ae9=%09b be9=%09b ze9=%09b", a_exp, b_exp, ze);
-//        $display("srsub %m    ae_plus_be=%09b", ae_plus_be);
-//        $display("srsub %m    ze_prenorm=%09b", ze_prenorm);
-//        $display("srsub %m    too_big=%1b ze_norm=%09b", too_big, ze_norm);
-//        $display("srsub %m  aeb=%09b beb=%09b zeb=%09b", a_exp-bias, b_exp-bias, ze-bias);
-//        $display("srsub %m  ----");
-//        $display("srsub %m    zm_true=%06X",   zm_true);
-//        $display("srsub %m    zm_hidden=%06X", zm_hidden);
-//        $display("srsub %m    zm_true[23]=%1b ab[46]=%1b", zm_true[23], ab[46]);
-//        $display("srsub %m  ----");
-//        $display("srsub %m  ufw=%1b ofw=%1b", ufw, ofw);
+//        $display("%m  as=%1x bs=%1x zs=%1x", a[`sign], b[`sign], z[`sign]);
+//        $display("%m  ae8=%09b be8=%09b ze8=%09b", a[`exponent], b[`exponent], z[`exponent]);
+//        $display("%m  ae9=%09b be9=%09b ze9=%09b", a_exp, b_exp, ze);
+//        $display("%m    ae_plus_be=%09b", ae_plus_be);
+//        $display("%m    ze_prenorm=%09b", ze_prenorm);
+//        $display("%m    too_big=%1b ze_norm=%09b", too_big, ze_norm);
+//        $display("%m  aeb=%09b beb=%09b zeb=%09b", a_exp-bias, b_exp-bias, ze-bias);
+//        $display("%m  ----");
+//        $display("%m    zm_true=%06X",   zm_true);
+//        $display("%m    zm_hidden=%06X", zm_hidden);
+//        $display("%m    zm_true[23]=%1b ab[46]=%1b", zm_true[23], ab[46]);
+//        $display("%m  ----");
+//        $display("%m  ufw=%1b ofw=%1b", ufw, ofw);
