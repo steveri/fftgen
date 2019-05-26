@@ -1,0 +1,166 @@
+// Copyright 2019, all rights reserved.
+// See below (end of file) for extended copyright information.
+//
+//;# push (@INC, "./rtl"); # Now this happens in "Makefile.local"
+//; require fftgen;        # log2(), iterate()
+//;
+//; ########################################################################
+//; # PARAMETERS cause default Genesis output to .v file
+//; ########################################################################
+//;
+// ---------------- Begin default Genesis2 parameter summary ----------------
+//;
+//; my $whose_fpu = parameter
+//;    (Name=>'whose_fpu', Val=>"designware",
+//;     List=>["danshanley", "designware"],
+//;     Doc=>'fix=fixed-point, float=floating-point');
+//;
+//; my $op = parameter
+//;    (Name=>'op', Val=>"add",
+//;     List=>["add", "sub", "mul", "div"],
+//;     Doc=>'add, sub, mul, or div');
+//;
+//; ########################################################################
+//;
+// ---------------- End default Genesis2 parameter summary ----------------
+
+////////////////////////////////////////////////////////////////////////
+// module `mname`
+//
+// Usage: fpu(a, b, z)
+//
+//   z = f(a,b) (single precision floating-point)
+
+module `mname` (
+  input  logic [31:0] a,
+  input  logic [31:0] b,
+  output logic [31:0] z
+  );
+  //; if ("$whose_fpu" eq "designware") {
+
+    // /hd/cad/synopsys/dc_shell/latest/dw/doc/datasheets/dw_fp_mult.pdf
+    logic [7:0] status; // unused :(
+      // [0] zero
+      // [1] infinity
+      // [2] invalid
+      // [3] tiny (denorm small)
+      // [4] huge (denorm big)
+      // [5] inexact
+      // [6] hugeint (int > MAXINT)
+      // [7] passa/div0
+
+    logic [3:0] rnd;
+      // 000 nearest (even)
+      // 001 zero
+      // 010 pos infinity
+      // 011 neg infinity
+      // 100 nearest up
+      // 101 away from zero
+      // 110 reserved
+      // 111 reserved
+    assign rnd = 3'b000; // nearest even
+
+    //; my $add_op = "1'b0"; my $sub_op = "1'b1";
+    //; 
+    //; if ($op eq "mul") {
+
+
+
+// DESIGNWARE MUL
+//      // z = a * b
+//      DW_fp_mult #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
+//      MUL (.a(a), .b(b), .z(z), .rnd(rnd), .status(status));
+
+
+//      logic Exception, Overflow, Underflow;
+//      multiplication
+//      MUL (
+//        .a_operand(a), .b_operand(b),
+//	.Exception(Exception), .Overflow(Overflow), .Underflow(Underflow),
+//        .result(z));
+
+
+
+// SRMUL
+srmul MUL (.a(a), .b(b), .z(z));
+
+
+
+    //; } elsif ($op eq "add") {
+
+//      // z = a + b
+//      DW_fp_addsub #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
+//      ADD (.a(a), .b(b), .z(z), .op(`$add_op`), .rnd(rnd), .status(status));
+
+
+      logic exception;
+      addition_subtraction
+      ADD (.a_operand(a), .b_operand(b), .AddBar_Sub(1'b0), .Exception(exception), .result(z));
+
+
+    //; } elsif ($op eq "sub") {
+
+        // z = a - b
+\`ifndef SRSUB_TEST
+        // DW_fp_addsub #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
+        // SUB (.a(a), .b(b), .z(z), .op(`$sub_op`), .rnd(rnd), .status(status));
+
+        // logic exception;
+        // addition_subtraction
+        // SUB (.a_operand(a), .b_operand(b), .AddBar_Sub(1'b1), .Exception(exception), .result(z));
+
+        srsub SUB (.a(a), .b(b), .z(z));
+\`else
+        wire [31:0] z1;
+        wire [31:0] z2;
+        wire [31:0] z3;
+        wire [31:0] z4;
+
+        srsub SUB41(.a($shortrealtobits(4.0)), .b($shortrealtobits(1.0)), .z(z1));
+        srsub SUB43(.a($shortrealtobits(4.0)), .b($shortrealtobits(3.0)), .z(z2));
+        srsub SUB14(.a($shortrealtobits(1.0)), .b($shortrealtobits(4.0)), .z(z3));
+        srsub SUB34(.a($shortrealtobits(3.0)), .b($shortrealtobits(4.0)), .z(z4));
+        assign z = z1|z2|z3|z4;
+\`endif
+    //; } # $op eq "sub"
+  //; } # ("$whose_fpu" eq "designware")
+  //; 
+  //;# NO
+  //;#   //; } elsif ("$whose_fpu" eq "danshanley") {
+  //;# 
+  //;#     // FPU opcodes (00,01,10,11) = (ADD,SUB,DIV,MUL)
+  //;#     localparam ADD = 2'b00;
+  //;#     localparam SUB = 2'b01;
+  //;#     localparam DIV = 2'b10;
+  //;#     localparam MUL = 2'b11;
+  //;# 
+  //;#     logic [1:0] op;
+  //;# 
+  //;#   fpu_danshanley FPU (.opcode(op), .A(a), .B(b), .O(z));
+  //;# 
+  //;#     //; if ($op eq "mul") {
+  //;#         assign op = MUL;
+  //;#     //; } elsif ($op eq "add") {
+  //;#         assign op = ADD;
+  //;#     //; } elsif ($op eq "sub") {
+  //;#         assign op = SUB;
+  //;#     //; }
+  //;# } # ("$whose_fpu" eq "designware")
+  //;# NO
+
+endmodule
+//////////////////////////////////////////////////////////////////////////////
+// Copyright Stephen Richardson and Stanford University.  All rights reserved.
+//              Exclusively Licensed by Chip Genesis Inc.
+//
+// The code, the algorithm, or any part of it is not to be copied/reproduced.
+// The code, the algorithm, or results from running this code may not be used
+// for any commercial use unless legally licensed.
+//
+// For more information please contact
+//   Ofer Shacham (Stanford Univ./Chip Genesis)   shacham@alumni.stanford.edu
+//   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu
+//
+// Genesis2 is patent pending. For information regarding the patent please
+// contact the Stanford Technology Licensing Office.
+///////////////////////////////////////////////////////////////////////////////
