@@ -83,12 +83,12 @@ module `mname`
    assign out2[`$real`] = in2[`$real`];                 // Doesn't change, always == 1
 
    // out1[`$imag`] = in1[`$real`] * in1[`$imag`];
-   //; my $spmult_t1 = generate('fpu', 'spmult_t1', op=>"mul");
-   `$spmult_t1->instantiate` (.a(in1[`$real`]), .b(in1[`$imag`]), .z(out1[`$imag`]));
+   //; my $mult_t1 = generate('fpu', 'mult_t1', op=>"mul");
+   `$mult_t1->instantiate` (.a(in1[`$real`]), .b(in1[`$imag`]), .z(out1[`$imag`]));
 
    // out2[`$imag`] = in2[`$real`] * in2[`$imag`];
-   //; my $spmult_t2 = generate('fpu', 'spmult_t2', op=>"mul");
-   `$spmult_t2->instantiate` (.a(in2[`$real`]), .b(in2[`$imag`]), .z(out2[`$imag`]));
+   //; my $mult_t2 = generate('fpu', 'mult_t2', op=>"mul");
+   `$mult_t2->instantiate` (.a(in2[`$real`]), .b(in2[`$imag`]), .z(out2[`$imag`]));
 
    //; }
    //; elsif ($op_type eq "TEST4") {     # twiddles only
@@ -128,13 +128,13 @@ module `mname`
      // $t1a = $c * $in2_real
      // $t1b = $s * $in2_imag
 
-     //; my $spsub_t1 = generate('fpu', 'spsub_t1', op=>'sub');
-     //; my $spmult_t1a = generate('fpu', 'spmult_t1a', op=>"mul");
-     //; my $spmult_t1b = generate('fpu', 'spmult_t1b', op=>'mul');
+     //; my $sub_t1 = generate('fpu', 'sub_t1', op=>'sub');
+     //; my $mult_t1a = generate('fpu', 'mult_t1a', op=>"mul");
+     //; my $mult_t1b = generate('fpu', 'mult_t1b', op=>'mul');
 
-     `$spsub_t1->instantiate` (.a(t1a), .b(t1b), .z(t1));
-     `$spmult_t1a->instantiate` (.a(twc), .b(in2[`$real`]), .z(t1a));
-     `$spmult_t1b->instantiate` (.a(tws), .b(in2[`$imag`]), .z(t1b));
+     `$sub_t1->instantiate` (.a(t1a), .b(t1b), .z(t1));
+     `$mult_t1a->instantiate` (.a(twc), .b(in2[`$real`]), .z(t1a));
+     `$mult_t1b->instantiate` (.a(tws), .b(in2[`$imag`]), .z(t1b));
 
    ////////////////////////////////////////////////////////////////////////
    // $t2 = $s * $in2_real + $c * $in2_imag;
@@ -142,13 +142,13 @@ module `mname`
      // $t2a = $s * $in2_real;
      // $t2b = $c * $in2_imag;
 
-     //; my $spadd_t2 = generate('fpu', 'spadd_t2', op=>'add');
-     //; my $spmult_t2a = generate('fpu', 'spmult_t2a', op=>'mul');
-     //; my $spmult_t2b = generate('fpu', 'spmult_t2b', op=>'mul');
+     //; my $add_t2 = generate('fpu', 'add_t2', op=>'add');
+     //; my $mult_t2a = generate('fpu', 'mult_t2a', op=>'mul');
+     //; my $mult_t2b = generate('fpu', 'mult_t2b', op=>'mul');
 
-     `$spadd_t2->instantiate` (.a(t2a), .b(t2b), .z(t2));
-     `$spmult_t2a->instantiate` (.a(tws), .b(in2[`$real`]), .z(t2a));
-     `$spmult_t2b->instantiate` (.a(twc), .b(in2[`$imag`]), .z(t2b));
+     `$add_t2->instantiate` (.a(t2a), .b(t2b), .z(t2));
+     `$mult_t2a->instantiate` (.a(tws), .b(in2[`$real`]), .z(t2a));
+     `$mult_t2b->instantiate` (.a(twc), .b(in2[`$imag`]), .z(t2b));
 
    ////////////////////////////////////////////////////////////////////////
 
@@ -157,15 +157,15 @@ module `mname`
      // $out2_real = $in1_real - $t1;
      // $out2_imag = $in1_imag - $t2;
 
-     //; my $spadd_o1r = generate('fpu', 'spadd_o1r', op=>'add');
-     //; my $spadd_o1i = generate('fpu', 'spadd_o1i', op=>'add');
-     //; my $spsub_o2r = generate('fpu', 'spsub_o2r', op=>'sub');
-     //; my $spsub_o2i = generate('fpu', 'spsub_o2i', op=>'sub');
+     //; my $add_o1r = generate('fpu', 'add_o1r', op=>'add');
+     //; my $add_o1i = generate('fpu', 'add_o1i', op=>'add');
+     //; my $sub_o2r = generate('fpu', 'sub_o2r', op=>'sub');
+     //; my $sub_o2i = generate('fpu', 'sub_o2i', op=>'sub');
 
-     `$spadd_o1r->instantiate` (.a(in1[`$real`]), .b(t1), .z(out1[`$real`]));
-     `$spadd_o1i->instantiate` (.a(in1[`$imag`]), .b(t2), .z(out1[`$imag`]));
-     `$spsub_o2r->instantiate` (.a(in1[`$real`]), .b(t1), .z(out2[`$real`]));
-     `$spsub_o2i->instantiate` (.a(in1[`$imag`]), .b(t2), .z(out2[`$imag`]));
+     `$add_o1r->instantiate` (.a(in1[`$real`]), .b(t1), .z(out1[`$real`]));
+     `$add_o1i->instantiate` (.a(in1[`$imag`]), .b(t2), .z(out1[`$imag`]));
+     `$sub_o2r->instantiate` (.a(in1[`$real`]), .b(t1), .z(out2[`$real`]));
+     `$sub_o2i->instantiate` (.a(in1[`$imag`]), .b(t2), .z(out2[`$imag`]));
 
 
    ////////////////////////////////////////////////////////////////////////

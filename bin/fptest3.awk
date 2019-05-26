@@ -5,10 +5,10 @@ BEGIN { DBG = 0 }
 #   % ../bin/golden_test.csh 128 1 1port|& tee tmp.log.srsub$i | tail
 #   % cp /tmp/test_128_1_1port.log test_128_1_1port.log$i
 #   % fptest3.awk test_128_1_1port.log$i |& grep fptest | sort | uniq | less
-#   fptest top_fft.BFLY0.spsub_o2i.SUB (0.000000 - 0.000000) = 0.000000    true
-#   fptest top_fft.BFLY0.spsub_o2i.SUB (-0.049126 - -1.001206) = 0.952080    true
-#   fptest top_fft.BFLY0.spsub_o2i.SUB (-0.098491 - -1.004838) = 0.906347    true
-#   fptest top_fft.BFLY0.spsub_o2i.SUB (-0.148336 - -1.010942) = 0.862606    true
+#   fptest top_fft.BFLY0.sub_o2i.SUB (0.000000 - 0.000000) = 0.000000    true
+#   fptest top_fft.BFLY0.sub_o2i.SUB (-0.049126 - -1.001206) = 0.952080    true
+#   fptest top_fft.BFLY0.sub_o2i.SUB (-0.098491 - -1.004838) = 0.906347    true
+#   fptest top_fft.BFLY0.sub_o2i.SUB (-0.148336 - -1.010942) = 0.862606    true
 #   ...
 # 
 # Printed-out signals can fluctuate before achieving final value.
@@ -17,21 +17,21 @@ BEGIN { DBG = 0 }
 # Sample input:
 #   % less test_128_1_1port.log$i
 #   ...
-#   top_fft.BFLY0.spsub_o2r.SUB a= 1.000000 (3f800000) b= 0.000000 (00000000) z= 1.000000 (3f800000)
-#   top_fft.BFLY0.spsub_o2r.SUB a= 1.000000 (3f800000) b= 0.000000 (00000000) z= 1.000000 (3f800000)
-#   top_fft.BFLY0.spsub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.000000 (Xxxxxxxx)
-#   top_fft.BFLY0.spsub_o2r.SUB a= 1.000000 (3f800000) b= 0.000000 (00000000) z= 1.000000 (3f800000)
-#   top_fft.BFLY0.spsub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.000000 (Xxxxxxxx)
-#   top_fft.BFLY0.spsub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.000000 (Xxxxxxxx)
-#   top_fft.BFLY0.spsub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.414214 (3ed413cc)
+#   top_fft.BFLY0.sub_o2r.SUB a= 1.000000 (3f800000) b= 0.000000 (00000000) z= 1.000000 (3f800000)
+#   top_fft.BFLY0.sub_o2r.SUB a= 1.000000 (3f800000) b= 0.000000 (00000000) z= 1.000000 (3f800000)
+#   top_fft.BFLY0.sub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.000000 (Xxxxxxxx)
+#   top_fft.BFLY0.sub_o2r.SUB a= 1.000000 (3f800000) b= 0.000000 (00000000) z= 1.000000 (3f800000)
+#   top_fft.BFLY0.sub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.000000 (Xxxxxxxx)
+#   top_fft.BFLY0.sub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.000000 (Xxxxxxxx)
+#   top_fft.BFLY0.sub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.414214 (3ed413cc)
 #   top_fft.BFLY0 t5 ------------------------
 #   ...
 # 
 # Sample output:
 #   % fptest3.awk test_128_1_1port.log$i |& less
 #   ...
-#   fptest top_fft.BFLY0.spsub_o2r.SUB    (1.000000 - 0.000000)    =   1.000000    true
-#   fptest top_fft.BFLY0.spsub_o2i.SUB   (-1.000000 - -1.414214)   =   0.414214    true
+#   fptest top_fft.BFLY0.sub_o2r.SUB    (1.000000 - 0.000000)    =   1.000000    true
+#   fptest top_fft.BFLY0.sub_o2i.SUB   (-1.000000 - -1.414214)   =   0.414214    true
 #   top_fft.BFLY0 t5 ------------------------
 #   ...
 
@@ -78,14 +78,14 @@ function abs(v) {return v < 0 ? -v : v}
 
 { print }
 
-/.*spsub.*z=[ -0123456789]/ {
+/.*BFLY[0-9]*.sub.*z=[ -0123456789]/ {
 
   # before & after gsub:
-  # top_fft.BFLY0.spsub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.414214 (3ed413cc)
-  # top_fft.BFLY0.spsub_o2i.SUB a= -1.000000 (bf800000) b= -1.414214 (bfb504f3) z=  0.414214 (3ed413cc)
+  # top_fft.BFLY0.sub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.414214 (3ed413cc)
+  # top_fft.BFLY0.sub_o2i.SUB a= -1.000000 (bf800000) b= -1.414214 (bfb504f3) z=  0.414214 (3ed413cc)
   gsub(/=/, "= ", $0)
 
-  # E.g. op="top_fft.BFLY0.spsub_o2r.SUB"
+  # E.g. op="top_fft.BFLY0.sub_o2r.SUB"
   op = $1
   line_op[op] = $0
   found_op[op] = 1
