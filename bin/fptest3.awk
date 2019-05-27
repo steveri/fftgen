@@ -1,6 +1,6 @@
 #!/usr/bin/awk -f
-BEGIN { DBG = 1 } # Whoever's last wins! Right?
 BEGIN { DBG = 0 }
+BEGIN { DBG = 1 } # Whoever's last wins! Right?
 
 # HOW TO USE:
 #   % ../bin/golden_test.csh 128 1 1port|& tee tmp.log.srsub$i | tail
@@ -70,8 +70,11 @@ function abs(v) {return v < 0 ? -v : v}
     result = (r == zcmp) ? "true" : should_be
     result = good_enough ? "true" : should_be
 
-    printf("fptest %-27s %12s %s %-12s = %10s %s\n",
-                     op, "(" a, fn, b ")", z,   result);
+    # op="top_fft.BFLY0.sub_t1.FPU.SUB" is TOO MUCH
+    # This shortens it to e.g. "t1.FPU.SUB"
+    short_op = op; gsub(/top_fft.*_/, "", short_op);
+    printf("fptest %11s %12s %s %-12s = %10s %s\n",
+               short_op, "(" a, fn, b ")", z,   result);
     if (DBG) { printf("fptest    z_op['%s'] = %s\n", op, z_op[op]) }
 
     # Reset array
