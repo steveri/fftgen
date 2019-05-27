@@ -93,9 +93,14 @@ srmul MUL (.a(a), .b(b), .z(z));
 //      ADD (.a(a), .b(b), .z(z), .op(`$add_op`), .rnd(rnd), .status(status));
 
 
-      logic exception;
-      addition_subtraction
-      ADD (.a_operand(a), .b_operand(b), .AddBar_Sub(1'b0), .Exception(exception), .result(z));
+// haha freeware add is BROKEN
+//      logic exception;
+//      addition_subtraction
+//      ADD (.a_operand(a), .b_operand(b), .AddBar_Sub(1'b0), .Exception(exception), .result(z));
+
+        addsub FPU (.op(`$add_op`), .a(a), .b(b), .z(z));
+
+
 
 
     //; } elsif ($op eq "sub") {
