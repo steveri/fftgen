@@ -17,24 +17,23 @@ module srsub(
   `define NaN      32'hFFFFFFFF
 
   // Extract sign, exponent, mantissa  
-
   wire as = a[`sign];
   wire bs = b[`sign];
 
+  // Extract sign, exponent, mantissa  
+  wire [7:0] ae; assign ae = a[`exponent];
+  wire [7:0] be; assign be = b[`exponent];
+
+  // Extract sign, exponent, mantissa  
   // Restore hidden one's, use 48-bit precision
   wire [47:0] am; assign am = {23'b0, 1'b1, a[`mantissa]};
   wire [47:0] bm; assign bm = {23'b0, 1'b1, b[`mantissa]};
 
-  // 
-  wire [7:0] ae; assign ae = a[`exponent];
-  wire [7:0] be; assign be = b[`exponent];
-
-
-  // Can left-shift smaller mantissa as much as 22 bits and still get valid result maybe
+  // NORMALIZE
+  // Shift the larger operand left 'ediff' bits, and reduce exp accordingly
   wire [7:0] ediff; assign ediff = (ae >= be) ? (ae - be) : (be - ae);
 
-
-  // Shift the larger operand left 'ediff' bits, and reduce exp accordingly
+  // Can left-shift smaller mantissa as much as 22 bits and still get valid result maybe
   wire [47:0] am_adj; assign am_adj = (ediff > 8'd22) ? am : (
     (ae > be) ? (am << ediff) : am
   ); 
@@ -56,9 +55,9 @@ module srsub(
   // bm range 0000 to 1111
   // am-bm range -1111 to 1111 (10000 to 01111)
 
-  // use if (as == bs)
   wire [47:0] abs_am_minus_bm;
-  assign abs_am_minus_bm = (am_adj >= bm_adj) ? (am_adj - bm_adj) : (bm_adj - am_adj);
+  assign abs_am_minus_bm = (am_adj >= bm_adj) ?
+                               (am_adj - bm_adj) : (bm_adj - am_adj);
 
   // Previously, we normalized by shifting larger operand *left* by 'ediff' bits
   // Now we can shift back down (remember, ediff can be as small as 0 bits)
@@ -204,7 +203,7 @@ module srsub(
 
 
   wire [31:0] a_plus_b;
-  sradd SUBADDER (
+  sradd ADD (
 
 //`define SRADD_TEST1
 `ifdef SRADD_TEST1
