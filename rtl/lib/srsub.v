@@ -186,56 +186,25 @@ module srsub(
     zm[0] == 1'b1 ?  ze - 7'd23 :
     7'd0;
 
-//  // oops oh noooooo
-//  wire [7:0] ze_final; assign ze_final = ze_finall - 8'd1;
-
-
-//  // use if (as != bs)
-//  wire [47:0] abs_am_minus_bm;
-//  assign am_plus_bm = am + bm;
-
-
-
-  wire [31:0] a_plus_b;
-  sradd ADD (
-
-//`define SRADD_TEST1
-`ifdef SRADD_TEST1
-    // FIXME TEST CODE
-    // 1 + .707 = 1.707?
-    .a(32'h3f800000),
-    .b(32'h3f3504f3),
-`else
-  `ifdef SRADD_TEST2
-    // FIXME TEST CODE
-    // 1 + 1 = 2?
-    .a(32'h3f800000),
-    .b(32'h3f800000),
-  `else
-    .a({a[`sign], a[`exponent], a[`mantissa]}),
-    .b({a[`sign], b[`exponent], b[`mantissa]}),
-  `endif
-`endif
-
-    .z(a_plus_b)
-  );
-
-
   ////////////////////////////////////////////////////////////////
   assign z =
-    a[`sign] != b[`sign] ? a_plus_b :
-    a == b ? 32'b0 :
+    a == b   ? 32'b0 :
     ignore_b ? a :
     ignore_a ? {~b[`sign],b[`exponent],b[`mantissa]} :
-    (a > b) ? {as,ze_final,zm_final} :
-              {~as,ze_final,zm_final};
+    (a > b)  ? {as,ze_final,zm_final} :
+              {~as,ze_final,zm_final} ;
 
+// FIXME FIXME this little fixme block
+// Somebody else has to do this check now:
+// a[`sign] != b[`sign] ? a_plus_b :
+// FIXME need some kind of ASSERT a[`sign] == b[`sign]
+// 
 // FIXME instead of (a>b) above, should do...ah never mind
 
 
 // FIXME Technically I think these are supposed to be OUTSIDE the module def
 `define DBG1
-`define DBG9
+//`define DBG9
 
 `ifdef DBG1
   // DEBUGGING

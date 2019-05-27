@@ -88,3 +88,30 @@ always @ (*) begin
 end
 
 endmodule;
+
+
+/*
+  wire [31:0] a_plus_b;
+  sradd ADD (
+
+//`define SRADD_TEST1
+`ifdef SRADD_TEST1
+    // FIXME TEST CODE
+    // 1 + .707 = 1.707?
+    .a(32'h3f800000),
+    .b(32'h3f3504f3),
+`else
+  `ifdef SRADD_TEST2
+    // FIXME TEST CODE
+    // 1 + 1 = 2?
+    .a(32'h3f800000),
+    .b(32'h3f800000),
+  `else
+    .a({a[`sign], a[`exponent], a[`mantissa]}),
+    .b({a[`sign], b[`exponent], b[`mantissa]}),
+  `endif
+`endif
+
+    .z(a_plus_b)
+  );
+*/
