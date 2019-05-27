@@ -9,8 +9,8 @@ UNDER DEVELOPMENT
 
 #### CURRENT STATUS
 
-- debugging 128_1_1port
--- fptest3.awk accurately reflects srsub CORRECT (ish) for 128_1_1port
+- debugged 128_1_1port, it's working correctly now
+- next, need to retry regressions and see if we get farther now
 
 - debugged 64_1_1port
 -- verified the following CORRECT for srsub: 4-1, 4-3, 1-4, 3-4
