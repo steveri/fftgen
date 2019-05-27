@@ -101,7 +101,8 @@ srmul MUL (.a(a), .b(b), .z(z));
     //; } elsif ($op eq "sub") {
 
         // z = a - b
-\`ifndef SRSUB_TEST
+
+    \`ifndef SRSUB_TEST
         // DW_fp_addsub #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
         // SUB (.a(a), .b(b), .z(z), .op(`$sub_op`), .rnd(rnd), .status(status));
 
@@ -109,44 +110,20 @@ srmul MUL (.a(a), .b(b), .z(z));
         // addition_subtraction
         // SUB (.a_operand(a), .b_operand(b), .AddBar_Sub(1'b1), .Exception(exception), .result(z));
 
-        srsub SUB (.a(a), .b(b), .z(z));
-\`else
-        wire [31:0] z1;
-        wire [31:0] z2;
-        wire [31:0] z3;
-        wire [31:0] z4;
-
-        srsub SUB41(.a($shortrealtobits(4.0)), .b($shortrealtobits(1.0)), .z(z1));
-        srsub SUB43(.a($shortrealtobits(4.0)), .b($shortrealtobits(3.0)), .z(z2));
-        srsub SUB14(.a($shortrealtobits(1.0)), .b($shortrealtobits(4.0)), .z(z3));
-        srsub SUB34(.a($shortrealtobits(3.0)), .b($shortrealtobits(4.0)), .z(z4));
+        //srsub SUB (.a(a), .b(b), .z(z));
+        addsub FPU (.op(`$sub_op`), .a(a), .b(b), .z(z));
+    \`else
+        // FIXME really? is this the best place for this???
+        wire [31:0] z1; wire [31:0] z2; wire [31:0] z3; wire [31:0] z4;
+        srsub SUB41(.op(`$sub_op`), .a($shortrealtobits(4.0)), .b($shortrealtobits(1.0)), .z(z1));
+        srsub SUB43(.op(`$sub_op`), .a($shortrealtobits(4.0)), .b($shortrealtobits(3.0)), .z(z2));
+        srsub SUB14(.op(`$sub_op`), .a($shortrealtobits(1.0)), .b($shortrealtobits(4.0)), .z(z3));
+        srsub SUB34(.op(`$sub_op`), .a($shortrealtobits(3.0)), .b($shortrealtobits(4.0)), .z(z4));
         assign z = z1|z2|z3|z4;
-\`endif
+    \`endif
     //; } # $op eq "sub"
   //; } # ("$whose_fpu" eq "designware")
   //; 
-  //;# NO
-  //;#   //; } elsif ("$whose_fpu" eq "danshanley") {
-  //;# 
-  //;#     // FPU opcodes (00,01,10,11) = (ADD,SUB,DIV,MUL)
-  //;#     localparam ADD = 2'b00;
-  //;#     localparam SUB = 2'b01;
-  //;#     localparam DIV = 2'b10;
-  //;#     localparam MUL = 2'b11;
-  //;# 
-  //;#     logic [1:0] op;
-  //;# 
-  //;#   fpu_danshanley FPU (.opcode(op), .A(a), .B(b), .O(z));
-  //;# 
-  //;#     //; if ($op eq "mul") {
-  //;#         assign op = MUL;
-  //;#     //; } elsif ($op eq "add") {
-  //;#         assign op = ADD;
-  //;#     //; } elsif ($op eq "sub") {
-  //;#         assign op = SUB;
-  //;#     //; }
-  //;# } # ("$whose_fpu" eq "designware")
-  //;# NO
 
 endmodule
 //////////////////////////////////////////////////////////////////////////////

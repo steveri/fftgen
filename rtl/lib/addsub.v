@@ -6,7 +6,7 @@
 `define POS 1'b0
 `define NEG 1'b1
 
-module adder(
+module addsub(
   input  wire op, // 0 for add, 1 for sub (matches designware why not)
   input  wire [31:0] a,
   input  wire [31:0] b,
@@ -20,47 +20,71 @@ module adder(
 
 // Add and subtract
 
-  ////////////////////////////////////////////////////////////////
-  //wire [31:0] zm;
-  srsub SUB (
-    .a({`POS, a[`exponent], a[`mantissa]}),
-    .b({`POS, b[`exponent], b[`mantissa]}),
-    .z(z)
-  );
+wire [31:0] abs_a; assign abs_a = {`POS,a[30:0]};
+wire [31:0] abs_b; assign abs_b = {`POS,b[30:0]};
 
-/*
+wire [31:0] zadd;
+sradd ADD (
+  .a(abs_a),
+  .b(abs_b),
+  .z(zadd)
+);
+
+wire [31:0] zsub;
+srsub SUB (
+  .a(abs_a),
+  .b(abs_b),
+  .z(zsub)
+);
+
 //////////////////////////////////////
 //   op  sign(a)   sign(b)   result //
 // -------------------------------- //
-//   +      +         +      (a+b)  //
-//   +      +         -      (a-b)  //
-//   +      -         +     -(a-b)  //
-//   +      -         -     -(a+b)  //
+//  add     +         +      (a+b)  //
+//  add     +         -      (a-b)  //
+//  add     -         +     -(a-b)  //
+//  add     -         -     -(a+b)  //
 // -------------------------------- //
-//   -      +         +      (a-b)  //
-//   -      +         -      (a+b)  //
-//   -      -         +     -(a+b)  //
-//   -      -         -     -(a-b)  //
+//  sub     +         +      (a-b)  //
+//  sub     +         -      (a+b)  //
+//  sub     -         +     -(a+b)  //
+//  sub     -         -     -(a-b)  //
 //////////////////////////////////////
 
 // Sign bit shortcuts
-wire as; assign as = a[`sign];
-wire bs; assign bs = b[`sign];
-
+wire apos; assign apos = (a[`sign] == `POS);
+wire bpos; assign bpos = (b[`sign] == `POS);
 
 wire [31:0] z;
 assign z = 
-  ((op == `ADD) &&  as &&  bs) ? (zp & 32'h00000000) :
-  ((op == `ADD) &&  as && ~bs) ? (zm & 32'h00000000) :
-  ((op == `ADD) && ~as &&  bs) ? (zm & 32'h10000000) :
-  ((op == `ADD) && ~as && ~bs) ? (zp & 32'h10000000) :
+  ((op == `ADD) &&  apos &&  bpos) ? zadd :
+  ((op == `ADD) &&  apos && ~bpos) ? zsub :
+  ((op == `ADD) && ~apos &&  bpos) ? zsub^32'h80000000 :
+  ((op == `ADD) && ~apos && ~bpos) ? zadd^32'h80000000 :
 
-  ((op == `SUB) &&  as &&  bs) ? (zm & 32'h00000000) :
-  ((op == `SUB) &&  as && ~bs) ? (zp & 32'h00000000) :
-  ((op == `SUB) && ~as &&  bs) ? (zp & 32'h10000000) :
-  ((op == `SUB) && ~as && ~bs) ? (zm & 32'h10000000) :
+  ((op == `SUB) &&  apos &&  bpos) ? zsub :
+  ((op == `SUB) &&  apos && ~bpos) ? zadd :
+  ((op == `SUB) && ~apos &&  bpos) ? zadd^32'h80000000 :
+  ((op == `SUB) && ~apos && ~bpos) ? zsub^32'h80000000 :
 
   32'hFFFFFFFF;
 
-*/
+
+always @ (*) begin
+  $display("%m");
+  if (op == `ADD) begin
+    $display("%m..ADD a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
+      $bitstoshortreal(a), a, $bitstoshortreal(b), b, $bitstoshortreal(z), z);
+  end else begin  
+    $display("%m..SUB a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
+      $bitstoshortreal(a), a, $bitstoshortreal(b), b, $bitstoshortreal(z), z);
+  end
+`ifdef DBG9
+  $display("%m    op=%1x apos=%1x bpos=%1x", op, apos, bpos);
+  $display("%m    (op==SUB) = %x", (op==`SUB));
+  $display("%m    (op==SUB) &&  apos &&  bpos) = %x", ((op == `SUB) &&  apos &&  bpos));
+`endif
+  $display("%m");
+end
+
 endmodule;
