@@ -55,8 +55,8 @@ srsub SUB (
 wire apos; assign apos = (a[`sign] == `POS);
 wire bpos; assign bpos = (b[`sign] == `POS);
 
-wire [31:0] z;
-assign z = 
+wire [31:0] zraw;
+assign zraw = 
   ((op == `ADD) &&  apos &&  bpos) ? zadd :
   ((op == `ADD) &&  apos && ~bpos) ? zsub :
   ((op == `ADD) && ~apos &&  bpos) ? zsub^32'h80000000 :
@@ -68,6 +68,12 @@ assign z =
   ((op == `SUB) && ~apos && ~bpos) ? zsub^32'h80000000 :
 
   32'hFFFFFFFF;
+
+
+// oh how i hate to do this
+// turn -0 (0x80000000) into true zero (0x00000000)
+wire [31:0] z;
+assign z = (zraw == 32'h80000000) ? 32'h0 : zraw;
 
 
 always @ (*) begin
