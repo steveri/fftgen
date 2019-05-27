@@ -41,12 +41,9 @@ module sradd(
   wire ignore_a; assign ignore_a = (a == 32'b0) || ((ediff > 8'd22) && (be > ae));
   wire ignore_b; assign ignore_b = (b == 32'b0) || ((ediff > 8'd22) && (ae > be));
 
-  wire [47:0] am_adj; assign am_adj = (ediff > 8'd22) ? am : (
-    (ae > be) ? (am << ediff) : am
-  ); 
-  wire [47:0] bm_adj; assign bm_adj = (ediff > 8'd22) ? bm : (
-    (be > ae) ? (bm << ediff) : bm
-  ); 
+  wire [47:0] am_adj; assign am_adj = (ae > be) ? (am << ediff) : am;
+  wire [47:0] bm_adj; assign bm_adj = (be > ae) ? (bm << ediff) : bm;
+
 
   // smaller operand shifts up and back, so end up with larger exponent right?
   wire [7:0] ze; assign ze = (ae > be) ? ae : be;

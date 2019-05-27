@@ -33,23 +33,17 @@ module srsub(
   // Shift the larger operand left 'ediff' bits, and reduce exp accordingly
   wire [7:0] ediff; assign ediff = (ae >= be) ? (ae - be) : (be - ae);
 
-  // Can left-shift smaller mantissa as much as 22 bits and still get valid result maybe
-  wire [47:0] am_adj; assign am_adj = (ediff > 8'd22) ? am : (
-    (ae > be) ? (am << ediff) : am
-  ); 
-  wire [47:0] bm_adj; assign bm_adj = (ediff > 8'd22) ? bm : (
-    (be > ae) ? (bm << ediff) : bm
-  ); 
+  // Ummmmmm...if ediff too great, then somebody is essentially zero...
+  wire ignore_a; assign ignore_a = (a == 32'b0) || ((ediff > 8'd22) && (be > ae));
+  wire ignore_b; assign ignore_b = (b == 32'b0) || ((ediff > 8'd22) && (ae > be));
 
-/*
+  // Can left-shift smaller mantissa as much as 22 bits and still get valid result maybe
+  wire [47:0] am_adj; assign am_adj = (ae > be) ? (am << ediff) : am;
+  wire [47:0] bm_adj; assign bm_adj = (be > ae) ? (bm << ediff) : bm;
+
   // FIXME check to see if exp will go l.t. zero
-  wire [8:0] ae_adj; assign ae_adj = (ediff > 8'd22) ? ae : (
-    (ae > be) ? ({1'b0,ae} - {1'b0,ediff}) : ae
-  );
-  wire [8:0] be_adj; assign be_adj = (ediff > 8'd22) ? be : (
-    (be > ae) ? ({1'b0,be} - {1'b0,ediff}) : be
-  );
-*/
+  // FIXME not sure what that means exc. need extensive testing!
+
 
   // am range 0000 to 1111
   // bm range 0000 to 1111
@@ -230,13 +224,14 @@ module srsub(
   ////////////////////////////////////////////////////////////////
   assign z =
     a[`sign] != b[`sign] ? a_plus_b :
-    a == b     ? 32'b0 :
-    b == 32'b0 ? a :
-    a == 32'b0 ? {~b[`sign],b[`exponent],b[`mantissa]} :
-    ((ediff > 8'd22)) && (a > b) ? a :
-    ((ediff > 8'd22)) && (a < b) ? {~b[`sign],b[`exponent],b[`mantissa]} :
+    a == b ? 32'b0 :
+    ignore_b ? a :
+    ignore_a ? {~b[`sign],b[`exponent],b[`mantissa]} :
     (a > b) ? {as,ze_final,zm_final} :
               {~as,ze_final,zm_final};
+
+// FIXME instead of (a>b) above, should do...ah never mind
+
 
 // FIXME Technically I think these are supposed to be OUTSIDE the module def
 `define DBG1
