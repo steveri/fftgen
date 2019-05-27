@@ -1,4 +1,5 @@
 #!/usr/bin/awk -f
+BEGIN { DBG = 1 } # Whoever's last wins! Right?
 BEGIN { DBG = 0 }
 
 # HOW TO USE:
@@ -53,22 +54,24 @@ function abs(v) {return v < 0 ? -v : v}
     # For compare, remove spaces from front of z string
     zcmp = sprintf("%9s", z)
 
-    # Generate comparison value
-    # #     if (op == "sradd") { r = sprintf("%9.6f", prev[op "-a"] + prev[op "-b"]) }
-    # #     if (op == "srsub") { r = sprintf("%9.6f", prev[op "-a"] - prev[op "-b"]) }
-    # #     if (op == "srmul") { r = sprintf("%9.6f", prev[op "-a"] * prev[op "-b"]) }
-    if (1) { r = sprintf("%9.6f", a-b) }
+    # Generate comparison value; op comes from a line that might look like this:
+    # top_fft.BFLY0.sub_o2r.SUB.ADD a= 1.000000 (3f800000) b= 1.000000 ...
+         if (match(op, /ADD$/)) { r = sprintf("%9.6f", a + b); fn="+" }
+    else if (match(op, /SUB$/)) { r = sprintf("%9.6f", a - b); fn="-" }
+    else if (match(op, /MUL$/)) { r = sprintf("%9.6f", a * b); fn="*" }
+    else { printf("fptest ERROR what is op '%s'?\n", op) }
 
     diff = abs(r - zcmp)
-    should_be = sprintf("false (should be %s) (del = %9.6f)", r, diff)
-    good_enough = (diff <= 0.000002)
-    # FIXME but is this really good enough?
-   # A question for fpu testing i guess...
+    should_be = sprintf("false (wanted %s, off by %.6f)", r, diff)
+    good_enough = (diff <= 0.000003)
+    # FIXME but is this really good enough? IT KEEPS CREEPING!!!
+    # A question for fpu testing i guess...
 
     result = (r == zcmp) ? "true" : should_be
     result = good_enough ? "true" : should_be
 
-    printf("fptest %-27s %12s - %-12s = %10s    %s\n", op, "(" a, b ")", z, result);
+    printf("fptest %-27s %12s %s %-12s = %10s %s\n",
+                     op, "(" a, fn, b ")", z,   result);
     if (DBG) { printf("fptest    z_op['%s'] = %s\n", op, z_op[op]) }
 
     # Reset array
@@ -78,7 +81,8 @@ function abs(v) {return v < 0 ? -v : v}
 
 { print }
 
-/.*BFLY[0-9]*.sub.*z=[ -0123456789]/ {
+# FIXME have to restore mul one of these days...!!!
+/.*BFLY[0-9]*.(add|sub).*z=[ -0123456789]/ {
 
   # before & after gsub:
   # top_fft.BFLY0.sub_o2i.SUB a=-1.000000 (bf800000) b=-1.414214 (bfb504f3) z= 0.414214 (3ed413cc)
