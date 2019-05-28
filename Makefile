@@ -352,8 +352,7 @@ cleanall: clean
 	\rm -rf DVE*
 	\rm -rf vcdplus.vpd
 
-# 1905 regression tests
+# 1905 regression tests; regressions/ subdir should already exist!! (as part of dist)
 regress:
-	test -d tmp.regress || mkdir tmp.regress
-	cd tmp.regress; make -f ../Makefile cleanall
-	cd tmp.regress; ../bin/golden_test.csh |& tee regress.log.$$
+	cd regressions; make -f ../Makefile cleanall
+	cd regressions; ../bin/golden_test.csh |& tee regress.log.$$

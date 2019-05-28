@@ -7,6 +7,8 @@ TODO
 - put it in a separate repo...StanfordVLSI I guess
 
 
+HOW TO TEST THE FPU
+cd ../../fftgen/test; make fptest_64_1_1port
 
 
 

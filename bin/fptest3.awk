@@ -1,6 +1,6 @@
 #!/usr/bin/awk -f
-BEGIN { DBG = 0 }
 BEGIN { DBG = 1 } # Whoever's last wins! Right?
+BEGIN { DBG = 0 }
 
 # HOW TO USE:
 #   % ../bin/golden_test.csh 128 1 1port|& tee tmp.log.srsub$i | tail
@@ -31,8 +31,13 @@ BEGIN { DBG = 1 } # Whoever's last wins! Right?
 # Sample output:
 #   % fptest3.awk test_128_1_1port.log$i |& less
 #   ...
-#   fptest top_fft.BFLY0.sub_o2r.SUB    (1.000000 - 0.000000)    =   1.000000    true
-#   fptest top_fft.BFLY0.sub_o2i.SUB   (-1.000000 - -1.414214)   =   0.414214    true
+#   fptest o2i.FPU.SUB      (0.414214 - 1.082392)     =  -0.668179 true
+#   fptest o2i.FPU..SUB    (-0.414214 - -1.082392)    =   0.668179 true
+#   fptest o1i.FPU..ADD    (-0.414214 + -1.082392)    =  -1.496606 true
+#   fptest o2r.FPU..SUB     (1.000000 - 0.000000)     =   1.000000 true
+#   fptest o1r.FPU..ADD     (1.000000 + 0.000000)     =   1.000000 true
+#   fptest t2.FPU..ADD     (-0.923880 + -0.158513)    =  -1.082392 true
+#   fptest t1.FPU.ADD       (0.382683 + 0.382683)     =   0.765367 true
 #   top_fft.BFLY0 t5 ------------------------
 #   ...
 
@@ -73,8 +78,8 @@ function abs(v) {return v < 0 ? -v : v}
     # op="top_fft.BFLY0.sub_t1.FPU.SUB" is TOO MUCH
     # This shortens it to e.g. "t1.FPU.SUB"
     short_op = op; gsub(/top_fft.*_/, "", short_op);
-    printf("fptest %11s %12s %s %-12s = %10s %s\n",
-               short_op, "(" a, fn, b ")", z,   result);
+    printf("fptest %-12s %13s %s %-13s = %10s %s\n",
+             short_op, "(" a, fn, b ")", z,   result);
     if (DBG) { printf("fptest    z_op['%s'] = %s\n", op, z_op[op]) }
 
     # Reset array
