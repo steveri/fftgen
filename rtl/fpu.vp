@@ -11,9 +11,9 @@
 // ---------------- Begin default Genesis2 parameter summary ----------------
 //;
 //; my $whose_fpu = parameter
-//;    (Name=>'whose_fpu', Val=>"designware",
-//;     List=>["danshanley", "designware"],
-//;     Doc=>'fix=fixed-point, float=floating-point');
+//;    (Name=>'whose_fpu', Val=>"sr",
+//;     List=>["sr", "dw"],
+//;     Doc=>'sr=homegrown-fpu, dw=designware-fpu (where avail)');
 //;
 //; my $op = parameter
 //;    (Name=>'op', Val=>"add",
@@ -36,7 +36,35 @@ module `mname` (
   input  logic [31:0] b,
   output logic [31:0] z
   );
-  //; if ("$whose_fpu" eq "designware") {
+  //; ########################################################################
+  //; if ("$whose_fpu" eq "sr") {
+    //; my $add_op = "1'b0"; my $sub_op = "1'b1";  # same as designware i guess
+    //; if ($op eq "mul") {
+
+        srmul MUL (.a(a), .b(b), .z(z));
+
+    //; } elsif ($op eq "add") {
+
+        addsub FPU (.op(`$add_op`), .a(a), .b(b), .z(z));
+
+    //; } elsif ($op eq "sub") {
+
+    \`ifndef SRSUB_TEST
+        addsub FPU (.op(`$sub_op`), .a(a), .b(b), .z(z));
+    \`else
+        // FIXME really? is this the best place for this???
+        wire [31:0] z1; wire [31:0] z2; wire [31:0] z3; wire [31:0] z4;
+        srsub SUB41(.op(`$sub_op`), .a($shortrealtobits(4.0)), .b($shortrealtobits(1.0)), .z(z1));
+        srsub SUB43(.op(`$sub_op`), .a($shortrealtobits(4.0)), .b($shortrealtobits(3.0)), .z(z2));
+        srsub SUB14(.op(`$sub_op`), .a($shortrealtobits(1.0)), .b($shortrealtobits(4.0)), .z(z3));
+        srsub SUB34(.op(`$sub_op`), .a($shortrealtobits(3.0)), .b($shortrealtobits(4.0)), .z(z4));
+        assign z = z1|z2|z3|z4;
+    \`endif
+    //; } # $op eq "sub"
+  //; 
+
+  //; ########################################################################
+  //; } elsif ("$whose_fpu" eq "dw") {
 
     // /hd/cad/synopsys/dc_shell/latest/dw/doc/datasheets/dw_fp_mult.pdf
     logic [7:0] status; // unused :(
@@ -63,72 +91,16 @@ module `mname` (
     //; my $add_op = "1'b0"; my $sub_op = "1'b1";
     //; 
     //; if ($op eq "mul") {
-
-
-
-// DESIGNWARE MUL
-//      // z = a * b
-//      DW_fp_mult #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
-//      MUL (.a(a), .b(b), .z(z), .rnd(rnd), .status(status));
-
-
-//      logic Exception, Overflow, Underflow;
-//      multiplication
-//      MUL (
-//        .a_operand(a), .b_operand(b),
-//	.Exception(Exception), .Overflow(Overflow), .Underflow(Underflow),
-//        .result(z));
-
-
-
-// SRMUL
-srmul MUL (.a(a), .b(b), .z(z));
-
-
-
+        DW_fp_mult #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
+        MUL (.a(a), .b(b), .z(z), .rnd(rnd), .status(status));
     //; } elsif ($op eq "add") {
-
-//      // z = a + b
-//      DW_fp_addsub #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
-//      ADD (.a(a), .b(b), .z(z), .op(`$add_op`), .rnd(rnd), .status(status));
-
-
-// haha freeware add is BROKEN
-//      logic exception;
-//      addition_subtraction
-//      ADD (.a_operand(a), .b_operand(b), .AddBar_Sub(1'b0), .Exception(exception), .result(z));
-
-        addsub FPU (.op(`$add_op`), .a(a), .b(b), .z(z));
-
-
-
-
+        DW_fp_addsub #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
+        ADD (.a(a), .b(b), .z(z), .op(`$add_op`), .rnd(rnd), .status(status));
     //; } elsif ($op eq "sub") {
-
-        // z = a - b
-
-    \`ifndef SRSUB_TEST
-        // DW_fp_addsub #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
-        // SUB (.a(a), .b(b), .z(z), .op(`$sub_op`), .rnd(rnd), .status(status));
-
-        // logic exception;
-        // addition_subtraction
-        // SUB (.a_operand(a), .b_operand(b), .AddBar_Sub(1'b1), .Exception(exception), .result(z));
-
-        //srsub SUB (.a(a), .b(b), .z(z));
-        addsub FPU (.op(`$sub_op`), .a(a), .b(b), .z(z));
-    \`else
-        // FIXME really? is this the best place for this???
-        wire [31:0] z1; wire [31:0] z2; wire [31:0] z3; wire [31:0] z4;
-        srsub SUB41(.op(`$sub_op`), .a($shortrealtobits(4.0)), .b($shortrealtobits(1.0)), .z(z1));
-        srsub SUB43(.op(`$sub_op`), .a($shortrealtobits(4.0)), .b($shortrealtobits(3.0)), .z(z2));
-        srsub SUB14(.op(`$sub_op`), .a($shortrealtobits(1.0)), .b($shortrealtobits(4.0)), .z(z3));
-        srsub SUB34(.op(`$sub_op`), .a($shortrealtobits(3.0)), .b($shortrealtobits(4.0)), .z(z4));
-        assign z = z1|z2|z3|z4;
-    \`endif
+        DW_fp_addsub #(23, 8, 1)// #(sig, exp, IEEE compliance (0 or 1)) 
+        SUB (.a(a), .b(b), .z(z), .op(`$sub_op`), .rnd(rnd), .status(status));
     //; } # $op eq "sub"
   //; } # ("$whose_fpu" eq "designware")
-  //; 
 
 endmodule
 //////////////////////////////////////////////////////////////////////////////

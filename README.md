@@ -9,10 +9,5 @@ UNDER DEVELOPMENT
 
 #### CURRENT STATUS
 
-- debugged 128_1_1port, it's working correctly now
-- next, need to retry regressions and see if we get farther now
-
-- debugged 64_1_1port
--- verified the following CORRECT for srsub: 4-1, 4-3, 1-4, 3-4
--- appears to have successfully PASSED golden_test.csh 64 1 1port
-
+- all regression tests PASS (47/47) using homebrew fpu
+- still to do: make everything work with verilator
