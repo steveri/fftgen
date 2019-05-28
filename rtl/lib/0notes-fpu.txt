@@ -8,7 +8,24 @@ TODO
 
 
 HOW TO TEST THE FPU
-cd ../../fftgen/test; make fptest_64_1_1port
+  cd ../../fftgen/test
+  make fptest_64_1_1port
+OR
+  cd ../../ftgen/test
+  make test_64_1_1port
+  ../bin/fptest3.awk test_64_1_1port.log
+  # Sample output:
+  #   % fptest3.awk test_128_1_1port.log$i |& less
+  #   ...
+  #   fptest o2i.FPU.SUB      (0.414214 - 1.082392)     =  -0.668179 true
+  #   fptest o2i.FPU..SUB    (-0.414214 - -1.082392)    =   0.668179 true
+  #   fptest o1i.FPU..ADD    (-0.414214 + -1.082392)    =  -1.496606 true
+  #   fptest o2r.FPU..SUB     (1.000000 - 0.000000)     =   1.000000 true
+  #   fptest o1r.FPU..ADD     (1.000000 + 0.000000)     =   1.000000 true
+  #   fptest t2.FPU..ADD     (-0.923880 + -0.158513)    =  -1.082392 true
+  #   fptest t1.FPU.ADD       (0.382683 + 0.382683)     =   0.765367 true
+  #   top_fft.BFLY0 t5 ------------------------
+  #   ...
 
 
 
