@@ -1,0 +1,271 @@
+STATUS 1905
+- seems stable for now, works on 47 fft regressions
+- could use a severe cleaning up
+- also needs severe testsing, i.e. maybe find IEEE/IBM vectors
+
+TODO
+- put it in a separate repo...StanfordVLSI I guess
+
+
+
+
+
+
+
+Okay 128 works again!
+- severe cleanings up
+- checkings in
+
+
+
+
+Okay 128 works!
+next:
+- clean up
+- update README status
+- and check in
+then:
+- propagate ignore_a and b to srsub, right?
+- recheck 128
+- check in
+then:
+- regressions! haha
+
+
+new filter:
+fptest test_128_1_1port.log$i |& egrep ^fptest | sort \
+| uniq | sed 's/^fptest top_fft.BFLY0.sub_//' | less
+
+
+fptest top_fft.BFLY0.sub_o2r.SUB.SUBADDER    (1.000000 - 1.000000)    =   2.000000 FALSE (wanted  0.000000, off by 2.000000)
+
+PROBLEM: 1 - 1 = 2
+SUBADDER a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 2.000000 (40000000)
+SUBADDER   ae=7f be=7f
+SUBADDER   ae+bias=0 be+bias=0
+SUBADDER   ediff= 0
+SUBADDER   am=800000 bm=800000
+SUBADDER   am_adj=000000800000
+SUBADDER   bm_adj=000000800000
+SUBADDER   am+bm =000001000000
+SUBADDER   ze      =7f
+SUBADDER   ze_final=80
+SUBADDER   zm      =1000000
+SUBADDER   zm_final=000000
+SUBADDER 
+
+
+
+
+
+
+
+
+NOW
+- checked in and clean
+
+NEXT
+- update sradd w/new display/debug format
+- update fptest3 to handle add, mul
+- debug 128/1/1port
+- start round6; look at all sr results in log; expect to see busted sradd, srmul at least
+
+
+LATER
+- continue debugging fptest
+  cd build; fptest2.awk test_128_1_1port.log$i |& less
+- try always @ (z)
+- implement "ntries" in fptest maybe
+- remove FIXME TEST CODE in srsub, try again
+- potential FIXME? fpu.vp makes three separate unique modules :( ?
+
+CURRENT TEST SEQ
+i=0
+cd build/
+alias fptest=/nobackup/steveri/github/fftgen/bin/fptest3.awk 
+../bin/golden_test.csh 128 1 1port|& tee tmp.log.srsub$i | tail
+cp /tmp/test_128_1_1port.log test_128_1_1port.log$i
+fptest test_64_1_1port.log$i | less (look for "false")
+fptest test_128_1_1port.log$i |& grep fptest | sort | uniq | less
+fptest test_128_1_1port.log$i |& egrep ^fptest | sort | uniq > tmp4; h40 tmp4
+
+NEXT
+- clean up srsub/sradd, use below test as your guide
+- fix multiplier, use test below as your guide
+- is mul still broken? see test(s) below
+
+MULTIPLIER NOTES
+# multiplier flowchart:
+#   https://www.quora.com/What-is-the-verilog-code-for-floating-point-multiplier
+# sp format:
+#   https://www.quora.com/How-can-I-design-a-floating-point-multiplier-in-Verilog
+#   https://en.wikipedia.org/wiki/Single-precision_floating-point_format
+
+
+
+
+==============================================================================
+DONE
+- update fptest and srsub to remove "srsub" from display out
+
+
+DONE 1905
+- srsub is GOOOOOD
+-- b/c fixed fptest; ALL TRUE:
+  % alias fptest=/nobackup/steveri/github/fftgen/bin/fptest3.awk 
+  % ../bin/golden_test.csh 128 1 1port|& tee tmp.log.srsub$i | tail
+  % cp /tmp/test_128_1_1port.log test_128_1_1port.log$i
+  % fptest test_128_1_1port.log$i |& grep fptest | sort | uniq | less
+
+DONE/FIXED 1905
+- DEBUG 2 - 1 = x
+srsub top_fft.BFLY0.spsub_o2r.SUB a= 2.000000 (40000000) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srsub top_fft.BFLY0.spsub_o2r.SUB    ae=80 be=7f
+srsub top_fft.BFLY0.spsub_o2r.SUB    ae+bias=1 be+bias=0
+srsub top_fft.BFLY0.spsub_o2r.SUB    ediff=  x
+srsub top_fft.BFLY0.spsub_o2r.SUB    am=800000 bm=800000
+srsub top_fft.BFLY0.spsub_o2r.SUB    am_adj=xxxxxxxxxxxx
+srsub top_fft.BFLY0.spsub_o2r.SUB    bm_adj=xxxxxxxxxxxx
+srsub top_fft.BFLY0.spsub_o2r.SUB    a>b = x
+srsub top_fft.BFLY0.spsub_o2r.SUB    |am-bm| == xxxxxxxxxxxx
+srsub top_fft.BFLY0.spsub_o2r.SUB    ze      =xx
+srsub top_fft.BFLY0.spsub_o2r.SUB    ze_final=xx
+srsub top_fft.BFLY0.spsub_o2r.SUB    zm      =xxxxxx
+srsub top_fft.BFLY0.spsub_o2r.SUB    zm_final=xxxxxx
+
+DONE 1905
+- verified the following for srsub 4-1, 4-3, 1-4, 3-4
+
+DONE
+- undo test sequences in fpu.v (srsub.v?)
+- fptest.awk test_128_1_1port.log$i | egrep '(true|false)$' | sort -rn | uniq | less
+
+DONE
+# okay, identified srsub error:
+# srsub a= 4.000000 (40800000) b= 1.000000 (3f800000) z= 6.000000 (40c00000)
+# ...by adding this test in fpu.vp:
+#       srsub
+#      SUB (.a($shortrealtobits(4.0)), .b($shortrealtobits(1.0)), .z(z));
+
+DONE
+- fix srsub
+- resture fpu.vp
+- continue testing, see below
+
+DONE
+- fix this broken thing in srsub.v
+  cd build
+  fptest.awk test_64_1_1port.log2 | sort -rn | uniq | less | head
+  srsub a= 1.000000 (3f800000) b=2097152.000000 (4a000000) z= 0.000000 (ca00000X) 1.000000 false
+
+DONE
+- clean up fptest.awk maybe
+- assume add/sub is correct, clean up and check in
+
+DONE
+- adder works maybe, see below.
+- clean up and check in
+- see where we are with fft results, probably still broken
+
+DONE
+- 1+1=2 AND 1+.707=1.707 i think VICK TORY!
+
+OLD
+# cd build/
+# ../bin/golden_test.csh 64 1 1port |& tee tmp.log.srsub$i | tail
+# less -r /tmp/test_64_1_1port.log
+# cp /tmp/test_64_1_1port.log test_64_1_1port.log$i
+
+VERY OLD
+# cd build/
+# astest.sh test_64_1_1port.log$i | egrep 'add|sub'
+
+OLD
+#  11332  srsub a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 0.000000 (00000000)
+# 
+# sradd a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 1.000000 (3f800000)
+# sradd   ae=7f be=7f
+# sradd   ae+bias=0 be+bias=0
+# sradd   ediff= 0
+# sradd   am=800000 bm=800000
+# sradd   am_adj=000000800000
+# sradd   bm_adj=000000800000
+# sradd   am+bm =000001000000
+# sradd   ze      =7f
+# sradd   ze_final=7f
+# sradd   zm      =1000000
+# sradd   zm_final=000000
+# 
+# 
+# sradd a= 1.000000 (3f800000) b= 0.707107 (3f3504f3) z= 1.707107 (3fda8279)
+# sradd   ae=7f be=7e
+# sradd   ae+bias=0 be+bias=255
+# sradd   ediff= 1
+# sradd   am=800000 bm=b504f3
+# sradd   am_adj=000001000000
+# sradd   bm_adj=000000b504f3
+# sradd   am+bm =000001b504f3
+# sradd   ze      =7e
+# sradd   ze_final=7f
+# sradd   zm      =da8279
+# sradd   zm_final=5a8279
+
+OLD
+# build/round4/
+# c; ../bin/golden_test.csh 8 1 1port |& tee tmp.log7
+# diff tmp.log[67]
+
+DONE
+# sub kinda sorta seems to work; 
+# but now need add i.e. what happens when sign(a) != sign(b)
+
+OLD
+# make -f ../bin/../Makefile clean gen TOP=fft
+# GENESIS_PARAMS="top_fft.n_fft_points=64 top_fft.units_per_cycle=1
+# top_fft.SRAM_TYPE=TRUE_1PORT top_fft.swizzle_algorithm=round7" >&
+# /tmp/test_ 64_1_1port.log
+
+OLD
+# vcs -sverilog +cli +memcbk +lint=all,noVCDE +libext+.v -notice -full64
+# +v2k -debug_pp -timescale=1ps/1ps +noportcoerce +vcs+lic+wait
+# -licqueue -ld gcc -top top_fft \ -y
+# /nobackup/steveri/github/fftgen/build
+# +incdir+/nobackup/steveri/github/fftgen/build -y
+# /hd/cad/synopsys/dc_shell/latest/dw/sim_ver
+# +incdir+/hd/cad/synopsys/dc_shell/latest/dw/sim_ver -y
+# /nobackup/steveri/github/fftgen/rtl/lib
+# +incdir+/nobackup/steveri/github/fftgen/rtl/lib -f
+# /nobackup/steveri/github/fftgen/build/genesis_vlog.vf
+
+DONE (right?)
+- WHEN WE COME BACK
+-- write'cher own dam' multplier
+
+DONE
+- clean up below
+- save work so far
+
+OLD
+- cruzebarada it is!!!
+- git clone https://github.com/CruzeBurada/Floating-Point-ALU-in-Verilog tmp.cruzeburada
+- looking goody...
+- no in the end it was baddy
+
+OLD
+# vcs -sverilog +cli +memcbk +lint=all,noVCDE +libext+.v -notice -full64 \
+# +v2k -debug_pp -timescale=1ps/1ps +noportcoerce +vcs+lic+wait \
+# -licqueue -ld gcc -top top_fft -y \
+# /nobackup/steveri/github/fftgen/build \
+# +incdir+/nobackup/steveri/github/fftgen/build -y \
+# /hd/cad/synopsys/dc_shell/latest/dw/sim_ver/ \
+# +incdir+/hd/cad/synopsys/dc_shell/latest/dw/sim_ver/ -y \
+# /hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
+# +incdir+/hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ -y \
+# /nobackup/steveri/github/fftgen/rtl \
+# +incdir+/nobackup/steveri/github/fftgen/rtl -f \
+# /nobackup/steveri/github/fftgen/build/genesis_vlog.vf \
+# |& less
+
+
+
+
