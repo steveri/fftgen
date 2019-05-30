@@ -1,3 +1,11 @@
+1905 NEW EXECUTIVE SUMMARY
+- ALL THE FREE FPUs WERE CRAP!
+- wrote my own instead
+- mine is also crap
+- but it passes regressions
+
+
+
 1905 (May 2019)
 
 TODO
