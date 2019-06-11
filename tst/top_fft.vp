@@ -399,7 +399,7 @@ module `mname`();
    end
 
    // BUG/FIXME/TODO this is wrong and you know why!
-   // At reset, start pulses high until next clk posedge.  BUG/FIXME/TODEO
+   // At reset, start pulses high until next clk posedge.  BUG/FIXME/TODO
    always @(negedge rst_n) begin
       start <= 1'b1;
       @(posedge fftclk) begin start <= 1'b0; end

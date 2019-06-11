@@ -12,10 +12,16 @@ my $TEST_ERROR = 0;
 
 if (@ARGV != 3) {
     my $errmsg = sprintf(
-        "Usage: $0 <npoints> <n_butterfly_units> <sram_type>\n".
-        "Example:\n".
-        "    $0    8 1 \"2port\"".
-        "    $0 1024 4 \"1port\"");
+        "\n".
+        "Generates correct fft answers and compares vs. simv.log\n".
+        "\n".
+        "Usage:\n".
+        "   $0 <npoints> <n_butterfly_units> <sram_type>\n".
+        "\n".
+        "Examples:\n".
+        "    $0    8 1 \"2port\"\n".
+        "    $0 1024 4 \"1port\"\n".
+        "\n");
     die $errmsg;
 }
 my ($npoints,$nunits,$sram_type) = ($ARGV[0], $ARGV[1], $ARGV[2]);

@@ -1,0 +1,713 @@
+SEEMS TO WORK according to waveforms
+- gtkwave 811vcs/811vcs.vcd fft.gtkw
+  and/or
+  gtkwave 811vcs/fft.vcd 811vcs/fft.gtkw
+- btkwave verilator/counter.vcd verilator/counter.gtkw
+
+
+NEXT
+- see if new code works with vcs
+- establish a baseline
+-- do sequence below
+-- check that diff give same simv.log GOOD
+-- check that vcd file is still the same GOOD
+- propagate changes from verilator/rtl
+- repeat verification
+
+TO CHECK SIMV.LOG, just do
+cp simv.log$i simv.log
+../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
+
+
+i=1
+vcs -sverilog +cli +lint=all,noVCDE +libext+.v -notice -full64 \
+  +v2k -debug_pp -timescale=1ps/1ps \
+  +noportcoerce +vcs+lic+wait -licqueue -ld gcc -top top_fft \
+  -y /hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
+  +incdir+/hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
+  -y ./rtl/ +incdir+./rtl/ -f fft.vf | tee vcs.log$i | tail
+
+simv +vcs+dumparrays |& tee simv.log$i | tail
+cp fft.vcd fft.vcd$i
+diff fft.vcd0 fft.vcd$i
+
+diff simv.log$i simv.log0
+
+cp simv.log$i simv.log
+../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
+
+
+
+
+DONE
+- snapshot everything to home dir fftgen.snapshot.190611
+
+
+
+
+new problem: 5/6 transition
+wz stays high, should go low...
+
+
+plan is to disable wz when addr==x
+see printout, plus new signals wz[0123] in fftram
+TODO should also disable ez I suppose
+NOTE vcs version is WRONG but addr==x effectively disables writes anyway :(
+
+
+
+
+
+
+
+SRAM is a TERRIBLE SRAM!!!
+- e.g. write is clocked on ez/wz edges!!?
+- but read is not clocked at all :(
+* should be able to make it work with standard SRAM!!!
+
+
+Okay it compiles (verilator) w/o error.
+Next: make, obj/fft etc.
+
+
+
+
+
+
+
+
+
+Okay think maybe I got fft_top done
+NEXT: Try a compile?
+
+
+verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} \
+  |& tee verilator.log$i | less
+
+
+
+
+------------------------------------------------------------------------
+HOW-TO - SETUP
+cd $fft/verilator
+top=rtl/top_fft.v; cpp=fft.cpp; vdir=rtl/
+echo $top $cpp $vdir
+
+
+HOW-TO - RUN
+i=4
+echo mv obj_dir obj_dir`expr $i - 1`
+verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} \
+  |& tee verilator.log$i | less
+make -j -C obj_dir/ -f Vtop_fft.mk Vtop_fft |& tee make.log$i | less
+obj_dir/Vtop_fft |& ../bin/bsr.awk %9.6f\
+  | egrep -v 'srmul|FPU' \
+  | sed 's/^TOP.v/top_fft/' \
+  | tee fft.log$i | less
+
+------------------------------------------------------------------------
+
+
+
+
+
+
+
+REBOOT
+- build 811vcs.vcd DONE
+- save old verilator directory
+- build new verilator directory
+- build 811v.vcd
+- CONVERGE
+
+------------------------------------------------------------------------
+VERILATOR VERSION
+
+cd verilator
+cp -rp ../811vcs/rtl .
+
+
+copy fft.cpp from old verilator directory, check it for errors etc.
+update top_fft, refer to old verilator
+cd rtl
+cp top_fft.v top_fft.v.vcs
+cp ../../verilator.round1/rtl/top_fft.v top_fft.v.ver1
+chmod -w top_fft.v.*
+
+
+
+------------------------------------------------------------------------
+VCS VERSION
+
+TODO
+- fix up 881vcs
+-- alter 'make test8' to build fft.vcd maybe
+-- alter 'Makefile' to build fft.vcd maybe
+
+cd $fft
+make test8
+mv tmpXXX/ 811vcs/
+
+THEN
+- have to (re)build vcd file correctly now :(
+
+vcs -sverilog +cli +lint=all,noVCDE +libext+.v -notice -full64 \
+ +v2k -debug_pp -timescale=1ps/1ps \
+ +noportcoerce +vcs+lic+wait -licqueue -ld gcc -top top_fft -y \
+ /hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
+ +incdir+/hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ -y \
+ ./rtl/ +incdir+./rtl/ -f tmp.vf | tee vcs.log | tail
+
+simv +vcs+dumparrays |& tee simv.log | tail
+
+
+cd $fft
+make test8
+
+TODO
+- document memory array / vcd stuff?
+
+
+------------------------------------------------------------------------
+HOWTO dump memory arrays to vcd file:
+
+In clock_unq1.v:
+   initial begin
+     $dumpon;
+     $dumpfile("fft.vcd");
+   end
+
+IN vcs command line: nothing. no memcbk, no dumpvars, no nothing
+Example vcs command that works
+
+vcs -sverilog +cli +lint=all,noVCDE +libext+.v -notice -full64 \
+  +v2k -debug_pp -timescale=1ps/1ps \
+  +noportcoerce +vcs+lic+wait -licqueue -ld gcc -top top_fft \
+  -y /hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
+  +incdir+/hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
+  -y ./rtl/ +incdir+./rtl/ -f tmp.vf | tee vcs.log | tail
+
+simv +vcs+dumparrays |& tee simv.log | tail
+
+For things that did NOT work see $fft/archives/vcd-mem-thrashing.txt
+
+------------------------------------------------------------------------
+next: CLEAN UP!!!
+
+
+/cad/synopsys/vcs/I-2014.03-2/doc/UserGuide/pdf/vcs.pdf
+
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+
+
+# npoints="top_fft.n_fft_points=8"
+# nbutts="top_fft.units_per_cycle=1"
+# sram="top_fft.SRAM_TYPE=TRUE_1PORT"
+# alg="top_fft.swizzle_algorithm=round7"
+# echo GENESIS_PARAMS="$npoints $nbutts $sram $alg"
+# 
+# # make -f ../bin/../Makefile \
+# make \
+# clean gen TOP=fft \
+# GENESIS_PARAMS="$npoints $nbutts $sram $alg" \
+# >& test_8_1_1port.log
+# 
+# ../bin/golden_test.pl 8 1 1port |& tee gold.log$i | less
+
+
+
+
+
+
+==============================================================================
+
+
+
+
+TODO
+- NO INITIAL BEGINS right?
+- start should stay high for a full cycle maybe why not
+- reset should be generated in top_fft.v, yes?
+
+
+
+awk -f ../bin/process_test5.awk ncsim.log >& ncsim.processed
+
+
+
+
+
+
+
+
+
+NEXT
+- log convergence, see TODO CONVERGENCE below
+- then back to "CHECK ANSWERS" then "ADV COMPARE"
+
+
+
+TODO CONVERGENCE - fft.log, ncsim.log convergence (converge verilator, ncsim logs)
+- debugging
+- works like this:
+- compare fft.log$i to ncsim.log
+- squelch diffs
+- repeat
+
+
+
+
+LATER
+- work on regression tests for verilator
+- clean up / rename the other todo's
+- consider replacing todo's with github issues maybe
+- WOW really need to clean up bin/ directory
+- haha fft.cpp opens "counter.vcd"
+
+DONE 1906
+- got rid of 13's checked the answer (round2 i=4)
+- time to snapshot to next i i guess
+- golden test (ADV. COMPARE) and "CHECK ANSWERS" failed miserably
+  (see below), so back to log convergence
+
+
+------------------------------------------------------------------------
+HOW-TO - SETUP
+cd $fft/verilator
+top=rtl/top_fft.v; cpp=fft.cpp; vdir=rtl/
+
+HOW-TO - RUN
+i=4
+echo mv obj_dir obj_dir`expr $i - 1`
+verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} \
+  |& tee verilator.log$i | less
+make -j -C obj_dir/ -f Vtop_fft.mk Vtop_fft |& tee make.log$i | less
+obj_dir/Vtop_fft |& ../bin/bsr.awk %9.6f\
+  | egrep -v 'srmul|FPU' \
+  | sed 's/^TOP.v/top_fft/' \
+  | tee fft.log$i | less
+
+HOW-TO - CHECK ANSWERS
+awk -f ../bin/process_test5.awk ncsim.log >& ncsim.processed; tail ncsim.processed
+awk -f ../bin/process_test5.awk fft.log$i >& fft$i.processed; tail fft$i.processed
+
+HOW-TO - ADVANCED COMPARE
+cp fft.log$i simv.log
+../bin/golden_test.pl 8 1 1port |& tee gold.log$i | less
+
+
+DONE
+- see if golden-test works NOPE
+- if not, continue with TODO CONVERGENCE below
+
+
+SRAM restore did not work
+
+
+Compare fft.log2, ncsim.log...looks pretty good, no?
+
+f=`diff -r rtl round1/rtl4 -q | grep differ | awk '{print $2}'`
+echo $f
+mkdir rtl$i
+cp $f rtl$i/
+
+
+PLAN:
+- capture what you got
+- increment i
+- try restoring SRAM_unq[1234], output should not change
+- document EVERYTHING
+- sleep
+
+WOW this looks promising
+can we capture what we got so far?
+- main thing was we restored fftctl
+- maybe try restoring SRAM_unq[1234]
+
+
+
+thingsa lookin GOODY! NEXT:
+- save all changes
+- continue w/same i
+
+
+
+
+TODO ZERO - modify rtl to emit bsr's instead of 13.13's
+- save existing state to round1
+- ready round 2: see how-to, above
+- once 13.13's have been purged:
+  cd $fft/verilator
+  ../bin/bsr.awk < fft.log$i > fft.log$i.bsr
+  diff fft.log$i fft.log$i.bsr
+
+
+
+
+
+TODO ONE
+- compare new to old fft logs
+
+
+-- looks like verilator log is $fft/verilator/fft.log6
+-- 
+
+-- verilator simv > t64_verilator.log.raw
+-- bin/bsr.awk < t64_verilator.log.raw > t64_verilator.log.bsr
+-- gunzip -c $fft/test/examples/test_64_1_1port.log.gz > t64_ncsim.log
+-- diff t64_ncsim.log t64_verilator.log.bsr
+-- probably won't match, go on to TODO TWO anyway
+
+TODO TWO
+- merge verilator, ncsim code, use regression tests to stay on track
+
+
+
+DONE
+- bin/bsr.awk works maybe
+
+
+------------------------------------------------------------------------------
+time to make verilator work!!!
+
+1. build genesis_verif using simplest 8-1-1 test
+2. try this:
+
+  cd verilator
+  alias mf='make -f ../Makefile'
+  npoints="top_fft.n_fft_points=8"
+  nbutts="top_fft.units_per_cycle=1"
+  sram="top_fft.SRAM_TYPE=TRUE_1PORT"
+  alg="top_fft.swizzle_algorithm=round7"
+
+  make -f ../bin/../Makefile \
+  clean gen TOP=fft \
+  GENESIS_PARAMS="$npoints $nbutts $sram $alg" \
+  >& test_8_1_1port.log
+
+
+
+
+------------------------------------------------------------------------------
+STATUS 1905
+- new fpu seems stable, works on 47 fft regressions, see rtl/lib/0notes-fpu.txt
+- maybe put fpu in rtl/fpu or rtl/lib/fpu instead of rtl/lib or something maybe
+
+
+
+TODO
+- also see rtl/lib/0notes-fpu.txt
+- ELIMINATE LINT ERRORS!!! 
+- test and see if still works with designware maybe
+- PORT TO VERILATOR!
+- also do a system test /complete runthrough i.e. clone from scratch and see if it works
+
+
+HOW TO RUN REGRESSIONS
+- cd regressions; make regress
+
+HOW TO RUN A SINGLE FFT TEST (should say "1/1 tests PASSED")
+- cd test; make
+- OR cd test; make test_64_1_1port
+
+HOW TO TEST THE FPU
+- cd test; make fptest_64_1_1port
+- OR cd test; make test_64_1_1port; ../bin/fptest3.awk test_64_1_1port.log
+# Sample output:
+#   % fptest3.awk test_128_1_1port.log$i |& less
+#   ...
+#   fptest o2i.FPU.SUB      (0.414214 - 1.082392)     =  -0.668179 true
+#   fptest o2i.FPU..SUB    (-0.414214 - -1.082392)    =   0.668179 true
+#   fptest o1i.FPU..ADD    (-0.414214 + -1.082392)    =  -1.496606 true
+#   fptest o2r.FPU..SUB     (1.000000 - 0.000000)     =   1.000000 true
+#   fptest o1r.FPU..ADD     (1.000000 + 0.000000)     =   1.000000 true
+#   fptest t2.FPU..ADD     (-0.923880 + -0.158513)    =  -1.082392 true
+#   fptest t1.FPU.ADD       (0.382683 + 0.382683)     =   0.765367 true
+#   top_fft.BFLY0 t5 ------------------------
+#   ...
+
+
+
+
+DONE
+- debug 128 1 dpump or whatever
+- 
+
+
+STATUS 5/25
+- verified the following for srsub 4-1, 4-3, 1-4, 3-4
+- appears to have successfully PASSED golden_test.csh 64 1 1port
+- appears to have FAILED 128 1 dpump
+
+CONTEXT
+  cd github/fftgen/tmp.regress
+  egrep 'PASS|FAIL' log2 | less
+
+
+NEXT
+- debug 128 1 dpump or whatever
+- try regression tests i guess FAILES
+- see rtl/lib/0notes-fpu.txt
+- clean up below
+
+
+
+STATUS
+- fft currently broken i think b/c fpu
+-- cd build; mf cleanall; ../bin/golden_test.csh 8 1 1port |& tee tmp.log0
+-- also see build/round4/
+
+- working on fpu, see rtl/lib/0notes-fpu.txt
+
+
+
+
+
+
+NEXT
+- check it in!
+- then: continue debugging
+
+
+DONE
+- move all to github READY!!! -> IN PROGRESS -> DONE
+-- offload docs => /home/steveri/projects/fft/doc/ DONE
+-- move everything I guess, but first get rid of big trash maybe
+
+
+DEBUGGING
+  alias mf='make -f ../Makefile'
+  cd build
+  mf cleanall
+  i=8
+  ../bin/golden_test.csh 8 1 1port |& tee tmp.log$i
+  cp /tmp/test_8_1_1port.log test_8_1_1port.log$i
+  less test_8_1_1port.log$i
+  diff tmp.log[78]
+
+  DEBUG; check in
+  etc.
+
+
+
+
+Clean up golden_test output:
+
+  cd build; ../bin/golden_test.csh 8 1 1port |& tee tmp.log
+
+first problem: weird path name
+  make -f ../bin/../Makefile clean ...
+
+
+
+
+
+NEXT?
+- clean up README.txt
+- README.txt => README.md ?
+- try out README etc.
+- clean up below
+
+LATER
+- gui???
+
+
+
+
+  make -f ../bin/../Makefile clean gen TOP=fft
+  GENESIS_PARAMS="top_fft.n_fft_points=32 top_fft.units_per_cycle=2
+  top_fft.SRAM_TYPE=TRUE_1PORT top_fft.swizzle_algorithm=round7" >&
+  /tmp/test_32_2_1port.log
+
+
+
+Make notes in 0notes.txt
+Publish to README.md
+Also see ~/0notes/fftgen-2019.txt
+
+FFTGEN_DIR=`pwd`
+mkdir build/
+cd build/
+make -f $FFTGEN_DIR/Makefile gen
+
+
+c; bin/golden_test.csh 32 2 1port |& tee golden_test_32_2_1port.log
+
+
+
+unlinked: github -> /nobackup/steveri/github/fftgen/
+
+
+TODO
+- need some way to run in subdirectory
+-- i.e. separate "build" subdirectory? should start out empty, yes?
+
+thing to try:
+c; bin/golden_test.csh |& tee golden_test_all.log
+
+
+
+
+
+TODO
+- README.txt => README.md
+- README_files.txt => ???
+
+8 may 2019
+
+c; bin/golden_test.csh 32 2 1port |& tee golden_test.log2
+
+
+Seems to be working(!!!)
+- deleted this from makefile: "export VCS_ARCH_OVERRIDE=linux"
+
+
+
+TODO
+- seems like there should be a bin/setup_vcs.sh ??
+
+
+1. Need a working Genesis2 in your path. This will check for that:
+   which Genesis2
+   source bin/setup_genesis.sh  
+   export PATH=.:/home/steveri/bin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin:/cad/common/Linux/x86_64/bin:/cad/synopsys/vcs/O-2018.09-SP1/bin:/cad/synopsys/vcs/O-2018.09-SP1/gui/dve/bin:/tmp/Genesis2/Genesis2Tools/bin:/tmp/Genesis2/Genesis2Tools/gui/bin
+
+
+2. Need Synopsys' vcs tool in your path. On kiwi:
+   (TODO should be a bin/setup_vcs.sh, yes?)
+   which vcs
+   source /cad/modules/tcl/init/sh
+   module load base
+   module load vcs
+   export PATH=.:/home/steveri/bin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin:/cad/common/Linux/x86_64/bin:/cad/synopsys/vcs/O-2018.09-SP1/bin:/cad/synopsys/vcs/O-2018.09-SP1/gui/dve/bin
+
+   vcs -full64 -help | head
+
+
+
+3. Now give it a shot, now that you're set up and all:
+
+   bin/golden_test.csh 32 2 1port
+
+
+
+
+
+7 may 2019
+This is the fftgen directory ~/chipgen/fftgen
+
+To run exhaustive regression test on kiwi (? not yet verified)
+
+  kiwi% bin/switch.csh     # Result should be "round7"
+  kiwi% source bin/setup_stanford.bashrc
+
+  kiwi% ~/fftgen/bin/golden_test.csh           # Default, see above
+  kiwi% ~/fftgen/bin/golden_test.csh 8 1 1port # For single test
+  kiwi% ~/fftgen/bin/golden_test.csh -abbrev   # For D={8,16,32} only
+  kiwi% ~/fftgen/bin/gt8k.csh                  # For D=(8,8192,4096,2048) only
+
+
+
+
+
+
+------------------------------------------------------------------------
+16 Jul 2014
+This is the fftgen directory.
+
+No longer using symbolic link to fft_scheduler_{old,new}; use
+environment variable SCHED_ALG i.e. to access the old regime e.g.
+
+  setenv SCHED_ALG mod_bn_combo
+  bin/test_scheduler.pl > tstest2.mod_bn_combo
+  diff tstest[02].mod_bn_combo
+
+To test the scheduler in standalone mode, can do:
+
+  unsetenv SCHED_ALG (defaults to new 'round7' algorithm)
+  bin/test_scheduler.pl > tstest2.round7
+  diff tstest[02].round7
+
+To run exhaustive regression test:
+
+  kiwi% switch.csh -n     # Result should be "new"
+  kiwi% source ~/gui/configs/setup_stanford.cshrc
+
+  kiwi% ~/fftgen/bin/golden_test.csh           # Default, see above
+  kiwi% ~/fftgen/bin/golden_test.csh 8 1 1port # For single test
+  kiwi% ~/fftgen/bin/golden_test.csh -abbrev   # For D={8,16,32} only
+  kiwi% ~/fftgen/bin/gt8k.csh                  # For D=(8,8192,4096,2048) only
+
+Also, new golden test incorporates choice of algorithm.  New
+formal-proof algorithm 'round7' is now the default; to use old
+previously-correct-ish version specify 'mod_bn_combo' use command-line
+switch "-alg mod_bn_combo" algorithm, e.g.:
+
+For old algorithm, do e.g.:
+
+  kiwi% switch.csh -n     # Result should be "old"
+  kiwi% ~/fftgen/bin/golden_test.csh -alg mod_bn_combo
+  kiwi% ~/fftgen/bin/golden_test.csh -alg mod_bn_combo 8 1 1port
+  kiwi% ~/fftgen/bin/golden_test.csh 8 1 1port mod_bn_combo
+  kiwi% ~/fftgen/bin/golden_test.csh -alg mod_bn_combo -abbrev  
+  kiwi% ~/fftgen/bin/gt8k.csh -alg mod_bn_combo
+
+To analyze simv.log, try:
+  set b=~/fftgen/bin/simv_analysis
+  c ; $b/analyze_reads_and_writes.pl -d simv.log |\
+  $b/summarize_reads_and_writes.pl | egrep -v '^IGNORE|BB|wr' |\
+  uniq | sed 's/.*BREAK//' | less
+
+------------------------------------------------------------------------
+13 Jul 2014
+
+As of 7/15 (p4 change 12008) both versions (old/mod_bn_combo,
+new/round7) pass all std "golden_test" tests, and the gui works for at
+least two configs "8 1 1" (13 cy) and "1024 4 1" (1281 cy).
+
+------------------------------------------------------------------------------
+3 Jul 2014
+
+To see if the fft generator works, maybe try bin/golden_test.csh
+(probably only works from kiwi).  
+Default is (1,2)ports x (1,2,4)butterflies x (8,16,32...1024)datapoints
+
+  kiwi% source ~/gui/configs/setup_stanford.cshrc
+
+  kiwi% ~/fftgen/bin/golden_test.csh           # Default, see above
+  kiwi% ~/fftgen/bin/golden_test.csh 8 1 1port # For single test
+  kiwi% ~/fftgen/bin/golden_test.csh -abbrev   # For D={8,16,32} only
+  kiwi% ~/fftgen/bin/gt8k.csh                  # For D=(8,8192,4096,2048) only
+
+
+Prev simv.log appears to be for nunits=4 and npoints=2048.  Let's try duplicating that:
+
+  % mkdir old; mv simv* old; mv old old_simv
+
+  % source ~/gui/configs/setup_stanford.cshrc
+  % bin/golden_test.csh 2048 4 1port
+  % diff simv.log old_simv/simv.log
+
+Is it possible I haven't done development work since May 2013?
+  % ls -ltd ~/fftgen/simv*
+  -rw-r--r-- 1 steveri users  5599428 Jul 15  2013 simv.log
+  drwxr-xr-x 2 steveri users     4096 May 25  2013 simv.daidir/
+  -rwxr-xr-x 1 steveri users 14450733 May 25  2013 simv*
+  drwxr-xr-x 2 steveri users     4096 May 25  2013 simv.vdb/
+  -rw-r--r-- 1 steveri users   231103 Feb  6  2013 simv.0
+
+------------------------------------------------------------------------
+OLD 1906
+# HOWTO convert vpd to vcd - use 'vpd2vcd'
+# DON'T NEED anymore, generate vcd directly, see above.
+# 
+# Synopsys waveform viewer:
+#   dve -vpd vcdplus.vpd
+# 
+# BUT we don't generate vpd files no more
+# 

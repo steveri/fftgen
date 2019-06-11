@@ -356,3 +356,21 @@ cleanall: clean
 regress:
 	cd regressions; make -f ../Makefile cleanall
 	cd regressions; ../bin/golden_test.csh |& tee regress.log.$$
+
+
+test8:
+	tmpdir=`mktemp -d test8.XXX`;\
+	  cd $$tmpdir;\
+	  ../bin/golden_test.csh 8 1 1port |& tee gold.log
+
+
+# test8:
+# 	npoints="top_fft.n_fft_points=8"
+# 	nbutts="top_fft.units_per_cycle=1";\
+# 	sram="top_fft.SRAM_TYPE=TRUE_1PORT";\
+# 	alg="top_fft.swizzle_algorithm=round7";\
+# 	make clean gen TOP=fft \
+# 	  GENESIS_PARAMS="$$npoints $$nbutts $$sram $$alg" \
+# 	  >& test_8_1_1port.log
+# 
+

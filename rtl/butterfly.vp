@@ -176,7 +176,7 @@ module `mname`
 
    always @(fftclk) if (ready) begin
 
-      #2
+      //#2
       $display("%m t5 ------------------------");
       $display("%m t5 %5d: in1(r,i)= (%9.6f,%9.6f)", $time, `ri("in1")`);
       $display("%m t5 %5d: in2(r,i)= (%9.6f,%9.6f)", $time, `ri("in2")`);
@@ -190,8 +190,10 @@ module `mname`
       $display("%m t5 %5d: t2b = %9.6f",     $time, `sr("t2b")`);
       $display("%m t5");
 
-      $display("%m t5 %5d: out1(r,i)= (in1_real+t1, in1_imag+t2) = (%9.6f,%9.6f)", $time, `ri("out1")`);
-      $display("%m t5 %5d: out2(r,i)= (in1_real-t1, in1_imag-t2) = (%9.6f,%9.6f)", $time, `ri("out2")`);
+      $display("%m t5 %5d: out1(r,i)= (in1_real+t1, in1_imag+t2) = (%9.6f,%9.6f)",
+        $time, `ri("out1")`);
+      $display("%m t5 %5d: out2(r,i)= (in1_real-t1, in1_imag-t2) = (%9.6f,%9.6f)",
+        $time, `ri("out2")`);
       $display("%m t5 ------------------------");
    end
 
