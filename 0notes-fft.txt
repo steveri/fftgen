@@ -1,8 +1,73 @@
+NEXT
+- so far so good i guess
+- regressions i guess
+- fix remaining diffs including bsr maybe
+-- must to top_fft by hand i think
+-- also twiddle
+- fix .vp files to match .v files
+- and then and then...?
+
+
+
+
+
+
+CONVERGENCE
+% cd $fft/vcs
+% diff -r rtl ../verilator/rtl | less
+- make changes, then to sequence below...
+
+------------------------------------------------------------------------
+HOWTO check vcs/rtl
+
+i=1
+diff -r ../verilator/rtl rtl | less
+vcs -sverilog +cli +lint=all,noVCDE +libext+.v -notice -full64 \
+  +v2k -debug_pp -timescale=1ps/1ps \
+  +noportcoerce +vcs+lic+wait -licqueue -ld gcc -top top_fft \
+  -y /hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
+  +incdir+/hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
+  -y ./rtl/ +incdir+./rtl/ -f fft.vf | tee vcs.log$i | tail
+
+simv +vcs+dumparrays |& ../bin/bsr.awk %9.6f | tee simv.log$i | tail
+diff simv.log$i simv.log0
+
+sort simv.log5 > simv.sorted5
+sort simv.log$i > simv.sorted$i
+diff simv.sorted{2,$i} | h40
+
+cp fft.vcd fft.vcd$i
+diff fft.vcd0 fft.vcd$i | h40
+
+
+cp simv.log$i simv.log
+../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
+------------------------------------------------------------------------
+
+
+
+
+
+DONE
+- made a snapshot ~/fftgen.snapshot.190612.vcs.passed.regressions
+- make a snapshot and start over with vcs/i=0
+
+
+
+
+LATER consider renaming sradd, srsub... fpadd_sr, fpsub_sr etc
+- clean up snapshots ~/fftgen* maybe
+- clean up fftgen maybe
+
+
+STATUS
+- good through SRAM_unq1 maybe
+- NEXT continue with SRAM_unq2
+
+
 SEEMS TO WORK according to waveforms
-- gtkwave 811vcs/811vcs.vcd fft.gtkw
-  and/or
-  gtkwave 811vcs/fft.vcd 811vcs/fft.gtkw
-- btkwave verilator/counter.vcd verilator/counter.gtkw
+- cd vcs;       gtkwave fft.vcd fft.gtkw
+- cd verilator; gtkwave counter.vcd counter.gtkw
 
 
 NEXT
@@ -14,27 +79,7 @@ NEXT
 - propagate changes from verilator/rtl
 - repeat verification
 
-TO CHECK SIMV.LOG, just do
-cp simv.log$i simv.log
-../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
-
-
-i=1
-vcs -sverilog +cli +lint=all,noVCDE +libext+.v -notice -full64 \
-  +v2k -debug_pp -timescale=1ps/1ps \
-  +noportcoerce +vcs+lic+wait -licqueue -ld gcc -top top_fft \
-  -y /hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
-  +incdir+/hd/cad/synopsys/dc_shell/latest/packages/gtech/src_ver/ \
-  -y ./rtl/ +incdir+./rtl/ -f fft.vf | tee vcs.log$i | tail
-
-simv +vcs+dumparrays |& tee simv.log$i | tail
-cp fft.vcd fft.vcd$i
-diff fft.vcd0 fft.vcd$i
-
-diff simv.log$i simv.log0
-
-cp simv.log$i simv.log
-../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
+NOTE golden_test only processes simv.log, it doesn't build anything new...
 
 
 
@@ -711,3 +756,28 @@ OLD 1906
 # 
 # BUT we don't generate vpd files no more
 # 
+
+------------------------------------------------------------------------------
+NO! omg they're all backwards :(
+# NO cp ../verilator/rtl/addsub.v rtl/addsub.v
+# NO cp rtl/butterfly_unq1.v ../verilator/rtl/butterfly_unq1.v
+# NO cp rtl/fftram_unq1.v ../verilator/rtl/fftram_unq1.v
+# NO cp rtl/sradd.v ../verilator/rtl/sradd.v
+# NO cp rtl/SRAM_unq1.v ../verilator/rtl/SRAM_unq1.v
+# NO cp rtl/SRAM_unq2.v ../verilator/rtl/SRAM_unq2.v
+# NO cp rtl/SRAM_unq3.v ../verilator/rtl/SRAM_unq3.v
+# NO cp rtl/SRAM_unq4.v ../verilator/rtl/SRAM_unq4.v
+# NO cp rtl/srmul.v ../verilator/rtl/srmul.v
+# NO cp rtl/srsub.v ../verilator/rtl/srsub.v
+
+
+DONE
+# cp verilator/rtl/butterfly_unq1.v vcs/rtl/butterfly_unq1.v
+# cp verilator/rtl/fftram_unq1.v vcs/rtl/fftram_unq1.v
+# cp verilator/rtl/sradd.v vcs/rtl/sradd.v
+# cp verilator/rtl/SRAM_unq1.v vcs/rtl/SRAM_unq1.v
+# cp verilator/rtl/SRAM_unq2.v vcs/rtl/SRAM_unq2.v
+# cp verilator/rtl/SRAM_unq3.v vcs/rtl/SRAM_unq3.v
+# cp verilator/rtl/SRAM_unq4.v vcs/rtl/SRAM_unq4.v
+# cp verilator/rtl/srmul.v vcs/rtl/srmul.v
+# cp verilator/rtl/srsub.v vcs/rtl/srsub.v
