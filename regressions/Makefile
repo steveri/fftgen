@@ -3,7 +3,7 @@ regress:
 	@echo "  make -f ../Makefile cleanall"
 	@echo '  log=gold.log1'
 	@echo '  ../bin/golden_test.csh >& $$log &'
-	@echo "  tail -f $$log | egrep 'PASS|FAIL'"
+	@echo '  tail -f $$log | egrep "PASS|FAIL"'
 	@echo ""
 
 clean:

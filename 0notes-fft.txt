@@ -1,12 +1,24 @@
+NOW
+- running regressions
+
+NEXT
+- regressions should pass
+- check everything in
+- continue below
+
+
 NEXT
 - so far so good i guess
-- regressions i guess
 - fix remaining diffs including bsr maybe
--- must to top_fft by hand i think
+-- must do top_fft by hand i think
 -- also twiddle
 - fix .vp files to match .v files
 - and then and then...?
 
+DONE
+- made a snapshot ~/fftgen.snapshot.190612.vcs.passed.regressions
+- make a snapshot and start over with vcs/i=0
+- regressions i guess
 
 
 
@@ -48,9 +60,6 @@ cp simv.log$i simv.log
 
 
 
-DONE
-- made a snapshot ~/fftgen.snapshot.190612.vcs.passed.regressions
-- make a snapshot and start over with vcs/i=0
 
 
 
