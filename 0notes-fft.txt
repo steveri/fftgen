@@ -1,31 +1,23 @@
-did this:
+14 jun 2019 all regression tests pass (vcs):
+  mkdir regression; cd regression
+  ../bin/golden_test.csh >& gold.log &
+  tail -f gold.log | egrep 'PASS|ERR'
+
+
+
+
+HOLY CRAP it's gonna pass
+So maybe everything works with vcs and bsr
+So what's next?
+- check everything in
+- see where we are with the verilator
+
+
+OLD maybe
   i=69
   cd build
   ../bin/golden_test.csh >& gold.log$i &
   tail -f $log | egrep "PASS|FAIL|ERR"
-
-okay. all the 1port tests passed
-check everything in i guess
-then maybe take a pause...
-then fix 2port/dpump :(
-
-i mean, you *know* its the sram's...
-multiple ways to fix maybe...
-for now maybe just do ifdef 1port
-
-
-
-
-NOW
-- running regressions
-
-NEXT
-- regressions should pass (ha!)
-- check everything in
-- continue below
-
-
-TODO: grep for %f in rtl,tst files
 
 HOWTO do a quick test maybe (does this work?)
   mkdir build
@@ -34,31 +26,18 @@ HOWTO do a quick test maybe (does this work?)
   mf test8
 
 
-# To build and check a new simv.log from scratch:
-../bin/golden_test.csh 8 1 1port |& tee gold.log$i | tail
-
-# To check an existing simv.log:
-../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
-
+------------------------------------------------------------------------------
+GOLDEN TESTS csh vs. pl
+  # To build and check a new simv.log from scratch:
+  ../bin/golden_test.csh 8 1 1port |& tee gold.log$i | tail
+  
+  # To check an existing simv.log:
+  ../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
+------------------------------------------------------------------------------
 
 
 LATER
 - should rtl/ subdir  be renamed gsource/ or something?
-
-clean to here
-==============================================================================
-
-
-
-DONE 1906
-
-
-
-
-CONVERGENCE
-% cd $fft/vcs
-% diff -r rtl ../verilator/rtl | less
-- make changes, then to sequence below...
 
 ------------------------------------------------------------------------
 HOWTO check vcs/rtl
@@ -88,98 +67,25 @@ cp simv.log$i simv.log
 ------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
 LATER consider renaming sradd, srsub... fpadd_sr, fpsub_sr etc
 - clean up snapshots ~/fftgen* maybe
 - clean up fftgen maybe
 
-
-STATUS
-- good through SRAM_unq1 maybe
-- NEXT continue with SRAM_unq2
-
-
-SEEMS TO WORK according to waveforms
-- cd vcs;       gtkwave fft.vcd fft.gtkw
-- cd verilator; gtkwave counter.vcd counter.gtkw
-
-
-NEXT
-- see if new code works with vcs
-- establish a baseline
--- do sequence below
--- check that diff give same simv.log GOOD
--- check that vcd file is still the same GOOD
-- propagate changes from verilator/rtl
-- repeat verification
-
-NOTE golden_test only processes simv.log, it doesn't build anything new...
-
-
-
-
-DONE
-- snapshot everything to home dir fftgen.snapshot.190611
-
-
-
-
-new problem: 5/6 transition
-wz stays high, should go low...
-
-
-plan is to disable wz when addr==x
-see printout, plus new signals wz[0123] in fftram
-TODO should also disable ez I suppose
-NOTE vcs version is WRONG but addr==x effectively disables writes anyway :(
-
-
-
-
-
-
-
-SRAM is a TERRIBLE SRAM!!!
-- e.g. write is clocked on ez/wz edges!!?
-- but read is not clocked at all :(
-* should be able to make it work with standard SRAM!!!
-
-
-Okay it compiles (verilator) w/o error.
-Next: make, obj/fft etc.
-
-
-
-
-
-
-
-
-
-Okay think maybe I got fft_top done
-NEXT: Try a compile?
+TODO FIX SRAM'S!!!
+- use standard async design
+- move all weird clocking to SRAM driver :(
 
 
 verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} \
   |& tee verilator.log$i | less
 
-
-
-
 ------------------------------------------------------------------------
-HOW-TO - SETUP
+HOW-TO verilator - SETUP
 cd $fft/verilator
 top=rtl/top_fft.v; cpp=fft.cpp; vdir=rtl/
 echo $top $cpp $vdir
 
-
-HOW-TO - RUN
+HOW-TO verilator - RUN
 i=4
 echo mv obj_dir obj_dir`expr $i - 1`
 verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} \
@@ -193,17 +99,14 @@ obj_dir/Vtop_fft |& ../bin/bsr.awk %9.6f\
 ------------------------------------------------------------------------
 
 
+clean to here
+==============================================================================
+DONE 1906
+DONE 1906
 
 
+REBOOT------------------------------------------------------------------
 
-
-
-REBOOT
-- build 811vcs.vcd DONE
-- save old verilator directory
-- build new verilator directory
-- build 811v.vcd
-- CONVERGE
 
 ------------------------------------------------------------------------
 VERILATOR VERSION
@@ -211,15 +114,12 @@ VERILATOR VERSION
 cd verilator
 cp -rp ../811vcs/rtl .
 
-
 copy fft.cpp from old verilator directory, check it for errors etc.
 update top_fft, refer to old verilator
 cd rtl
 cp top_fft.v top_fft.v.vcs
 cp ../../verilator.round1/rtl/top_fft.v top_fft.v.ver1
 chmod -w top_fft.v.*
-
-
 
 ------------------------------------------------------------------------
 VCS VERSION
@@ -891,4 +791,311 @@ DONE 1906
 - regressions i guess
 
 
+
+==============================================================================
+NOTES from 9 jun 2019 ish
+
+------------------------------------------------------------------------------
+ncsim version works! right?
+SO: start over
+------------------------------------------------------------------------------
+
+SRAM000_wz should be active when either banknum == 000 etc.
+
+
+first cycle: in1,in2 = 1, 0 ; out1, out2 = 1, 1
+second cycle: out1, out2 should write back to sram000, sram001
+
+BUT NO
+
+currently need TWO posedge clocks to setup
+1. first clock edge sets ix
+2. second clockedge uses ix to fetch ops
+
+solutions?
+- make SRAM continuous (again) instead of clocked
+
+
+
+TWO THINGS
+- 1. did not propagate sram_unq1 changes to 2,3,4
+- 2. what is sram behavior when read/write on same cycle?
+
+
+
+- out1,out2 stable @ posedge clk 1000/1500
+- SRAM000,001 wz LOW/active @ posedge clk 1000/1500
+- why no write to sram0,1?
+
+
+==============================================================================
+NOTES from 8 jun 2019 ish
+# 
+# i think it will work! see below
+# - take gtkwave before/after screenshots
+# - increment i before and after? maybe not i dunno
+# 
+# 
+# "match" signals must be ready to go even while in reset...right?
+# which means "bnum" signals must be preloaded...?
+# "bnum" generated by swizzler unclocked bnum=f(addr)
+# "addr" in top_fft is "op[12]_ix" generated by fftctl
+# which works like this:
+#    always @(posedge fftclk_o) begin
+#       if (STARTED & ~rst_n_i) begin
+#          {BFLY0_op1_ix_o,BFLY0_op2_ix_o} <= GenOps2(cycle_num, 0, stageno);
+# 
+# 
+# 
+# how terrible would this be:
+# 
+#    always @(posedge fftclk_o) begin
+#       //if (STARTED & ~rst_n_i) begin
+#          {BFLY0_op1_ix_o,BFLY0_op2_ix_o} <= GenOps2(cycle_num, 0, stageno);
+# 
+# 
+# ...for this to work, maybe cycle_num and stageno have to be stable
+# BEFORE reset...is this kosher???
+# 
+# 1500:
+# - in2 should be zero RIGHT?
+# - but in2 is 1.0 WHY?
+# 
+# 1500:
+# - should be reading SRAM001 loc mem[0]
+# - but not reading SRAM001 loc mem[0]
+# - why?
+# 
+# 
+# OKAY things are stable ISH maybe
+# snapshot, increment i, continue debug...
+# 
+# In fftlog:
+# fftram 1000: fft_started = 1
+# fftram 1000: SRAM000_ez = 0
+# 
+# BUT I think I want ez OFF, ergo fft_started ZERO, for one more half cycle...
+# 
+# In fftram:
+#    assign SRAM000_ez = ~fft_started | ~(
+#         (BFLY0_op1_bnum_i == 0 ) | (BFLY0_op2_bnum_i == 0 ) | ~SRAM000_wz );
+# 
+# In top_fft:
+#    fftram_unq1  fftram  // .remote(local)
+#      ,.fft_started(busy | start)
+# 
+# original code in top_fft:
+# //   always @(negedge rst_n) begin
+# //      start <= 1'b1;
+# //      @(posedge fftclk) begin start <= 1'b0; end
+# new code:
+#     // fftclk  ___.---.___.---.___.---.___.---
+#     // rstn    -------._______________________
+#     // ck_rn   -----------.___________________ ?
+#     // rst2    ---------------._______________
+#     // start   ___________.---._______________ ?
+#     always @(posedge fftclk) ck_rn <= rst_n;
+#     always @(negedge fftclk) rst2  <= ck_rn;
+#     assign start = ~ck_rn & rst2;
+# 
+# 
+# original code in clock.vp (reset on posedge!!!?
+#       repeat(RST_PERIOD) @(posedge clk) reset = ~reset;  // Wait for RST_PERIOD posedges
+# 
+#    // I THINK I want fft_started OFF for one more half cycle...?
+# 
+# 
+# two problems:
+# 1) reading too soon: fft reads @1000
+# SRAM000 t5  1000: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+# 2) Reading wrong values maybe
+# SRAM000 t5  1000: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+# SRAM000 t5  1000: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+# 
+# fft:
+# SRAM000 t5  1000: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+# SRAM000 t5  1000: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+# SRAM001 t5  1500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+# SRAM001 t5  1500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+# 
+# 
+# 
+# ncsim:
+# SRAM000 t5  1500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+# SRAM001 t5  1500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+# SRAM002 t5  2500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+# SRAM003 t5  2500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+# 
+# 
+# 
+# Problem is here, in fft.log: wz_i SHOULD NOT BE ZERO
+# # TOP.v.fftram.SRAM000 1500: ez_i=0 and wz_i=0
+# # TOP.v.fftram.SRAM000 1500: Wrote   wr_data_i mem[0] <= 4000000000000000
+# # SRAM000 t5  1500: Wrote(f) wr_data_i mem[0] <= ( 2.000000, 0.000000)
+# # 
+# # 
+# # fftram 1500: fft_started = 1
+# # fftram 1500: BFLY0_op1_bnum_i = 0
+# # 
+# # fftram 1500: SRAM000_ez = 0
+# # fftram 1500: SRAM001_ez = 0
+# # fftram 1500: SRAM002_ez = 1
+# # fftram 1500: SRAM003_ez = 1
+# # 
+# # fftram 1500: SRAM000_wz = 0
+# # fftram 1500: SRAM001_wz = 1
+# # fftram 1500: SRAM002_wz = 1
+# # fftram 1500: SRAM003_wz = 1
+# 
+# In fftram:
+#       if ( fft_started & ( //TRUE
+#          (BFLY0_op1_bnum_i == 0 ) //TRUE but FALSE (x) for ncsim!!
+#          | (BFLY0_op2_bnum_i == 0 ) //DC
+#      )) begin
+#          SRAM000_wz <= suppress_wz_i[0];
+# 
+# ncsim:
+# fftctl 1500: in( x, x), out( x,  x)
+# fftctl 1500: cycle_num = 0
+# top_fft 1602: BFLY0_op1 ix 00 comes from bank  0 row   0
+# top_fft 1602: BFLY0_op2 ix 01 comes from bank  1 row   0
+# 
+# fftram 1500: fft_started = 1
+# fftram 1500: BFLY0_op1_bnum_i = x
+# 
+# fftram 1500: SRAM000_wz = 1
+# fftram 1500: SRAM001_wz = 1
+# fftram 1500: SRAM002_wz = 1
+# fftram 1500: SRAM003_wz = 1
+# 
+# bnum is generated by swizzler, where bnum = f(ix)
+#    swizzle_unq1  BFLY0_op1_swizzle(
+# .addr_i(BFLY0_op1_ix), 
+# .rnum_o(BFLY0_op1_rnum), 
+# .bnum_o(BFLY0_op1_bnum));
+# 
+# 
+# 
+# 
+# In fftctl:
+# OOOOOPS! 100 ps after? but i cannot find where that happens...?
+#      ,input logic [3:0] suppress_wz_i  // one bit per bank, set 100 ps after posedge
+# 
+# 
+#    logic [0:3] precomputed_suppress_wz [0:11];      // {0,1}
+#    always @(posedge start_i) if (~rst_n_i) begin
+#       suppress_wz_o <= 4'b0;
+#    end
+#          suppress_wz_o <= precomputed_suppress_wz[cycle_num];
+# 
+#        precomputed_suppress_wz[ 0] = 4'h0;
+#        precomputed_suppress_wz[ 1] = 4'h0;
+#        precomputed_suppress_wz[ 2] = 4'h0;
+#        precomputed_suppress_wz[ 3] = 4'h4;
+
+DONE oops did not expunge all %9.6f's
+# 
+# Do:
+#   greps 9.6f ../rtl/* ../tst/*
+# and/or
+#   greps 9.6f rtl/* tst/*
+# until they are all fixed!!!
+# ../rtl/fftram.vp:         $display("fftram %6d Bypassed SRAM `$i`, wrote (%9.6f,%9.6f) to bypass_buffer[%1d]",
+# ../rtl/SRAM.vp:      $display("`$myname` t5 %5d: Read(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("rd_data_o")`);
+# ../rtl/SRAM.vp:         $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("wr_data_i")`);
+# ../rtl/SRAM.vp:         $display("`$myname` t5 %5d: Read(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("rd_data_o")`);
+# ../rtl/SRAM.vp:         $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("wr_data_i")`);
+# 
+# ../tst/top_fftram.vp:         $display("top_fftram %5d: out1_imag = %9.6f", $time, $bitstoshortreal(BFLY0_out1_data[`$imag`]));
+# ../tst/top_fftram.vp:         $display("top_fftram %5d: out2_imag = %9.6f", $time, $bitstoshortreal(BFLY0_out2_data[`$imag`]));
+# 
+# 
+# top_fft.fftram.SRAM000 1500: ez_i=0 and wz_i=1
+# top_fft.fftram.SRAM000 1500: Reading rd_data_o mem[0] <= 3f80000000000000
+# SRAM000 t5  1500: Read(f) wr_data_i mem[0] <= (1065353216.000000, 0.000000)
+
+DONE 1906
+# - 1port tests all work, hooray!
+# - no 2port tests work, boo!
+# - how to fix?
+# -- build an unsuccessful 812 and save it
+# -- build a successful 812 using one of the snapshots
+# -- diff and fix
+# 
+# 
+# 1. build an unsuccessful 812 using existing infrastructure
+# 
+#   mkdir build; cd build
+#   ../bin/golden_test.csh 8 1 2port |& tee gold.log$i | tail  
+# 
+# Error-[IND] Identifier not declared
+# genesis_verif/fftram_unq1.v, 170
+#   Identifier 'cycle_num' has not been declared yet. If this error is not 
+#   expected, please check if you have set `default_nettype to none.
+
+DONE 1906
+# okay. all the 1port tests passed
+# check everything in i guess
+# then maybe take a pause...
+# then fix 2port/dpump :(
+# 
+# i mean, you *know* its the sram's...
+# multiple ways to fix maybe...
+# for now maybe just do ifdef 1port
+
+DONE 1906
+- running regressions
+- regressions should pass (ha!)
+- check everything in
+- continue below
+- TODO: grep for %f in rtl,tst files
+
+DONE 1906
+- good through SRAM_unq1 maybe
+- NEXT continue with SRAM_unq2
+
+DONE 1906 - SEEMS TO WORK according to waveforms
+- cd vcs;       gtkwave fft.vcd fft.gtkw
+- cd verilator; gtkwave counter.vcd counter.gtkw
+
+DONE 1906
+- see if new code works with vcs
+- establish a baseline
+-- do sequence below
+-- check that diff give same simv.log GOOD
+-- check that vcd file is still the same GOOD
+- propagate changes from verilator/rtl
+- repeat verification
+
+DONE 1906
+- snapshot everything to home dir fftgen.snapshot.190611
+
+DONE/FIXED 1906
+# new problem: 5/6 transition
+# wz stays high, should go low...
+# 
+# plan is to disable wz when addr==x
+# see printout, plus new signals wz[0123] in fftram
+# TODO should also disable ez I suppose
+# NOTE vcs version is WRONG but addr==x effectively disables writes anyway :(
+
+DONE 1906
+SRAM is a TERRIBLE SRAM!!!
+- e.g. write is clocked on ez/wz edges!!?
+- but read is not clocked at all :(
+* should be able to make it work with standard SRAM!!!
+
+DONE 1906
+# Okay it compiles (verilator) w/o error.
+# Next: make, obj/fft etc.
+# 
+# Okay think maybe I got fft_top done
+# NEXT: Try a compile?
+
+REBOOT DONE 1906
+- build 811vcs.vcd DONE
+- save old verilator directory
+- build new verilator directory
+- build 811v.vcd
+- CONVERGE
 

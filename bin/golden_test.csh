@@ -247,6 +247,10 @@ foreach t ($tests:q)
       continue
   endif
 
+# DEBUG
+#   echo "  TEMPORARY cp simv.log simv.log.orig FIXME"
+#                     cp simv.log simv.log.orig
+
   echo ""
   echo "Processing bsr macros in simv.log..."
   echo "  awk -f $BIN/bsr.awk %9.6f < simv.log > simv.log.bsr$$"

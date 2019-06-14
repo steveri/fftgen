@@ -141,7 +141,10 @@ module `mname`
    logic [`$rbits`] `$sname`_ix;   logic [`$op_width-1`:0] `$sname`_rd_data;   logic [`$op_width-1`:0] `$sname`_wr_data;   logic `$sname`_ez;   logic `$sname`_wz;
    //; }
 
-   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
+
+   //; # no longer optional i guess, everyone needs cycle_num...right? FIXME
+   //; # if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
+   //; if (1 == 1) {
    // (For now) BOTF: must duplicate fftctl's 'cycle_num' signal so we
    // can conservatively BYPASS ALL FINAL-CYCLE WRITES in a each stage.
    // FIXME Really shouldn't bypass final-stage writes!!!
@@ -254,10 +257,12 @@ module `mname`
 //;#   //; }
 //;#   end
 //;#   //; } else {
-//;#   // Placeholder for initialization of optional BOTF signals, unused in this configuration (cycle_num).
+//;#   // Placeholder for initialization of optional BOTF signals, unused in this configuration (sram_wants...).
 //;#   //; }
 
-   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
+   //; # FIXME cycle_num no longer optional i guess...
+   //; # if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
+   //; if (1 == 1) {
    // Initialize BOTF (bypass on the fly) signals (cycle_num)
    initial cycle_num <= `$nbits_cycle_num`'b0;
    //; } else {
@@ -286,14 +291,18 @@ module `mname`
    initial assert (1) $warning("WARNING Using OLD bypass mechanism.");
    //; }
 
-   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
+   //; # FIXME cycle_num no longer optional i guess...
+   //; # if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
+   //; if (1 == 1) {
    always @(posedge clk_i) begin
      // FIXME FIXME FIXME OH NO!!! waveform shows this
      //   cycle_num != top_fft cycle_num !! :( :(
      if (fft_started == 1) cycle_num <= cycle_num + 1'b1;
      else cycle_num <= `$nbits_cycle_num`'b0;
    end
+   //; }
 
+   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    always @(posedge clk_i) begin
       $display("fftctl %1d: cycle_num = %1d BOTF", $time, cycle_num);
    end
@@ -426,9 +435,8 @@ module `mname`
       //;     my $bufnum = ($nunits==1) ? "" : "[bufnum_i[$nn]]";
       //;     my $bufnum2 = ($nunits==1) ? "0" : "bufnum_i[$nn]";
       if (suppress_wz_i[`$nn`]) begin
-
          bypass_buffer`$bufnum` <= SRAM`$nnn`_wr_data;
-         $display("fftram %6d Bypassed SRAM `$i`, wrote (%9.6f,%9.6f) to bypass_buffer[%1d]",
+         $display("fftram %6d Bypassed SRAM `$i`, wrote (bsr'%08X,bsr'%08X) to bypass_buffer[%1d]",
                $time, `ri("SRAM${nnn}_wr_data")`, `$bufnum2`);
       end
       //; }

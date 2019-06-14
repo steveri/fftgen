@@ -232,7 +232,7 @@ module `mname`
       // READ INFO (historical) (also for analyze_reads_and_writes.pl -d9)
       $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
       $display("%m %1d: Reading rd_data_o mem[%1d] <= %16x", $time, addr_i, rd_data_o);
-      $display("`$myname` t5 %5d: Read(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("rd_data_o")`);
+      $display("`$myname` t5 %5d: Read(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)", $time, addr_i, `ri("rd_data_o")`);
       $display("");
    end
 
@@ -242,7 +242,7 @@ module `mname`
          mem[addr_i] = wr_data_i;
          $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
          $display("%m %1d: Wrote   wr_data_i mem[%1d] <= %16x", $time, addr_i, wr_data_i);
-         $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("wr_data_i")`);
+         $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)", $time, addr_i, `ri("wr_data_i")`);
          $display("");
       end
 
@@ -263,7 +263,7 @@ module `mname`
          // READ INFO (historical)
          $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
          $display("%m %1d: Reading rd_data_o mem[%1d] <= %16x", $time, addr_i, rd_data_o);
-         $display("`$myname` t5 %5d: Read(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("rd_data_o")`);
+         $display("`$myname` t5 %5d: Read(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)", $time, addr_i, `ri("rd_data_o")`);
          $display("");
       end
    end
@@ -273,7 +273,7 @@ module `mname`
          mem[addr_i] = wr_data_i;
          $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
          $display("%m %1d: Wrote   wr_data_i mem[%1d] <= %16x", $time, addr_i, wr_data_i);
-         $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("wr_data_i")`);
+         $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)", $time, addr_i, `ri("wr_data_i")`);
          $display("");
       end
    end
