@@ -2,6 +2,13 @@
 ################ Makefile Definitions
 ################################################################################
 
+howto:
+	@echo ""
+	@echo "For a clean build, you should do something like this:"
+	@echo "    mkdir build; cd build; make -f ../Makefile all"
+	@echo ""
+
+
 ########### Generic Env Defs ############
 #########################################
 # TOP is name of module to compile and run, e.g.
@@ -219,6 +226,7 @@ VERILOG_SIMULATION_FLAGS := 	$(VERILOG_SIMULATION_FLAGS) 			\
 				-l simv.log					\
 				+vcs+lic+wait					\
 				+vpdbufsize+100					\
+				+vcs+dumparrays					\
 				+vpdfileswitchsize+100
 
 ##### END OF FLAGS FOR SYNOPSYS COMPILATION ####
@@ -247,7 +255,7 @@ gen: $(GENESIS_VLOG_LIST) $(GENESIS_SYNTH_LIST) $(GENESIS_VERIF_LIST)
 # files (_unqN.v) from the genesis (.vp) program.
 # Use "make gen GEN=<genesis2_gen_flags>" to add elaboration time flags
 $(GENESIS_VLOG_LIST) $(GENESIS_SYNTH_LIST) $(GENESIS_VERIF_LIST): $(GENESIS_INPUTS) $(GENESIS_CFG_XML) $(GENESIS_CFG_SCRIPT)
-	# Check for existence of Genesis2.pl
+        # Check for existence of Genesis2.pl
 	@if ! `command -v Genesis2.pl > /dev/null`; then echo;\
 	 echo 'ERROR Cannot find Genesis2.pl';\
          echo 'ERROR Did you source bin/setup_genesis.sh?';\

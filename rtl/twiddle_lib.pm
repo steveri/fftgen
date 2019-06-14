@@ -28,6 +28,7 @@ sub setglobals {
   # May need to count a cycle or two beyond minimum!  (Why?)
   my $cnbits = sprintf("[%d:0]", log2($ncalcs_per_unit));  # Weird?  Contrived?
 
+  # FIXME FIXME cycle_num below different than cycle_num signals in fftram, fftctl !!! :(
   @inputs = (
       $cnbits, "cycle_num", "// Counts from 0 to ncalcs/nunits(?) maybe",
   );
@@ -203,6 +204,39 @@ sub gen_twiddle_mem_decl {
 #    }
 #}
 
+
+
+# Verilator doesn't understand $realtobits :(
+# my $convert;
+# if    ($tw == 32) { $convert = '$shortrealtobits'; }
+# elsif ($tw == 64) { $convert = '$realtobits'; }
+# else {
+#     printf("ERROR (twiddle.vp): data width %d not supported\n", $tw);
+# }
+
+sub twiddle_convert {
+    # Converts floating-point number to 32- or 64-bit hex representation
+    # E.g. twiddle_convert(1.0, 32) should return "32'h3f80_0000"
+    # 
+    # perl> printf("%08X\n", unpack("V", pack("f", 1.0)))
+    # 3F800000
+    # 
+    # perl> printf("%08X\n", unpack("Q", pack("d", 1.0)))
+    # 3FF0000000000000
+    my $fpnum = shift;
+    my $nbits = shift;
+    my $rval = "ERROR";
+    if    ($nbits == 32) { $rval = sprintf("32'h%08x", unpack("V", pack("f", $fpnum))); }
+    elsif ($nbits == 64) { $rval = sprintf("64'h%16x", unpack("Q", pack("2", $fpnum))); }
+    else {
+        # FIXME should be better error, also stderr etc
+        printf("ERROR (twiddle.vp): data width %d not supported\n", $nbits);
+    }
+    # "32'h3F800000" => "32'h3f80_0000"
+    $rval = substr($rval, 0, 8)."_".substr($rval,8,999);
+    return $rval
+}
+
 sub fft_gen_twiddles2 {
     # Given data struct @fft_scheduler::fft_sched (see below), do the same thing that fft_gen_twiddles used to do.
 
@@ -229,15 +263,6 @@ sub fft_gen_twiddles2 {
     my $nunits = shift;  # Number of butterfly units employed per cycle.
     my $tw = shift;
 
-#    $indent = "// FOOP ";
-#    print $indent."\n";
-
-    my $convert;
-    if    ($tw == 32) { $convert = '$shortrealtobits'; }
-    elsif ($tw == 64) { $convert = '$realtobits'; }
-    else {
-        printf("ERROR (twiddle.vp): data width %d not supported\n", $tw);
-    }
     my $howmany = $nunits == 1 ? "using one butterfly unit" : "spread over $nunits butterfly units";
     print $indent."/////////////////////////////////////////////////////////////////////////\n";
     print $indent."// Pre-load LUT with $tw-bit twiddle factors for $npoints FFT data points\n";
@@ -260,10 +285,15 @@ sub fft_gen_twiddles2 {
             $prev_stage = $stage;
         }
         my $c = @fft_scheduler::fft_sched[$i]->{ctwid};
-        printf($indent."BFLY${unum}_twiddle_mem_cos[%2d] = ${convert}(%15.8e);", $cynum, $c);
+        my $c_hex = twiddle_convert($c, $tw);
+      # printf($indent."BFLY${unum}_twiddle_mem_cos[%2d] = ${convert}(%15.8e);", $cynum, $c);
+        printf($indent."BFLY${unum}_twiddle_mem_cos[%2d] = %s;", $cynum, $c_hex);
         printf("  // %6.3f\n", $c);
+
         my $s = @fft_scheduler::fft_sched[$i]->{stwid};
-        printf($indent."BFLY${unum}_twiddle_mem_sin[%2d] = ${convert}(%15.8e);", $cynum, $s);
+        my $s_hex = twiddle_convert($s, $tw);
+      # printf($indent."BFLY${unum}_twiddle_mem_sin[%2d] = ${convert}(%15.8e);", $cynum, $s);
+        printf($indent."BFLY${unum}_twiddle_mem_sin[%2d] = %s;", $cynum, $s_hex);
         printf("  // %6.3f\n", $s);
         print "\n";
         $unum = ($unum + 1) % $nunits;  # 0,1,2,3,0,1,2,3,...

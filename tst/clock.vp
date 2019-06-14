@@ -16,13 +16,18 @@
 //;    (Name=>'MAX_CYCLES', Val=>10, Min=>1, Step=>1,
 //; 	Doc=>'What is max runtime (in clock cycles)?');
 //;
+//; my $SIMULATOR = parameter
+//;    (Name=>'SIMULATOR', Val=>"verilator",
+//;     List=>["verilator", "vcs"],
+//; 	Doc=>'Simulator: "verilator" or "vcs"');
+//;
 // ---------------- End default Genesis2 parameter summary ----------------
 
 ////////////////////////////////////////////////////////////////////////
 //module clock
 module `mname`
   (output reg clk,
-   output reg reset);
+  input reset);
    
    parameter CLK_PERIOD = `$CLK_PERIOD`;  // E.g. 5000 = 5ns
    parameter RST_PERIOD = `$RST_PERIOD`;  // E.g. 20 (cycles)
@@ -31,18 +36,28 @@ module `mname`
    int 		 clk_period;
    int 		 clk_half_period;
    int           nclocks;
-           
+
+ //; if ($SIMULATOR eq "vcs") {
+   //if ($SIMULATOR eq "vcs") {
+       // Build a vcd wave trace; to get mem signals also must do "simv +vcs+dumparrays"
+       // DON'T need "+memcbk" on vcs cmd line :(
+       initial begin
+         $dumpon;
+         $dumpvars;
+         $dumpfile("fft.vcd");
+       end
+
+   //}
+ //; }
    initial begin
       $display("\nclock.vp: BEGIN STUPID SIMULATION THINGY\n");
 
-      clk = 1'b0;
-      reset = 1'b1;
+      clk   = 1'b0;
       $display("\nclock.vp: BEGIN clk=%d \n", clk);
       $display("\nclock.vp: BEGIN reset=%d \n", reset);
       calibrate_clk;
       fork
 	 do_clk;
-	 do_reset;
       join_none
    end
 
@@ -65,21 +80,10 @@ module `mname`
       end
    endtask // calibrate_clk
 
-   // task to reverse reset (works for both pos and neg reset logic)
-   task do_reset;
-      //;#repeat(`$reset_period`) @(posedge clk);
-      repeat(RST_PERIOD) @(posedge clk) reset = ~reset;  // Wait for RST_PERIOD posedges
-      $display("\nRESET!!!\n");
-   endtask // do_reset
-   
-
    // task to toggle clk
    task do_clk;
       while (1) begin // Endless loop(ends when reach MAX_CYCLES).
          if (clk == 0) begin
-            $display("------------------------------------------------------------------------------");
-            $display("clock.vp: reset=%1d, ncy= %3d, time= %5d ns", reset, nclocks, $time/1000);
-            $display("------------------------------------------------------------------------------");
             if (nclocks == MAX_CYCLES) begin
                $display("\n\nclock.vp: ENDING AFTER %1d CLOCKS time=%1d ps,  ncy=%1d\n\n", MAX_CYCLES, $time, nclocks);
                $finish;

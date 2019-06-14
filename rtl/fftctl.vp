@@ -233,6 +233,7 @@ module `mname`
    //; my $n_cycle_num_bits = fftgen::log2($ncalcs_per_unit);
    // Need to count through array(s) from 0 to `$ncalcs_per_unit-1`
 
+   // FIXME FIXME FIXME same as fftram cycle_num but different than top_fft cycle_num :(
    // May need to count a cycle or two beyond minimum!  (Why?)
    logic [`$n_cycle_num_bits`:0] cycle_num;
 

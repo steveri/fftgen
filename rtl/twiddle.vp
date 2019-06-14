@@ -86,7 +86,14 @@ module `mname`
    //////////////////////////////////////////////////////////////////////////////
    // DECLARATIONS
    //;    twiddle_lib::gen_twiddle_mem_decl();
-   
+/*
+$shortrealtobits( 1.00000000e+00) = 32'h3f80_0000   
+$shortrealtobits( 0.00000000e+00) = 32'h0000_0000
+$shortrealtobits(-1.00000000e+00) = 32'hbf80_0000
+$shortrealtobits( 7.07106781e-01) = 32'h3f35_04f3
+$shortrealtobits( 6.12323400e-17) = 32'h248d_3132
+$shortrealtobits(-7.07106781e-01) = 32'hbf35_04f3
+*/
    //////////////////////////////////////////////////////////////////////////////////////
    // INIT BLOCKS
    initial begin

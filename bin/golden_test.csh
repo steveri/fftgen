@@ -72,6 +72,14 @@ set BIN      = $FFTGEN_DIR/bin
 set tests = ()
 set ntests = 1
 
+# simulator can be either vcs or verilator
+set SIMULATOR = 'vcs'
+if ("$1" == "-sim") then
+  set SIMULATOR=$2
+  shift; shift;
+endif
+
+
 # Default swizz alg is 'round7' unless otherwise specified e.g. with
 #    $0 -alg 'mod_bn_combo'
 set swizzalg = 'round7'
@@ -181,7 +189,12 @@ foreach t ($tests:q)
   if (-e simv.log) /bin/rm simv.log
 
   # Build a readable suffix that describes what test we're doing.
-  set parms="top_fft.n_fft_points=$npoints top_fft.units_per_cycle=$nunits top_fft.SRAM_TYPE=$sram top_fft.swizzle_algorithm=$swizzalg"
+  # set parms="top_fft.n_fft_points=$npoints top_fft.units_per_cycle=$nunits top_fft.SRAM_TYPE=$sram top_fft.swizzle_algorithm=$swizzalg"
+  set parms =        "top_fft.n_fft_points=$npoints"
+  set parms = "$parms top_fft.units_per_cycle=$nunits"
+  set parms = "$parms top_fft.SRAM_TYPE=$sram"
+  set parms = "$parms top_fft.swizzle_algorithm=$swizzalg"
+  set parms = "$parms top_fft.SIMULATOR=vcs"
   set sfx=${npoints}_${nunits}_${nports}
   set tmp = /tmp/test_$sfx.log
 
@@ -234,6 +247,14 @@ foreach t ($tests:q)
       continue
   endif
 
+  echo ""
+  echo "Processing bsr macros in simv.log..."
+  echo "  awk -f $BIN/bsr.awk %9.6f < simv.log > simv.log.bsr$$"
+          awk -f $BIN/bsr.awk %9.6f < simv.log > simv.log.bsr$$
+  echo "  mv simv.log.bsr$$ simv.log"
+          mv simv.log.bsr$$ simv.log
+  echo ""
+
   ########################################################################
   # Stats: ncycles, nwrites.
   set n_sram_writes   = `egrep '^SRAM.*Wrote' simv.log | wc -l`
@@ -250,8 +271,10 @@ foreach t ($tests:q)
 
   set lastline = 2
   if ($npoints == 16) set lastline=3
-  cat simv.log | awk -f $BIN/process_test5.awk | sed -n '/TEST5 FINAL/,$p'\
-  | egrep '^(ix00|ix07|ix15)' | sed -n "1p;${lastline}p"
+  cat simv.log \
+    | awk -f $BIN/process_test5.awk \
+    | sed -n '/TEST5 FINAL/,$p'\
+    | egrep '^(ix00|ix07|ix15)' | sed -n "1p;${lastline}p"
 
   ########################################################################
   # Lint errors?

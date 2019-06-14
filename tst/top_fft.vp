@@ -36,6 +36,12 @@
 //;     List=>["TEST0", "TEST1", "TEST2", "TEST3", "TEST4", "TEST5"],
 //;     Doc=>'TEST0: integer adds; TEST1: complex adds; TEST2: complex mults');
 //; 
+//; 
+//; my $SIMULATOR = parameter
+//;    (Name=>'SIMULATOR', Val=>"verilator",
+//;     List=>["verilator", "vcs"],
+//; 	Doc=>'Simulator: "verilator" or "vcs"');
+//;
 // ---------------- End default Genesis2 parameter summary ----------------
 
 //; # Should match identical line(s) in fftram.vp
@@ -56,9 +62,10 @@
 // Generating clock unit clock/GCLK...
 //; my $gclock = generate
 //;    ('clock','GCLK',
-//;     CLK_PERIOD=>1000,     # 5 ns clock period
+//;     SIMULATOR=>$SIMULATOR, # vcs or verilator
+//;     CLK_PERIOD=>1000,      # 5 ns clock period
 //;     RST_PERIOD=>   1,      # Currently not used
-//;     MAX_CYCLES=>  ($ncy+6)  # End simulation after complete cycle plus some.
+//;     MAX_CYCLES=>  ($ncy+6) # End simulation after complete cycle plus some.
 //; );
 
 // Generating fftctl unit fftctl/fftctl (nunits = `$nunits`, npoints=`$npoints`)...
@@ -129,6 +136,7 @@ module `mname`();
 
    //; $fftctl->printwires("   ", "wire_list");
 
+   // FIXME FIXME cycle_num below different than cycle_num signals in fftram, fftctl !!! :(
    //; twiddle_lib::printwires("   ", "wire_list");
 
    //; my $nbanks = 4*$nunits;             # SRAM banks, four for each butterfly.
@@ -167,6 +175,11 @@ module `mname`();
    // Because fftctl calls it one thing and twiddle calls it something else.
    assign cycle_num = fftctl_cycle_num;
 
+   // *Verilator* don't know from no $shortrealtowhatever
+   // So instead of $shortrealtobits(1) we get...
+   logic [31:0] _shortrealtobits_0 = 32'h0000_0000;
+   logic [31:0] _shortrealtobits_1 = 32'h3f80_0000;
+
    //; if ($test_mode eq "TEST5") {
    initial begin
       // Generate a square wave to test the FFT, e.g.:
@@ -174,12 +187,12 @@ module `mname`();
       // @a_imag = (0, 0, 0, 0,  0, 0, 0, 0);
       //;
       //;# // ix=0 => bank 0, row 0 <= ( 1.000,  0.000)
-      //;# top_fft.fftram.SRAM000.mem[0][`$real`] = $shortrealtobits(1);
-      //;# top_fft.fftram.SRAM000.mem[0][`$imag`] = $shortrealtobits(0);
+      //;# top_fft.fftram.SRAM000.mem[0][`$real`] = _shortrealtobits_1;
+      //;# top_fft.fftram.SRAM000.mem[0][`$imag`] = _shortrealtobits_0;
       //;#
       //;# // ix=1 => bank 3, row 0 <= ( 0.000,  0.000)
-      //;# top_fft.fftram.SRAM003.mem[0][`$real`] = $shortrealtobits(0);
-      //;# top_fft.fftram.SRAM003.mem[0][`$imag`] = $shortrealtobits(0);
+      //;# top_fft.fftram.SRAM003.mem[0][`$real`] = _shortrealtobits_0;
+      //;# top_fft.fftram.SRAM003.mem[0][`$imag`] = _shortrealtobits_0;
       //;# ...
       //;
       //; my $real="63:32"; # Real
@@ -236,14 +249,13 @@ module `mname`();
    // DEBUG/TEST info: twiddle_cos, apparently.
    always @(posedge fftclk) if (~rst_n) begin
       $display("");
-      $display("top_fft %5d: BFLY0_twiddle_cos = %x (%f)",
-               $time, BFLY0_twiddle_cos, $bitstoshortreal(BFLY0_twiddle_cos));
+      $display("top_fft %5d: BFLY0_twiddle_cos = %x (bsr'%08X)",
+               $time, BFLY0_twiddle_cos, BFLY0_twiddle_cos);
       $display("");
    end
-   
+
    // DEBUG/TEST info: show swizzle translations.
-   always @(posedge fftclk) begin   // 602,1602,2602...
-      #102
+   always @ (fftclk) if (fftclk==1) begin
       //; foreach my $io ("op1", "op2") {
       //;    for (my $i=0; $i<$nunits; $i++) {
       //;        my $pfx = "BFLY${i}_${io}";    # BFLY0_op1, BFLY0_op2, BFLY1_op1...
@@ -332,26 +344,28 @@ module `mname`();
       //; } elsif ($test_mode eq "TEST4") {
 
          $display("");
-         $display("top_fft %5d: out1_imag = %9.6f", $time, $bitstoshortreal(BFLY0_out1_data[`$imag`]));
-         $display("top_fft %5d: out2_imag = %9.6f", $time, $bitstoshortreal(BFLY0_out2_data[`$imag`]));
+         $display("top_fft %5d: out1_imag = bsr'%08X", $time, BFLY0_out1_data[`$imag`]);
+         $display("top_fft %5d: out2_imag = bsr'%08X", $time, BFLY0_out2_data[`$imag`]);
          $display("");
 
       //; } elsif ($test_mode eq "TEST5") {
          //;
-         //; sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
+         //; # sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
+         //; # 06/2019 oops cannot use bitstoshortreal any more b/c verilator
+         //; sub sr{ my $s = shift; return "${s}"; }
          //; sub r { my $s = shift; return sr("${s}[$real]"); }
          //; sub i { my $s = shift; return sr("${s}[$imag]"); }
          //; sub ri{ my $s = shift; return r($s).", ".i($s); }
          //;
          $display("top_fft t5");
-         $display("top_fft t5 %5d: in1(r,i)= (%9.6f,%9.6f)", $time, `ri("BFLY0_in1_data")`);
-         $display("top_fft t5 %5d: in2(r,i)= (%9.6f,%9.6f)", $time, `ri("BFLY0_in2_data")`);
+         $display("top_fft t5 %5d: in1(r,i)= (bsr'%08X,bsr'%08X)", $time, `ri("BFLY0_in1_data")`);
+         $display("top_fft t5 %5d: in2(r,i)= (bsr'%08X,bsr'%08X)", $time, `ri("BFLY0_in2_data")`);
          $display("top_fft t5");
-         $display("top_fft t5 %5d: tw_cos  =     %9.6f",     $time, `sr("BFLY0_twiddle_cos")`);
-         $display("top_fft t5 %5d: tw_sin  =     %9.6f",     $time, `sr("BFLY0_twiddle_sin")`);
+         $display("top_fft t5 %5d: tw_cos  =     bsr'%08X", $time, `sr("BFLY0_twiddle_cos")`);
+         $display("top_fft t5 %5d: tw_sin  =     bsr'%08X", $time, `sr("BFLY0_twiddle_sin")`);
          $display("top_fft t5");
-         $display("top_fft t5 %5d: out1(r,i)= (%9.6f,%9.6f)", $time, `ri("BFLY0_out1_data")`);
-         $display("top_fft t5 %5d: out2(r,i)= (%9.6f,%9.6f)", $time, `ri("BFLY0_out2_data")`);
+         $display("top_fft t5 %5d: out1(r,i)= (bsr'%08X,bsr'%08X)", $time, `ri("BFLY0_out1_data")`);
+         $display("top_fft t5 %5d: out2(r,i)= (bsr'%08X,bsr'%08X)", $time, `ri("BFLY0_out2_data")`);
          $display("top_fft t5");
          //;
       //; } else {
@@ -381,29 +395,59 @@ module `mname`();
        //; twiddle_lib::printconnections("      ");
     );
 
+   ////////////////////////////////////////////////////////////////////////
+   // BEGIN CLOCK AND RESET
+
+   ////////////////////////////////////
+   // Generate a reset and start
+   // clk   ___.---.___.---.___.---.___
+   //
+   // rstn  ---._______________________
+   // 
+   // start ___.---.___________________
+   //
+   ////////////////////////////////////
+
    initial begin
-      $vcdpluson(   0  , `($self->get_top())->mname`);
-
-      // http://users.ece.utexas.edu/~patt/10s.382N/handouts/vcs.pdf
-      // $vcdplusmemon( Mda [, dim1Lsb [, dim1Rsb [, dim2Lsb [, dim2Rsb [, ... dimNLsb [,  dimNRsb]]]]]] )
-      //
-      // In order for VCS to provide MDA data using the $vcdplusmemon
-      // and $vcdplusmemoff tasks, it requires the +memcbk and the +v2k
-      // switches.  E.g.: "vcs -R -I mda.v +memcbk +v2k"
-      //
-      // 1024 4 1port w/  vcdplusmemon: real 40.11 user 22.90 sys 2.79
-      // 1024 4 1port w/o vcdplusmemon: real 43.93 user 25.86 sys 2.99
-      $vcdplusmemon();
-
-      start <= 1'b0;
+      start = 1'b0; // Should be comb logic based on rst_n etc? leave it for now
+      rst_n = 1'b1;
    end
 
-   // BUG/FIXME/TODO this is wrong and you know why!
-   // At reset, start pulses high until next clk posedge.  BUG/FIXME/TODO
-   always @(negedge rst_n) begin
-      start <= 1'b1;
-      @(posedge fftclk) begin start <= 1'b0; end
+   // note cgra does this:
+   //  always @(posedge clk or posedge reset) begin
+   //    if (reset==1'b1) begin ...
+   //    end else begin  ...
+
+   // Reset on very first posedge
+   // FIXME this is terrible; for now we do it b/c matches vcs test rig :(
+   // Eventually will need like a ncy signal or something
+   always @ (posedge clk) begin
+     if (rst_n) begin
+        $display("\nRESET!!!");
+        rst_n <= 1'b0;
+        start <= 1'b1;
+     end
+     else begin // start is a one-shot, yes?
+        start <= 1'b0;
+     end
    end
+
+   ////////////////////////////////////////////////////////////////////////
+   // cycle counter I guess
+   //
+   logic [31:0] cycle_counter;
+
+   always @ (posedge clk or negedge rst_n) begin
+     if (rst_n) cycle_counter <= 32'b0;
+     else       cycle_counter <= cycle_counter + 32'b1;
+   end
+   
+   always @ (posedge clk) begin
+      $display("------------------------------------------------------------------------------");
+      $display("clock.vp: reset=%d, ncy=%4d, time=%6d ns", rst_n, cycle_counter, $time/1000);
+      $display("------------------------------------------------------------------------------");
+   end
+   // END CLOCK AND RESET
 
 endmodule
 

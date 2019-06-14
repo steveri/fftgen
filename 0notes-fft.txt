@@ -1,25 +1,56 @@
+did this:
+  i=69
+  cd build
+  ../bin/golden_test.csh >& gold.log$i &
+  tail -f $log | egrep "PASS|FAIL|ERR"
+
+okay. all the 1port tests passed
+check everything in i guess
+then maybe take a pause...
+then fix 2port/dpump :(
+
+i mean, you *know* its the sram's...
+multiple ways to fix maybe...
+for now maybe just do ifdef 1port
+
+
+
+
 NOW
 - running regressions
 
 NEXT
-- regressions should pass
+- regressions should pass (ha!)
 - check everything in
 - continue below
 
 
-NEXT
-- so far so good i guess
-- fix remaining diffs including bsr maybe
--- must do top_fft by hand i think
--- also twiddle
-- fix .vp files to match .v files
-- and then and then...?
+TODO: grep for %f in rtl,tst files
 
-DONE
-- made a snapshot ~/fftgen.snapshot.190612.vcs.passed.regressions
-- make a snapshot and start over with vcs/i=0
-- regressions i guess
+HOWTO do a quick test maybe (does this work?)
+  mkdir build
+  alias mf='make -f ../Makefile'
+  cd build
+  mf test8
 
+
+# To build and check a new simv.log from scratch:
+../bin/golden_test.csh 8 1 1port |& tee gold.log$i | tail
+
+# To check an existing simv.log:
+../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
+
+
+
+LATER
+- should rtl/ subdir  be renamed gsource/ or something?
+
+clean to here
+==============================================================================
+
+
+
+DONE 1906
 
 
 
@@ -500,7 +531,7 @@ STATUS 5/25
 
 CONTEXT
   cd github/fftgen/tmp.regress
-  egrep 'PASS|FAIL' log2 | less
+  egrep 'PASS|ERR' log2 | less
 
 
 NEXT
@@ -790,3 +821,74 @@ DONE
 # cp verilator/rtl/SRAM_unq4.v vcs/rtl/SRAM_unq4.v
 # cp verilator/rtl/srmul.v vcs/rtl/srmul.v
 # cp verilator/rtl/srsub.v vcs/rtl/srsub.v
+
+DONE
+# ------------------------------------------------------------------------------
+# using perl to convert floating-point to bits:
+# 
+#     perl> printf("%08X\n", unpack("V", pack("f", 1.0)))
+#     3F800000
+# 
+#     perl> printf("%08X\n", unpack("Q", pack("d", 1.0)))
+#     3FF0000000000000
+# ------------------------------------------------------------------------------
+
+DONE 1906
+# - run some golden tests, see what's gone wrong... DONE/FIXED
+# STATUS okay generating clean rtl maybe
+# try golden tests maybe, see what happens
+# 
+# STATUS: ALMOST DONE!!! with this part
+# NEXT: twiddle i think
+# 
+# 
+# c; diff -r -I 'Parameter' ../vcs/rtl genesis_verif | h40
+# 
+# - maybe add -I to 'help'diff'
+# 
+# NEXT: continue with "cleanall; gen; diffr"
+# 
+# NOW: think I got clock.vp fixed
+# NEXT: sanity check time maybe? nope all or nothing now! grrr!!!
+# 
+# NEXT: clock.vp
+# 
+# diff -r ../vcs/rtl/clock_unq1.v genesis_verif/clock_unq1.v | less
+# cleanall; gen; diff -r ../vcs/rtl/clock_unq1.v genesis_verif/clock_unq1.v | less
+# continue
+
+DONE 1906
+# HOWTO converge genesis -> handcrafted vcs files
+# cd $fftgen/build
+# alias cleanall='make -f ../Makefile cleanall'
+# alias gen='make -f ../Makefile gen'
+# alias diffr='diff -r ../vcs/rtl genesis_verif | grep -v Parameter | grep -v savedir | less -S'
+# cleanall; gen; diffr
+
+
+DONE 1906
+# THE ROAD SO FAR
+# - minimal diffs b/w hand-tweaked vcs, verilog rtl, see:
+# 
+# cd vcs; diff -r ../verilator/rtl/top_fft.v rtl/top_fft.v
+# 
+# - check in DONE
+# - snapshot to ~home DONE
+# - work on clean vp2v transition:
+#     cd $fftgen/build; make gen; diff -r genesis_verif ../vcs/rtl;
+
+DONE 1906
+- so far so good i guess
+- fix remaining diffs including bsr maybe
+-- must do top_fft by hand i think
+-- also twiddle
+- fix .vp files to match .v files
+- and then and then...?
+
+DONE 1906
+- made a snapshot ~/fftgen.snapshot.190612.vcs.passed.regressions
+- make a snapshot and start over with vcs/i=0
+- regressions i guess
+
+
+

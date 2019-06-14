@@ -270,10 +270,10 @@ module `mname`
    // bypassed_rnum: Use target row number (index) of valid data as an ID.
    // bypassed_data: Valid data lives here instead of 'rnum' in SRAM.
    //; # ...
-   // "default" means "set all bits to this value", see "verilog array assignment patterns"
+   // 'x means "set all bits to x", or so I'm told.
    initial begin
    //; for (my $i=0; $i<$nbanks; $i++) {
-      bypass_valid[`$i`] <= 1'b0;    bypassed_rnum[`$i`]<=`$rwidth`'b0;    bypassed_data[`$i`]<={default:'x}; // Tricky...!
+      bypass_valid[`$i`]=1'b0;  bypassed_rnum[`$i`]=`$rwidth`'b0;  bypassed_data[`$i`]='x;
    //; }
    end
    //; } else {
@@ -288,6 +288,8 @@ module `mname`
 
    //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    always @(posedge clk_i) begin
+     // FIXME FIXME FIXME OH NO!!! waveform shows this
+     //   cycle_num != top_fft cycle_num !! :( :(
      if (fft_started == 1) cycle_num <= cycle_num + 1'b1;
      else cycle_num <= `$nbits_cycle_num`'b0;
    end
@@ -345,7 +347,9 @@ module `mname`
 
    //; my $real=$real_bits; # E.g. "63:32" = real part
    //; my $imag=$imag_bits; # E.g. "31: 0" = imaginary part
-   //; sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
+   //; # sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
+   //; # 06/2019 oops cannot use bitstoshortreal any more b/c verilator
+   //; sub sr{ my $s = shift; return "${s}"; }
    //; sub r { my $s = shift; return sr("${s}[$real]"); }
    //; sub i { my $s = shift; return sr("${s}[$imag]"); }
    //; sub ri{ my $s = shift; return r($s).", ".i($s); }
@@ -368,8 +372,8 @@ module `mname`
       //;     my $bufnum = ($nunits==1) ? "0" : "bufnum_i[$nn]";
 
       if (bypass_read_i[`$nn`])
-         $display("fftram %6d Bypassed SRAM `$i`, read  (%9.6f,%9.6f) from bypass_buffer[%1d]",
-                  $time, $bitstoshortreal(bbr[`$nn`]), $bitstoshortreal(bbi[`$nn`]), `$bufnum`);
+         $display("fftram %6d Bypassed SRAM `$i`, read  (bsr'%08X,bsr'%08X) from bypass_buffer[%1d]",
+                  $time, bbr[`$nn`], bbi[`$nn`], `$bufnum`);
       //; }
    end
    //; } else {
@@ -391,9 +395,9 @@ module `mname`
           (`$sname`_ix == bypassed_rnum[`$s`])
       ) begin
          bypass_valid[`$s`] = 1'b0;
-         $display("fftram %6d Bypassed SRAM `$s`, read  (%9.6f,%9.6f) from bypassed_data[`$s`] BOTF", $time,
-                   $bitstoshortreal(bypassed_data[`$s`][`$real_bits`]), // Real part
-                   $bitstoshortreal(bypassed_data[`$s`][`$imag_bits`])); // Imaginary part
+         $display("fftram %6d Bypassed SRAM `$s`, read  (bsr'%08X,bsr'%08X) from bypassed_data[`$s`] BOTF", $time,
+                   bypassed_data[`$s`][`$real_bits`], // Real part
+                   bypassed_data[`$s`][`$imag_bits`]); // Imaginary part
       end
    //;}
    end
@@ -452,14 +456,14 @@ module `mname`
    //;         $wz_value = "suppress_wz_i[$snum]";
    //;     }
    //;
-   //;     print "   always @ ($wz_event) begin\n";
-   //;     print "      if ( fft_started & (\n";
-   //;
+   always @ (`$wz_event`) begin
+      if (cycle_num == `$nbits_cycle_num`'b0) `${sram}`_wz = 1'b1; else
+      if ( fft_started & (
    //;     my $i; for ($i=0; $i < ($nunits-1); $i++) {
    //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum ) |\n";
    //;     }
    //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
-   //;     print "     )) begin\n";
+   //;     print "      )) begin\n";
    //;     print "         ${sram}_wz = $wz_value;\n";
    //;     if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
           // \$display(\"FLOOF BOTF %1d okay want to write ${sram}\", \$time);
@@ -472,13 +476,13 @@ module `mname`
             bypass_valid[`$snum`]  <= 1'b1;              // True (1) means bypassed_data is valid
             bypassed_rnum[`$snum`] <= `$sram`_ix;     // Use target row number (index) of valid data as an ID.
             bypassed_data[`$snum`] <= `$sram`_wr_data; // Valid data lives here instead of 'rnum' in SRAM.
-            $display("fftram %6d Bypassed SRAM `$snum`, wrote (%9.6f,%9.6f) to bypassed_data[`$snum`] BTOF row %1d", $time,
+            $display("fftram %6d Bypassed SRAM `$snum`, wrote (bsr'%08X,bsr'%08X) to bypassed_data[`$snum`] BTOF row %1d", $time,
                      `ri("${sram}_wr_data")`,
                      bypassed_rnum[`$snum`]);
          end
    //;     }
-   end
-   else begin
+      end
+      else begin
          `${sram}`_wz = 1'b1;
       end
    end
@@ -503,6 +507,12 @@ module `mname`
 
    //////////////////////////////////////////////////////////////////////////////
    // SRAM address (ix) to access.
+
+   // Ugh. vcs version works b/c address is x and it doesn't know where to write bad value
+   // and so it doesn't write anything, which is the real desired behavior.
+   // Solution is to disable ez and/or wz when value would otherwise be x
+   // FIXME/TODO after things are fixed and working, disable the stupid x's!!!
+
    //; for (my $snum=0; $snum<$nbanks; $snum++) {
    //;     my $sram = sprintf("SRAM%03d", $snum);
    assign `$sram`_ix = 

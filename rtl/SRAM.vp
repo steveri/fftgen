@@ -72,6 +72,7 @@ module `mname`
    reg [`$data_width-1`:0] mem[0:`$nrows-1`];           // memory cells
 
    //; if ($SRAM_TYPE eq "TRUE_1PORT") {
+/* FIXME not the right place to check for cheats maybe
    // Testing and verification - no cheating on 1port configs!
    reg                     wz_at_posedge_clk;
    reg                     ez_at_posedge_clk;
@@ -80,7 +81,7 @@ module `mname`
    //; }
 
    integer           i;
-   
+
    //; my $real="63:32"; # Real
    //; my $imag="31: 0"; # Imaginary
    //;
@@ -105,9 +106,9 @@ module `mname`
 
    end
    //; } elsif ($test_mode =~ /^TEST3$/) {
-    //;# initialize 64-bit data to complex float (0.5, 1.0)
-    //;# butterfly reads (a,b) writes (a, a*b)
-    //;# see if b counts 1.0, 0.5, 0.25, 0.125...
+   //;# initialize 64-bit data to complex float (0.5, 1.0)
+   //;# butterfly reads (a,b) writes (a, a*b)
+   //;# see if b counts 1.0, 0.5, 0.25, 0.125...
    initial begin
       for (i=0; i < `$nrows`; i = i + 1) begin
          mem[i][`$real`] = $shortrealtobits(0.5);
@@ -148,7 +149,9 @@ module `mname`
    //; }
    //;
    //; # For debugging
-   //; sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
+   //; # sub sr{ my $s = shift; return "\$bitstoshortreal(${s})"; }
+   //; # 06/2019 oops cannot use bitstoshortreal any more b/c verilator
+   //; sub sr{ my $s = shift; return "${s}"; }
    //; sub r { my $s = shift; return sr("${s}[$real]"); }
    //; sub i { my $s = shift; return sr("${s}[$imag]"); }
    //; sub ri{ my $s = shift; return r($s).", ".i($s); }
@@ -180,24 +183,42 @@ module `mname`
                    $fatal("ERROR SRAM is trying to cheat (wz)!");
       end
    end
-
+*/
+   //////////////////////////////////////////////////////////////////////////////
+   // READ
    assign rd_data_o = (~ez_i & wz_i) ? mem[addr_i] : 'x;  // READ TRUE_1PORT
+
+   // READ DEBUG
+   // READ INFO (historical) (also for analyze_reads_and_writes.pl -d9)
    always @(ez_i or wz_i or addr_i) if (~ez_i & wz_i) begin
-      // READ INFO (historical) (also for analyze_reads_and_writes.pl -d9)
       $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
       $display("%m %1d: Reading rd_data_o mem[%1d] <= %16x", $time, addr_i, rd_data_o);
-      $display("`$myname` t5 %5d: Read(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("rd_data_o")`);
+      $display("`$myname` t5 %5d: Read(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)", 
+                       $time, addr_i, `ri("rd_data_o")`);
       $display("");
    end
 
+   //  sync sram see http://www.asic-world.com/examples/verilog/ram_sp_sr_sw.html
+   // async sram see http://www.asic-world.com/examples/verilog/ram_sp_ar_aw.html
 
+   //////////////////////////////////////////////////////////////////////////////
+   // WRITE
+   // FIXME use a proper async SRAM (see above)!!! fiddle w/signals outside, in wrapper :(
+   // 
+   // always @(ez_i or wz_i) begin // doesn't work for verilator
+   // always @(ez_i or wz_i) begin // NOT AN EDGE!!!!!!!!!
+   //
+   always @(negedge wz_i) begin // trial/error debugging - saw behavior on (correct) vcs wave
+      if (~ez_i & ~wz_i) begin
 
-   always @(ez_i or wz_i) begin
-      if (~ez_i & ~wz_i) begin // WRITE
+         // WRITE
          mem[addr_i] <= wr_data_i;
+
+         // WRITE DEBUG
          $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
          $display("%m %1d: Wrote   wr_data_i mem[%1d] <= %16x", $time, addr_i, wr_data_i);
-         $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (%9.6f,%9.6f)", $time, addr_i, `ri("wr_data_i")`);
+         $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)",
+                       $time, addr_i, `ri("wr_data_i")`);
          $display("");
       end
    end

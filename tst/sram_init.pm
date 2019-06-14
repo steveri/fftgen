@@ -58,12 +58,12 @@ sub swizzle_init {
     #
     # Output:
     #    // ix=0 => bank 0, row 0 <= ( 1.000,  0.000)
-    #    top_fft.fftram.SRAM000.mem[0][63:32] = $shortrealtobits(1);
-    #    top_fft.fftram.SRAM000.mem[0][31:0]  = $shortrealtobits(0);
+    #    top_fft.fftram.SRAM000.mem[0][63:32] = _shortrealtobits_1;
+    #    top_fft.fftram.SRAM000.mem[0][31:0]  = _shortrealtobits_0;
     #   
     #    // ix=1 => bank 3, row 0 <= ( 0.000,  0.000)
-    #    top_fft.fftram.SRAM003.mem[0][63:32] = $shortrealtobits(0);
-    #    top_fft.fftram.SRAM003.mem[0][31:0]  = $shortrealtobits(0);
+    #    top_fft.fftram.SRAM003.mem[0][63:32] = _shortrealtobits_0;
+    #    top_fft.fftram.SRAM003.mem[0][31:0]  = _shortrealtobits_0;
     #    ...
 
     my $indent = shift;
@@ -101,11 +101,11 @@ sub swizzle_init {
         printf($indent."// ix=%02d => bank %d, row %d", $i, $bank_num, $rownum);
         printf(" <= (%6.3f, %6.3f)\n", $real, $imag);
 
-        # top_fft.fftram.SRAM000.mem[0][63:32] = $shortrealtobits(1);
-        # top_fft.fftram.SRAM000.mem[0][31:0]  = $shortrealtobits(0);
+        # top_fft.fftram.SRAM000.mem[0][63:32] = _shortrealtobits(1);
+        # top_fft.fftram.SRAM000.mem[0][31:0]  = _shortrealtobits(0);
 
-        printf($indent."top_fft.fftram.SRAM%03d.mem[%d][$rbits] = \$shortrealtobits($real);\n", $bank_num, $rownum);
-        printf($indent."top_fft.fftram.SRAM%03d.mem[%d][$ibits] = \$shortrealtobits($imag);\n", $bank_num, $rownum);
+        printf($indent."top_fft.fftram.SRAM%03d.mem[%d][$rbits] = _shortrealtobits_$real;\n", $bank_num, $rownum);
+        printf($indent."top_fft.fftram.SRAM%03d.mem[%d][$ibits] = _shortrealtobits_$imag;\n", $bank_num, $rownum);
     }
 }
 
