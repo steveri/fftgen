@@ -24,6 +24,7 @@ install:
   # (verilator, csh) already installed above ("addons/apt" section)
 
   # Genesis2
+  - pwd; ls -l
   - source bin/setup_genesis.sh
 
 script:
