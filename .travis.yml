@@ -35,7 +35,7 @@ script:
   - mkdir regression; cd regression
   # - ls -l ../bin
   # - ../bin/golden_test.csh -sim verilator 8 1 1port |& tee test_results.log
-  - ../bin/golden_test.csh -sim verilator |& tee test_results.log
+  - ../bin/golden_test.csh -sim verilator |& tee test_results.log | egrep 'PASS|FAIL|ERR'
   # - cat /tmp/test_8_1_1port.log
   # - ls -l fft.log; wc -l fft.log; grep "Wrote" fft.log
   # - cat /tmp/golden_test_8_1_1port.log
