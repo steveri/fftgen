@@ -33,10 +33,12 @@ script:
   # 47/48 tests should run and pass; 48th test is *supposed* to fail
 
   - mkdir regression; cd regression
-  - ls -l ../bin
-  - ../bin/golden_test.csh -sim verilator 8 1 1port
+  # - ls -l ../bin
+  # - ../bin/golden_test.csh -sim verilator 8 1 1port |& tee test_results.log
+  - ../bin/golden_test.csh -sim verilator |& tee test_results.log
   # - cat /tmp/test_8_1_1port.log
-  - ls -l fft.log; wc -l fft.log; grep "Wrote" fft.log
-  - cat /tmp/golden_test_8_1_1port.log
+  # - ls -l fft.log; wc -l fft.log; grep "Wrote" fft.log
+  # - cat /tmp/golden_test_8_1_1port.log
+  - egrep 'FAIL|ERR' test_results.log && exit 13
 
 
