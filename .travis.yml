@@ -24,14 +24,14 @@ install:
   # (verilator, csh) already installed above ("addons/apt" section)
 
   # Genesis2
-  - pwd; ls -l
   - source bin/setup_genesis.sh
 
 script:
   # set -e => exit on failure "you can sandwich stuff in script w/ set -e and set +e."
   - set -e
 
-  ##################################################################
   # 47/48 tests should run and pass; 48th test is *supposed* to fail
+
   - mkdir regression; cd regression
-  - ../bin/golden_tests.csh -sim verilator
+  - ls -l ../bin
+  - ../bin/golden_test.csh -sim verilator
