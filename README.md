@@ -1,7 +1,14 @@
-fftgen
+fftgen - FFT Generator
 ======
 
-FFT Generator
+| Status                       |
+|------------------------------|
+| [![linux build status][1]][2]|
+
+[1]: https://travis-ci.org/steveri/fftgen.svg?branch=master
+[2]: https://travis-ci.org/steveri/fftgen
+
+
 
 UNDER DEVELOPMENT
 
@@ -15,6 +22,10 @@ Temporarily down for maintenance.  Check Back Again Tomorrow (tm).
 - see 0notes-fft.txt, README.txt for latest/best info
 
 #### NOTES
+<pre>
+dependences include perl, csh, genesis2, ...others...?
+</pre>
+
 <pre>
 2. Need Synopsys' vcs tool in your path. On kiwi:
    (TODO should be a bin/setup_vcs.sh, yes?)

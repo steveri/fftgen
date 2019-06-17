@@ -1,0 +1,36 @@
+dist: trusty
+language: c
+sudo: false
+
+notifications:
+  email:
+    recipients:
+      - steveri@stanford.edu
+    # on_success: never # default: change
+    on_failure: always # default: always
+
+addons:
+  apt:
+    # sources:
+    # - ubuntu-toolchain-r-test
+    packages:
+      - csh
+      - verilator
+    # - build-essential
+
+install:
+  # Current working directory: /home/travis/build/StanfordAHA/fftgen
+
+  # (verilator, csh) already installed above ("addons/apt" section)
+
+  # Genesis2
+  - source bin/setup_genesis.sh
+
+script:
+  # set -e => exit on failure "you can sandwich stuff in script w/ set -e and set +e."
+  - set -e
+
+  ##################################################################
+  # 47/48 tests should run and pass; 48th test is *supposed* to fail
+  - cd regression
+  - ../bin/golden_tests.csh -sim verilator

@@ -3,10 +3,11 @@ haha at long last, all tests pass
 NEXT
 - check everything in
 - set up travis to run w/ verilator
-- clean everything up
-- maybe try a clean install
+- clean everything up, maybe start with README
+- maybe try a clean install based on the new README
 - haha just for fun maybe find all the FIXME's
 - add dependences to README, maybe see slang for template https://github.com/MikePopoloski/slang
+- set up a nightly cron job
 
 ==============================================================================
 
