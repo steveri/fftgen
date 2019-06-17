@@ -33,5 +33,5 @@ script:
 
   ##################################################################
   # 47/48 tests should run and pass; 48th test is *supposed* to fail
-  - cd regression
+  - mkdir regression; cd regression
   - ../bin/golden_tests.csh -sim verilator
