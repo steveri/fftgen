@@ -2,6 +2,8 @@
 ################ Makefile Definitions
 ################################################################################
 
+SHELL := /bin/bash
+
 howto:
 	@echo ""
 	@echo "For a clean build, you should do something like this:"
