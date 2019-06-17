@@ -29,8 +29,8 @@ wire [7:0] ae; assign ae = a[`exponent];
 wire [7:0] be; assign be = b[`exponent];
 
 // Restore hidden one's, use 48-bit precision
-wire [47:0] am; assign am = {23'b0, 1'b1, a[`mantissa]};
-wire [47:0] bm; assign bm = {23'b0, 1'b1, b[`mantissa]};
+wire [47:0] am; assign am = {24'b0, 1'b1, a[`mantissa]};
+wire [47:0] bm; assign bm = {24'b0, 1'b1, b[`mantissa]};
 
 // NORMALIZE
 // Shift the smaller operand left ediff bits, and reduce exp accordingly
@@ -97,8 +97,8 @@ assign z =
    //if ((a != 0) && (b == 32'h40000000)) begin
   
       $display("%m");
-      $display("%m a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
-      $bitstoshortreal(a), a, $bitstoshortreal(b), b, $bitstoshortreal(z), z);
+      $display("%m a=bsr'%08X (%08X) b=bsr'%08X (%08X) z=bsr'%08X (%08X)",
+               a, a, b, b, z, z);
 
      `ifdef DBG9
         $display("%m   ae=%02x be=%02x", ae, be);

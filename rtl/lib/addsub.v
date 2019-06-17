@@ -79,11 +79,11 @@ assign z = (zraw == 32'h80000000) ? 32'h0 : zraw;
 always @ (*) begin
   $display("%m");
   if (op == `ADD) begin
-    $display("%m..ADD a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
-      $bitstoshortreal(a), a, $bitstoshortreal(b), b, $bitstoshortreal(z), z);
+    $display("%m..ADD a=bsr'%08X (%08X) b=bsr'%08X (%08X) z=bsr'%08X (%08X)",
+        a, a, b, b, z, z);
   end else begin  
-    $display("%m..SUB a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
-      $bitstoshortreal(a), a, $bitstoshortreal(b), b, $bitstoshortreal(z), z);
+    $display("%m..SUB a=bsr'%08X (%08X) b=bsr'%08X (%08X) z=bsr'%08X (%08X)",
+        a, a, b, b, z, z);
   end
 `ifdef DBG9
   $display("%m    op=%1x apos=%1x bpos=%1x", op, apos, bpos);

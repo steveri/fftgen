@@ -1,9 +1,9 @@
 regress:
 	@echo "Copy 'n' paste:"
-	@echo "  make -f ../Makefile cleanall"
-	@echo '  log=gold.log1'
-	@echo '  ../bin/golden_test.csh >& $$log &'
-	@echo '  tail -f $$log | egrep "PASS|FAIL"'
+	@echo "i=0"
+	@echo "make -f ../Makefile cleanall"
+	@echo '../bin/golden_test.csh -sim verilog >& gold.log$$i &'
+	@echo 'tail -f gold.log$$i | egrep "PASS|ERR"'
 	@echo ""
 
 clean:

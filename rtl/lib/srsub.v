@@ -26,8 +26,8 @@ module srsub(
 
   // Extract sign, exponent, mantissa  
   // Restore hidden one's, use 48-bit precision
-  wire [47:0] am; assign am = {23'b0, 1'b1, a[`mantissa]};
-  wire [47:0] bm; assign bm = {23'b0, 1'b1, b[`mantissa]};
+  wire [47:0] am; assign am = {24'b0, 1'b1, a[`mantissa]};
+  wire [47:0] bm; assign bm = {24'b0, 1'b1, b[`mantissa]};
 
   // NORMALIZE
   // Shift the larger operand left 'ediff' bits, and reduce exp accordingly
@@ -184,7 +184,7 @@ module srsub(
     zm[2] == 1'b1 ?  ze - 7'd21 :
     zm[1] == 1'b1 ?  ze - 7'd22 :
     zm[0] == 1'b1 ?  ze - 7'd23 :
-    7'd0;
+    8'd0;
 
   ////////////////////////////////////////////////////////////////
   assign z =
@@ -217,8 +217,8 @@ module srsub(
 // if ((a != 0) && (b == 32'h40000000)) begin
   
       $display("%m");
-      $display("%m a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
-      $bitstoshortreal(a), a, $bitstoshortreal(b), b, $bitstoshortreal(z), z);
+      $display("%m a=bsr'%08x (%08X) b=bsr'%08x (%08X) z=bsr'%08x (%08X)",
+               a, a, b, b, z, z);
 
  `ifdef DBG9
         $display("%m    ae=%02x be=%02x", ae, be);

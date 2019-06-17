@@ -58,15 +58,21 @@
 //;
 //; my $nunits = ($upc < 1) ? 1 : $upc;
 //; my $ncy = fftgen::log2($npoints) * ($npoints/2)/$upc;
+//; my $endtime = $ncy + 6; # End simulation after complete cycle plus some.
 //;
-// Generating clock unit clock/GCLK...
-//; my $gclock = generate
-//;    ('clock','GCLK',
-//;     SIMULATOR=>$SIMULATOR, # vcs or verilator
-//;     CLK_PERIOD=>1000,      # 5 ns clock period
-//;     RST_PERIOD=>   1,      # Currently not used
-//;     MAX_CYCLES=>  ($ncy+6) # End simulation after complete cycle plus some.
-//; );
+//; my $gclock = "";
+//; if ($SIMULATOR eq "vcs") {
+// Generating clock unit clock/GCLK (vcs only)...
+//;   $gclock = generate
+//;      ('clock','GCLK',
+//;       SIMULATOR=>$SIMULATOR, # vcs or verilator
+//;       CLK_PERIOD=>1000,      # 5 ns clock period
+//;       RST_PERIOD=>   1,      # Currently not used
+//;       MAX_CYCLES=>  $endtime # End simulation after complete cycle plus some.
+//;   );
+//; } else {
+// Clock will be supplied by verilator...
+//; }
 
 // Generating fftctl unit fftctl/fftctl (nunits = `$nunits`, npoints=`$npoints`)...
 //; my $fftctl = generate
@@ -131,7 +137,11 @@
 //;# //;     printf("FOO 2a //     %-20s %8s %s\n", $p, "($val)", $doc);
 //;# //; }
 //;
+//; if ($SIMULATOR eq "vcs") {
 module `mname`();
+//; } else {
+module `mname`( input logic clk, output wire done );
+//; }
    // BEGIN WIRE DECLARATIONS
 
    //; $fftctl->printwires("   ", "wire_list");
@@ -206,8 +216,13 @@ module `mname`();
       $display("\nfftmem.vp: n_butterfly_units=`$nunits` and n_fft_points=`$npoints`\n");
    end
 
-   // Generate clock and connect it to local wire ".clk"
+//; if ($SIMULATOR eq "vcs") {
+   // Generate clock and connect it to local wire ".clk" (vcs only)
    `$gclock->instantiate()`(.clk(clk), .reset(rst_n));       // .remote(local)
+//; } else {
+   // Clock will be supplied by verilator; "clock_unq1" is for vcs only.
+   // clock_unq1  GCLK(.clk(clk), .reset(rst_n));       // .remote(local)
+//; }
 
    // Instantiate swizzle units BFLY0_op1_swizzle, BFLY0_op2_swizzle etc.
    //;
@@ -255,7 +270,9 @@ module `mname`();
    end
 
    // DEBUG/TEST info: show swizzle translations.
-   always @ (fftclk) if (fftclk==1) begin
+   // FIXME I think this is supposed to be "negedge fftclk..?"
+   // FIXME originally displayed at 602, 1602, 2602,...right???
+   always @ (fftclk) if (fftclk==1) begin   // 602,1602,2602...(?)
       //; foreach my $io ("op1", "op2") {
       //;    for (my $i=0; $i<$nunits; $i++) {
       //;        my $pfx = "BFLY${i}_${io}";    # BFLY0_op1, BFLY0_op2, BFLY1_op1...
@@ -442,11 +459,18 @@ module `mname`();
      else       cycle_counter <= cycle_counter + 32'b1;
    end
    
+//; # FIXME not sure this (divisor thingy) is correct or useful...
+//; my $divisor = ($SIMULATOR eq "vcs") ? "1000" : "1";
    always @ (posedge clk) begin
       $display("------------------------------------------------------------------------------");
-      $display("clock.vp: reset=%d, ncy=%4d, time=%6d ns", rst_n, cycle_counter, $time/1000);
+      $display("clock.vp: reset=%d, ncy=%4d, time=%6d ns", rst_n, cycle_counter, $time/`$divisor`);
       $display("------------------------------------------------------------------------------");
    end
+
+//; if ($SIMULATOR eq "verilator") {
+   assign done = (cycle_counter == 32'd`$endtime`);
+//; }
+
    // END CLOCK AND RESET
 
 endmodule

@@ -24,8 +24,8 @@ module srmul(
   // Mantissa is hard. Remember mantissa is [22:0]
 
   // Restore hidden one's, use 48-bit precision
-  wire [47:0] am; assign am = {23'b0, 1'b1, a[`mantissa]};
-  wire [47:0] bm; assign bm = {23'b0, 1'b1, b[`mantissa]};
+  wire [47:0] am; assign am = {24'b0, 1'b1, a[`mantissa]};
+  wire [47:0] bm; assign bm = {24'b0, 1'b1, b[`mantissa]};
   wire [47:0] ab; assign ab = am * bm;
 
   // Normalized result will have leading '0' e.g. 01x01=0100
@@ -73,8 +73,8 @@ module srmul(
   always @ (*) begin
     if ((a != 0) && (b != 0)) begin
 //    if ((a != 0) && (b == 32'h40000000)) begin
-      $display("srmul a=%9.6f (%08X) b=%9.6f (%08X) z=%9.6f (%08X)",
-      $bitstoshortreal(a), a, $bitstoshortreal(b), b, $bitstoshortreal(z), z);
+      $display("srmul a=bsr'%08X (%08X) b=bsr'%08X (%08X) z=bsr'%08X (%08X)",
+                a, a, b, b, z, z);
      `ifdef DBG9
         $display("srmul as=%1x bs=%1x zs=%1x", a[`sign], b[`sign], z[`sign]);
         $display("srmul ----");

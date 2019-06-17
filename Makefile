@@ -16,6 +16,10 @@ howto:
 #   - make TOP=clock to test clock.vp module only.
 TOP := fft
 
+# Simulator can be "vs" or "verilator". For now, default is vcs.
+SIM := vcs
+$(warning SIMULATOR set to $(SIM))
+
 # This little trick finds where the makefile exists (not used so far as I can tell)
 MAKEFILE_PATH:=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 
@@ -25,10 +29,6 @@ $(warning Home dir set to $(DESIGN_HOME))
 # RUNDIR is where we are actually running
 RUNDIR := $(shell cd ./; pwd -P)
 $(warning Work started at $(RUNDIR)) 
-
-# Now using -perl_libs (see below) instead of PERL5LIB
-# PERL5LIB := $(PERL5LIB):$(DESIGN_HOME)/rtl:$(DESIGN_HOME)/tst
-# $(warning Added $(DESIGN_HOME)/rtl to PERL5LIB)
 
 # DELETED 05/2019 ------------------------------------------------------------
 # this line enables a local Makefile to override values of the main makefile
@@ -242,7 +242,7 @@ VERILOG_SIMULATION_FLAGS := 	$(VERILOG_SIMULATION_FLAGS) 			\
 ################ Makefile Rules
 ################################################################################
 #default rule: 
-all: run
+all: run_$(SIM)
 
 
 ###### Genesis2 rules: ######
@@ -263,8 +263,9 @@ $(GENESIS_VLOG_LIST) $(GENESIS_SYNTH_LIST) $(GENESIS_VERIF_LIST): $(GENESIS_INPU
 	@echo ""
 	@echo Making $@ because of $?
 	@echo ==================================================
+       #Genesis2.pl $(GENESIS_GEN_FLAGS) $(GEN) $(GENESIS_PARSE_FLAGS) -debug $(GENESIS_DBG_LEVEL) 
+	echo Genesis2.pl $(GENESIS_GEN_FLAGS) $(GEN) $(GENESIS_PARSE_FLAGS) -debug $(GENESIS_DBG_LEVEL) 
 	Genesis2.pl $(GENESIS_GEN_FLAGS) $(GEN) $(GENESIS_PARSE_FLAGS) -debug $(GENESIS_DBG_LEVEL) 
-#	locDesignMap.pl TCL=gen_params.tcl INPUT_XML=small_$(GENESIS_HIERARCHY) DESIGN_FILE=BB_clock.design LOC_DESIGN_MAP_FILE=/dev/null PARAM_LIST_FILE=/dev/null PARAM_ATTRIBUTE_FILE=/dev/null > /dev/null
 
 genesis_clean:
 	@echo ""
@@ -286,7 +287,7 @@ genesis_clean:
 comp: $(SIMV)
 
 #$(SIMV):$(GENESIS_VLOG_LIST) clock.v
-$(SIMV):$(GENESIS_VLOG_LIST)
+$(SIMV): $(GENESIS_VLOG_LIST)
 	@echo ""
 	@echo Making $@ because of $?
 	@echo ==================================================
@@ -300,23 +301,47 @@ $(SIMV):$(GENESIS_VLOG_LIST)
 # Simulation rules:
 #####################
 # use "make run RUN=+<runtime_flag[=value]>" to add runtime flags
+# "PHONY" means there is no actual file named "run" :)
 .PHONY: run
-run: $(SIMV)
+run: run_$(SIM)
+
+.PHONY: run_vcs
+run_vcs: $(SIMV)
 	@echo ""
 	@echo Now Running simv
 	@echo ==================================================
 	$(SIMV) $(VERILOG_SIMULATION_FLAGS) $(RUN)
 
+# E.g. VTOP=Vtop_fft
+VTOP := Vtop_$(TOP)
+
+# E.g. obj_dir/Vtop_fft |& ../bin/bsr.awk %9.6f > Vtop_fft.log
+.PHONY: run_verilator
+run_verilator: obj_dir/$(VTOP) $(DESIGN_HOME)/bin/bsr.awk
+	@echo ""
+	@echo Now Running verilator simulator obj_dir/$(VTOP)
+	@echo ==================================================
+	obj_dir/$(VTOP) |& ../bin/bsr.awk %9.6f > $(TOP).log
+
+obj_dir/$(VTOP): obj_dir/$(VTOP).mk
+	make -j -C obj_dir/ -f $(VTOP).mk $(VTOP)
 
 
-########################################
-# DELETED 5/2019
-# DC & ICC Run rules: See Makefile.synth
-########################################
-# -include Makefile.synth
-########################################
+# verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir}
+# verilator -Wno-fatal -Wall --cc genesis_verif/top_fft.v --exe ../tst/fft.cpp 
+#           --trace -y genesis_verif/ -y ../rtl/lib/
+# 
+# FIXME shouldn't dependence be "$(RUNDIR)/$(GENESIS_VLOG_LIST)"???
+VERILATOR_TESTBENCH := ../tst/$(TOP).cpp
+obj_dir/$(VTOP).mk: ${VERILATOR_TESTBENCH} $(GENESIS_VLOG_LIST)
+	verilator -Wno-fatal -Wall --cc \
+	  genesis_verif/top_fft.v --exe ../tst/fft.cpp \
+	  --trace -y genesis_verif/ -y ../rtl/lib/
 
-
+# Top module should be e.g. genesis_verif/top_fft.v
+VFILE_TOP := genesis_verif/$(GENESIS_TOP).v
+verilator_list.vf: $(GENESIS_VLOG_LIST)
+	grep -v $(VFILE_TOP) $(GENESIS_VLOG_LIST) > verilator_list.vf
 
 # # Something for the GUI: "make gui_info" gives the gui everything it needs to know.
 # gui_info:
@@ -359,6 +384,7 @@ cleanall: clean
 	\rm -rf depend.list
 	\rm -rf DVE*
 	\rm -rf vcdplus.vpd
+	\rm -rf obj_dir
 
 # 1905 regression tests; regressions/ subdir should already exist!! (as part of dist)
 regress:
@@ -367,11 +393,11 @@ regress:
 
 
 test8:
-	tmpdir=`mktemp -d test8.XXX`;\
+	tmpdir=`mktemp -d tmp.test8.XXX`;\
 	  cd $$tmpdir;\
-	  ../bin/golden_test.csh 8 1 1port |& tee gold.log
+	  ../../bin/golden_test.csh -sim $(SIMULATOR) 8 1 1port
 
-
+# AND/OR?
 # test8:
 # 	npoints="top_fft.n_fft_points=8"
 # 	nbutts="top_fft.units_per_cycle=1";\
@@ -380,5 +406,3 @@ test8:
 # 	make clean gen TOP=fft \
 # 	  GENESIS_PARAMS="$$npoints $$nbutts $$sram $$alg" \
 # 	  >& test_8_1_1port.log
-# 
-

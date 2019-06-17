@@ -766,7 +766,10 @@ module `mname`
    always @(posedge fftclk_o) begin
      // LAST signal tells us when we're done.
      //; my $last_cycle = $ncalcs_per_unit + 1;             # Need one extra cycle to complete (why?)
-     //; if ($SRAM_TYPE eq "TRUE_1PORT") { $last_cycle++; } # Plus one cycle for the final write.
+     //;
+     //;
+     //; # Trial and error debugging! Regressions work if comment out line below 6/2019 :(
+     //; # if ($SRAM_TYPE eq "TRUE_1PORT") { $last_cycle++; } # Plus one cycle for the final write.
      //;
      if (cycle_num == `$last_cycle-1`) LAST <= 1'b1;
 
@@ -851,6 +854,7 @@ endmodule
 //;    # Okay yes this is weird but parm list has extra "HASH" when called as "function()" vs. "obj->function()"!!
 //;    my $indent = shift @_; while ($indent =~ /HASH/) { $indent = shift @_; }
 //;    my $list    = shift @_; # Either "io_list" (for me) or "wire_list" (for others)
+//;
 //;    my $io_list = ($list eq "io_list") ? 1 : 0;
 //;    
 //;    # Print port list as either list of wires ($list="wire_list")

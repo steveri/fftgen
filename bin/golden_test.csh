@@ -46,13 +46,6 @@ EOF
 exit
 endif
 
-# Quick check will save heartache later
-set which_vcs = `which vcs`
-if ("$which_vcs" == "") then
-  echo "ERROR looks like you do not have vcs in your path"
-  exit
-endif
-
 unset gt8k
 if ("$0:t" == "gt8k.csh") set gt8k
 
@@ -79,6 +72,22 @@ if ("$1" == "-sim") then
   shift; shift;
 endif
 
+if ("$SIMULATOR" == "verilator") then
+  set simlog = "fft.log"
+
+else if ("$SIMULATOR" == "vcs") then
+  set simlog = "simv.log"
+
+else
+  echo "ERROR What is -sim '$SIMULATOR'? Can only handle -sim 'vcs' or 'verilator'"
+  exit
+endif
+
+# Quick check will save heartache later
+set w = `which $SIMULATOR`; if ("$w" == "") then
+  echo "ERROR looks like you do not have '$SIMULATOR' in your path"
+  exit
+endif
 
 # Default swizz alg is 'round7' unless otherwise specified e.g. with
 #    $0 -alg 'mod_bn_combo'
@@ -99,7 +108,6 @@ if ("$swizzalg" != 'round7') then
   echo "Setting env var SCHED_ALG='$swizzalg'" 
   setenv SCHED_ALG $swizzalg
 endif
-
 
 # For one-off tests specified on command line e.g. "golden_test.csh 8 1 1port"
 if ($#argv == 3) then
@@ -186,7 +194,7 @@ foreach t ($tests:q)
 
   # Start with a clean slate
   # cd $FFTGEN_DIR
-  if (-e simv.log) /bin/rm simv.log
+  if (-e $simlog) /bin/rm $simlog
 
   # Build a readable suffix that describes what test we're doing.
   # set parms="top_fft.n_fft_points=$npoints top_fft.units_per_cycle=$nunits top_fft.SRAM_TYPE=$sram top_fft.swizzle_algorithm=$swizzalg"
@@ -194,7 +202,7 @@ foreach t ($tests:q)
   set parms = "$parms top_fft.units_per_cycle=$nunits"
   set parms = "$parms top_fft.SRAM_TYPE=$sram"
   set parms = "$parms top_fft.swizzle_algorithm=$swizzalg"
-  set parms = "$parms top_fft.SIMULATOR=vcs"
+  set parms = "$parms top_fft.SIMULATOR=$SIMULATOR"
   set sfx=${npoints}_${nunits}_${nports}
   set tmp = /tmp/test_$sfx.log
 
@@ -207,15 +215,15 @@ foreach t ($tests:q)
   # Print out date, id info
   date; echo $sfx": npoints=$npoints, nunits=$nunits, sram=$sram; alg=$swizzalg"
 
+  set cmd = "make -f $MAKEFILE clean gen SIM=$SIMULATOR TOP=fft"
+
   # Generate the FFT.
   unset fatal_error
   set dq = '"'
   if ($?VERBOSE) then
-    echo "  make -f $MAKEFILE clean gen TOP=fft GENESIS_PARAMS=$dq$parms$dq >& $tmp"
+    echo "  $cmd GENESIS_PARAMS=$dq$parms$dq" >& $tmp
   endif
-
-  make  -f $MAKEFILE clean gen TOP=fft \
-    GENESIS_PARAMS="$parms" >& $tmp || set fatal_error
+  $cmd GENESIS_PARAMS="$parms" >& $tmp || set fatal_error
 
   # If FFT generator failed, print out a coherent error message.
   if ($?fatal_error) then
@@ -231,15 +239,15 @@ foreach t ($tests:q)
 
   # Run the generator
   # alias mr   make -j 1 run TOP=fft
-  alias mr   make -f $MAKEFILE run TOP=fft
+  alias mr   make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR
 
   mr |& egrep -v '^Makefile' >> $tmp
   mr |& egrep -v '^Makefile' >> $tmp
 
   # If "make run" failed, print out a coherent error message.
-  if (! -e simv.log) then
+  if (! -e $simlog) then
       echo fatal error
-      echo "ERROR No simv.log; 'make run' failed? --- $npoints $nunits $nports"
+      echo "ERROR No $simlog; 'make run' failed? --- $npoints $nunits $nports"
       echo "  See $tmp for details"
       echo "  less -r $tmp"
       echo
@@ -248,25 +256,25 @@ foreach t ($tests:q)
   endif
 
 # DEBUG
-#   echo "  TEMPORARY cp simv.log simv.log.orig FIXME"
-#                     cp simv.log simv.log.orig
+#   echo "  TEMPORARY cp $simlog $simlog.orig FIXME"
+#                     cp $simlog $simlog.orig
 
   echo ""
-  echo "Processing bsr macros in simv.log..."
-  echo "  awk -f $BIN/bsr.awk %9.6f < simv.log > simv.log.bsr$$"
-          awk -f $BIN/bsr.awk %9.6f < simv.log > simv.log.bsr$$
-  echo "  mv simv.log.bsr$$ simv.log"
-          mv simv.log.bsr$$ simv.log
+  echo "Processing bsr macros in $simlog..."
+  echo "  awk -f $BIN/bsr.awk %9.6f < $simlog > $simlog.bsr$$"
+          awk -f $BIN/bsr.awk %9.6f < $simlog > $simlog.bsr$$
+  echo "  mv $simlog.bsr$$ $simlog"
+          mv $simlog.bsr$$ $simlog
   echo ""
 
   ########################################################################
   # Stats: ncycles, nwrites.
-  set n_sram_writes   = `egrep '^SRAM.*Wrote' simv.log | wc -l`
-  set n_bypass_writes = `egrep 'Bypass.*wrote' simv.log | wc -l`
+  set n_sram_writes   = `egrep '^SRAM.*Wrote' $simlog | wc -l`
+  set n_bypass_writes = `egrep 'Bypass.*wrote' $simlog | wc -l`
   @ nwrites = $n_sram_writes + $n_bypass_writes
 
   set ncycles = \
-    `awk -f $BIN/process_test5.awk simv.log | awk '/FFT took/{print $3}'`
+    `awk -f $BIN/process_test5.awk $simlog | awk '/FFT took/{print $3}'`
 
   echo "$nwrites writes ($n_bypass_writes bypass writes), $ncycles cycles"
 
@@ -275,7 +283,7 @@ foreach t ($tests:q)
 
   set lastline = 2
   if ($npoints == 16) set lastline=3
-  cat simv.log \
+  cat $simlog \
     | awk -f $BIN/process_test5.awk \
     | sed -n '/TEST5 FINAL/,$p'\
     | egrep '^(ix00|ix07|ix15)' | sed -n "1p;${lastline}p"
@@ -291,10 +299,10 @@ foreach t ($tests:q)
   echo
   # Note "make gen" deletes all logfiles *.log in "." (should I fix that?)
   set logfile = "/tmp/golden_test_${npoints}_${nunits}_${nports}.log"
-  $BIN/golden_test.pl $npoints $nunits $nports \
+  $BIN/golden_test.pl $simlog $npoints $nunits $nports \
     |& tee $logfile | egrep '^PASS|^FAIL|ERROR|WARNING|See|less' \
     | sed 's/\(^ERROR.*\)/\1 --- '"$npoints $nunits $nports/"\
-    | sed 's/^/TR /' | tee -a $summfile
+    | sed "s/^\(.*\)/TR \1 ($SIMULATOR)/" | tee -a $summfile
 
   # "TR" => "Test Result"
   (egrep '^FAIL|ERROR' $logfile > /dev/null) && echo "TR For more info:"    | tee -a $summfile
@@ -303,8 +311,8 @@ foreach t ($tests:q)
   (egrep '^FAIL|ERROR' $logfile > /dev/null) && echo "TR "                  | tee -a $summfile
 
   # Check for problems in the log file; it's important to have errors AFTER warnings, right?
-  egrep -i 'warn'        simv.log | sed 's/\(.*\)/simv.log: \1/' | tee -a $summfile
-  egrep -i 'fatal|error' simv.log | sed 's/\(.*\)/simv.log: \1/' | tee -a $summfile
+  egrep -i 'warn'        $simlog | sed "s/\(.*\)/${simlog}: \1/" | tee -a $summfile
+  egrep -i 'fatal|error' $simlog | sed "s/\(.*\)/${simlog}: \1/" | tee -a $summfile
 
   echo "-------------------------------------------"
 

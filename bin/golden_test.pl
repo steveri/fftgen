@@ -9,30 +9,31 @@ use strict;
 my $DBG = 0;
 my $DBG9 = 0;
 my $TEST_ERROR = 0;
+my $LOGFILE = "simv.log";
 
-if (@ARGV != 3) {
+if (@ARGV != 4) {
     my $errmsg = sprintf(
         "\n".
-        "Generates correct fft answers and compares vs. simv.log\n".
+        "Generates correct fft answers and compares vs. $LOGFILE\n".
         "\n".
         "Usage:\n".
-        "   $0 <npoints> <n_butterfly_units> <sram_type>\n".
+        "   $0 <logfile> <npoints> <n_butterfly_units> <sram_type>\n".
         "\n".
         "Examples:\n".
-        "    $0    8 1 \"2port\"\n".
-        "    $0 1024 4 \"1port\"\n".
+        "    $0 fft.log  8    1 \"2port\"\n".
+        "    $0 simv.log 1024 4 \"1port\"\n".
         "\n");
     die $errmsg;
 }
-my ($npoints,$nunits,$sram_type) = ($ARGV[0], $ARGV[1], $ARGV[2]);
-print "Comparing simv.log against GM w/ npoints=$npoints, nunits=$nunits and sram_type=\"$sram_type\".\n";
+my ($LOGFILE, $npoints,$nunits,$sram_type) = ($ARGV[0], $ARGV[1], $ARGV[2], $ARGV[3]);
+print "Comparing $LOGFILE against GM w/ npoints=$npoints, nunits=$nunits and sram_type=\"$sram_type\".\n";
 
 if ($sram_type eq "test_error") {
     $sram_type = "1port";
     $TEST_ERROR = 1;  # Guarantees at least one error
 }
 
-# Compare results in "$FFTGEN_DIR/simv.log" against result of running golden model
+# Compare results in "$FFTGEN_DIR/$LOGFILE" against result of running golden model
 # on "npoints" and "nunits"
 
 my $FFTGEN_DIR = mydir("..");  # Script lives in $FFTGEN_DIR/bin
@@ -60,7 +61,7 @@ sub do_test {
 #    foreach my $result (@gm_results) { print "bat $result\n"; } print "\n";
 
 #    my @fft_results = do_fft(8, 1, "1port");
-    my @fft_results = do_fft();  # Use results found in "simv.log".
+    my @fft_results = do_fft();  # Use results found in "$LOGFILE".
     print "\n";
 #    foreach my $result (@fft_results) { print "fat $result\n\n"; } print "\n";
 
@@ -88,19 +89,19 @@ sub do_test {
 }
 
 sub do_fft {
-    # Use whatever results we find in "simv.log"
+    # Use whatever results we find in "$LOGFILE"
     #my $npoints = shift;
     #my $nunits = shift;
     #my $sram_type = shift;
     ##############################################################################
     # Print results from FFT.
 
-    #my $fft = `cat /home/steveri/fftgen/simv.log | egrep '^SRAM.*Wrote'`;
-    #my $fft = `cat /home/steveri/fftgen/simv.log | awk -f bin/process_test5.awk | egrep '^ix'`;
+    #my $fft = `cat /home/steveri/fftgen/$LOGFILE | egrep '^SRAM.*Wrote'`;
+    #my $fft = `cat /home/steveri/fftgen/$LOGFILE | awk -f bin/process_test5.awk | egrep '^ix'`;
 
     # 1905 can run from any directory!
-    # my $fft = `cat $FFTGEN_DIR/simv.log | awk -f bin/process_test5.awk | egrep '^ix'`;
-    my $fft = `cat $RUN_DIR/simv.log | awk -f $FFTGEN_DIR/bin/process_test5.awk | egrep '^ix'`;
+    # my $fft = `cat $FFTGEN_DIR/$LOGFILE | awk -f bin/process_test5.awk | egrep '^ix'`;
+    my $fft = `cat $RUN_DIR/$LOGFILE | awk -f $FFTGEN_DIR/bin/process_test5.awk | egrep '^ix'`;
 
 
     # Above command should have yielded e.g.
