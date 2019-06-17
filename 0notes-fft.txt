@@ -1,3 +1,63 @@
+haha at long last, all tests pass
+
+NEXT
+- check everything in
+- set up travis to run w/ verilator
+- clean everything up
+- maybe try a clean install
+- haha just for fun maybe find all the FIXME's
+- add dependences to README, maybe see slang for template https://github.com/MikePopoloski/slang
+
+==============================================================================
+
+for SRAM/2PORT, try always @ (poedge clk_i or negedge clk_i) or whatever
+
+
+
+Verilated model didn't converge
+
+    Verilator sometimes has to evaluate combinatorial logic multiple
+    times, usually around code where a UNOPTFLAT warning was issued,
+    but disabled. For example:
+
+    always @ (a)  b=~a;
+    always @ (b)  a=b
+
+    will toggle forever and thus the executable will give the didn't
+    converge error to prevent an infinite loop.
+
+    To debug this, run Verilator with --profile-cfuncs. Run make on
+    the generated files with "OPT=-DVL_DEBUG". Then call
+    Verilated::debug(1) in your main.cpp.
+
+    This will cause each change in a variable to print a message. Near
+    the bottom you'll see the code and variable that causes the
+    problem. For the program above:
+
+    CHANGE: filename.v:1: b
+    CHANGE: filename.v:2: a
+
+
+ verilator --profile-cfuncs -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace \
+  -y ${vdir} -y ${fpu} |& tee verilator.log$i
+
+
+make OPT=-DVL_DEBUG -j -C obj_dir/ -f Vtop_fft.mk Vtop_fft |& tee make.log$i | less
+
+obj_dir/Vtop_fft  | tee tmp.log | less
+
+
+
+        CHANGE: genesis_verif//fftram_unq1.v:104: v.fftram.SRAM000_wr_data
+        CHANGE: genesis_verif//fftram_unq1.v:105: v.fftram.SRAM001_wr_data
+
+
+------------------------------------------------------------------------------
+
+
+
+
+
 STATUS
 
     cd regression; ../bin/golden_test.csh -sim vcs

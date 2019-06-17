@@ -64,30 +64,11 @@ int main(int argc, char **argv, char **env) {
   VerilatedVcdC* tfp = new VerilatedVcdC;
   top->trace (tfp, 99);
   tfp->open ("counter.vcd");
-  // initialize simulation inputs
 
-  //  top->eval();
+  //Uncomment to debug "didn't converge" error (see verilator manual "verilator --help")
+  //Verilated::debug(1);
 
-/* This is the old clock
-  localparam CLK_PERIOD = 1000;  // E.g. 5000 = 5ns
-  initial begin
-    clk = 1'b0;
-    reset = 1'b1;
-
-    #(CLK_PERIOD*10) ;
-    reset = 1'b0;
-    #(CLK_PERIOD*4) ;
-    // This is where the testing starts
-    // @(posedge clk) 
-  end
-*/
-
-  // clock.vp: BEGIN STUPID SIMULATION THINGY
-  // clock.vp: BEGIN clk=0 
-  // clock.vp: BEGIN reset=1 
-  // clock.vp: Using clock period= 1 ns
   top->clk = 0;
-  //  top->rst_n = 1;
   top->eval(); // establish initial values?
   ncy=0;
 
