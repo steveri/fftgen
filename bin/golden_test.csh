@@ -3,6 +3,7 @@
 ## See below (end of file) for extended copyright information.
 
 set VERBOSE
+set TRAVIS
 
 if ("$1" == "--help") then
 cat <<EOF
@@ -229,6 +230,10 @@ foreach t ($tests:q)
   if ($?fatal_error) then
       echo fatal error
       echo "  ERROR 'make gen' failed. --- $npoints $nunits $nports"
+
+      if ($?TRAVIS) cat $tmp
+      if ($?TRAVIS) exit 13
+
       echo "  See $tmp for details"
       echo "  less -r $tmp"
       if ($sfx == "8_4_1port") echo "*** NOTE $sfx is SUPPOSED to fail! (16 SRAM's for 8 points\!?) ***"

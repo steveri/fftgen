@@ -13,10 +13,16 @@ else
     echo "Installing new Genesis2 in /tmp/Genesis2..."
     git clone https://github.com/StanfordVLSI/Genesis2.git /tmp/Genesis2
 
-    # 05/2019 REMOVED Compress subdir from repository omg finally
+    # 05/2019 REMOVED Compress subdir from repository omg finally so don't need this
     # huh.  seems to break if don't remove distrib Zlib?
     # Compress::Raw::Zlib object version 2.060 does not match bootstrap parameter 2.033 at /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Compress/Raw/Zlib.pm line 98.
     # /bin/rm -rf /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Compress
+
+    # 06/2019 OMG now it's back. In "Archive" for some reason...?
+    # FIXME maybe check github log to see who did this..?
+    # Compilation failed in require at /tmp/Genesis2/.../Archive/Zip.pm line 12.
+    # BEGIN failed--compilation aborted at /tmp/Genesis2/.../Archive/Zip.pm line 12.
+    /bin/rm -rf /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Archive/
 
   fi
 
