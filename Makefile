@@ -1,3 +1,4 @@
+# FIXME clean up Makefile it's a mess
 ##############################################################################
 ################ Makefile Definitions
 ################################################################################
@@ -352,7 +353,7 @@ verilator_list.vf: $(GENESIS_VLOG_LIST)
 
 # Cleanup rules:
 #####################
-.PHONY: clean cleanall 
+.PHONY: clean
 #clean: genesis_clean synthesis_clean
 clean:
 	@echo ""
@@ -381,6 +382,7 @@ clean:
 	@echo "To clean *everything* run 'make cleanall'"
 	@echo ==================================================
 
+.PHONY: cleanall
 cleanall: clean 
 	genesis_clean.cmd >& /dev/null || echo genesis_clean.cmd already gone
 	\rm -rf depend.list
@@ -388,16 +390,24 @@ cleanall: clean
 	\rm -rf vcdplus.vpd
 	\rm -rf obj_dir
 
+
+##############################################################################
+# TESTING
+
 # 1905 regression tests; regressions/ subdir should already exist!! (as part of dist)
-regress:
-	cd regressions; make -f ../Makefile cleanall
-	cd regressions; ../bin/golden_test.csh |& tee regress.log.$$
+.PHONY: regress regressions
+regress regressions:
+	tmpdir=`mktemp -d tmp.regressions.XXX`;
+	  cd $$tmpdir; ../bin/golden_test.csh
 
 
+.PHONY: quicktest test
+test quicktest: test8
+
+.PHONY: test8
 test8:
 	tmpdir=`mktemp -d tmp.test8.XXX`;\
-	  cd $$tmpdir;\
-	  ../../bin/golden_test.csh -sim $(SIMULATOR) 8 1 1port
+	  cd $$tmpdir; ../bin/golden_test.csh -sim $(SIM) 8 1 1port
 
 # AND/OR?
 # test8:
