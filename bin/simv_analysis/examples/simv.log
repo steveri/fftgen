@@ -1,0 +1,2569 @@
+Command: /nobackup/steveri/github/fftgen/tmp.test8.DVS/simv -l simv.log +vcs+lic+wait +vpdbufsize+100 +vcs+dumparrays +vpdfileswitchsize+100
+Chronologic VCS simulator copyright 1991-2018
+Contains Synopsys proprietary information.
+Compiler version O-2018.09-SP1_Full64; Runtime version O-2018.09-SP1_Full64;  Jun 19 08:09 2019
+GENOPS2 -----------------------------------------------------
+GENOPS2 (t=000000) STAGE 0
+
+fftmem.vp: n_butterfly_units=1 and n_fft_points=8
+
+
+clock.vp: BEGIN STUPID SIMULATION THINGY
+
+
+clock.vp: BEGIN clk=0 
+
+
+clock.vp: BEGIN reset=1 
+
+clock.vp: Using clock period= 1 ns
+
+------------------------------------------------------------------------------
+clock.vp: reset=1, ncy=         x, time=     0 ns
+------------------------------------------------------------------------------
+top_fft 500: BFLY0_op1 ix  x comes from bank  x row   x
+top_fft 500: BFLY0_op2 ix  x comes from bank  x row   x
+top_fft
+fftctl 500: cycle_num = 0 BOTF
+fftram    500 bypass_valid[2]=0 SRAM002_active=x bypassed_rnum[2]=0 SRAM002_ix=x GLOOP
+
+fftram 500: BFLY0_op1_match[0] = x
+fftram 500: BFLY0_out1_data_i = xxxxxxxxxxxxxxxx
+
+
+RESET!!!
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  1000: in1(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5  1000: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  1000: t1  =  0.000000
+top_fft.BFLY0 t5  1000: t1a =  0.000000
+top_fft.BFLY0 t5  1000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  1000: t2  =  0.000000
+top_fft.BFLY0 t5  1000: t2a =  0.000000
+top_fft.BFLY0 t5  1000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  1000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5  1000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 1000: fft_started = 1
+fftram 1000: BFLY0_op1_bnum_i = x
+
+fftram 1000: SRAM000_ez = x
+fftram 1000: SRAM001_ez = x
+fftram 1000: SRAM002_ez = x
+fftram 1000: SRAM003_ez = x
+
+fftram 1000: SRAM000_wz = 1
+fftram 1000: SRAM001_wz = 1
+fftram 1000: SRAM002_wz = 1
+fftram 1000: SRAM003_wz = 1
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   1, time=     1 ns
+------------------------------------------------------------------------------
+top_fft 1500: BFLY0_op1 ix  x comes from bank  x row   x
+top_fft 1500: BFLY0_op2 ix  x comes from bank  x row   x
+top_fft
+fftctl 1500: cycle_num = 0 BOTF
+fftram   1500 bypass_valid[2]=0 SRAM002_active=x bypassed_rnum[2]=0 SRAM002_ix=x GLOOP
+
+fftram 1500: BFLY0_op1_match[0] = x
+fftram 1500: BFLY0_out1_data_i = xxxxxxxxxxxxxxxx
+
+fftctl 1500: cycle_num = 0
+fftctl 1500: fftctl_cycle_num_o =  x
+fftctl 1500: out2_offset = 1
+GENOPS2 (t=001500) ii,i: (0,1) => (0,1)
+GENOPS2
+GENOPS2 (t=001500) > P = 00000000
+GENOPS2 (t=001500) > ir= 00000000
+GENOPS2
+GENOPS2 (t=001500) > op1= 00000000
+GENOPS2 (t=001500) > op2= 00000001
+GENOPS2
+GENOPS2 (t=001500) ops=(0,1)
+GENOPS2 -----------------------------------------------------
+fftctl 1500: in( x, x), out( x,  x)
+fftctl 1500: cycle_num = 0
+
+top_fft  1500: BFLY0_twiddle_cos = xxxxxxxx ( 0.000000)
+
+top_fft t5
+top_fft t5  1500: in1(r,i)= ( 0.000000, 0.000000)
+top_fft t5  1500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft t5  1500: tw_cos  =      0.000000
+top_fft t5  1500: tw_sin  =      0.000000
+top_fft t5
+top_fft t5  1500: out1(r,i)= ( 0.000000, 0.000000)
+top_fft t5  1500: out2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  1500: in1(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5  1500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  1500: t1  =  0.000000
+top_fft.BFLY0 t5  1500: t1a =  0.000000
+top_fft.BFLY0 t5  1500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  1500: t2  =  0.000000
+top_fft.BFLY0 t5  1500: t2a =  0.000000
+top_fft.BFLY0 t5  1500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  1500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5  1500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 1500: fft_started = 1
+fftram 1500: BFLY0_op1_bnum_i = x
+
+fftram 1500: SRAM000_ez = x
+fftram 1500: SRAM001_ez = x
+fftram 1500: SRAM002_ez = x
+fftram 1500: SRAM003_ez = x
+
+fftram 1500: SRAM000_wz = 1
+fftram 1500: SRAM001_wz = 1
+fftram 1500: SRAM002_wz = 1
+fftram 1500: SRAM003_wz = 1
+
+top_fft.fftram.SRAM000 1500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 1500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM000 t5  1500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM001 1500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 1500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM001 t5  1500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM000 1500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 1500: Reading rd_data_o mem[0] <= 3f80000000000000
+SRAM000 t5  1500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM001 1500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 1500: Reading rd_data_o mem[0] <= 0000000000000000
+SRAM001 t5  1500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  2000: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  2000: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  2000: t1  =  0.000000
+top_fft.BFLY0 t5  2000: t1a =  0.000000
+top_fft.BFLY0 t5  2000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  2000: t2  =  0.000000
+top_fft.BFLY0 t5  2000: t2a =  0.000000
+top_fft.BFLY0 t5  2000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  2000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  2000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 2000: fft_started = 1
+fftram 2000: BFLY0_op1_bnum_i = 0
+
+fftram 2000: SRAM000_ez = 0
+fftram 2000: SRAM001_ez = 0
+fftram 2000: SRAM002_ez = 1
+fftram 2000: SRAM003_ez = 1
+
+fftram 2000: SRAM000_wz = 1
+fftram 2000: SRAM001_wz = 1
+fftram 2000: SRAM002_wz = 1
+fftram 2000: SRAM003_wz = 1
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   2, time=     2 ns
+------------------------------------------------------------------------------
+top_fft 2500: BFLY0_op1 ix 00 comes from bank  0 row   0
+top_fft 2500: BFLY0_op2 ix 01 comes from bank  1 row   0
+top_fft
+fftctl 2500: cycle_num = 1 BOTF
+fftram   2500 bypass_valid[2]=0 SRAM002_active=0 bypassed_rnum[2]=0 SRAM002_ix=x GLOOP
+
+fftram 2500: BFLY0_op1_match[0] = 1
+fftram 2500: BFLY0_out1_data_i = 3f80000000000000
+
+fftctl 2500: cycle_num = 1
+fftctl 2500: fftctl_cycle_num_o = 0
+fftctl 2500: out2_offset = 1
+GENOPS2 (t=002500) ii,i: (2,3) => (2,3)
+GENOPS2
+GENOPS2 (t=002500) > P = 00000010
+GENOPS2 (t=002500) > ir= 00000010
+GENOPS2
+GENOPS2 (t=002500) > op1= 00000010
+GENOPS2 (t=002500) > op2= 00000011
+GENOPS2
+GENOPS2 (t=002500) ops=(2,3)
+GENOPS2 -----------------------------------------------------
+fftctl 2500: in( 0, 1), out( 0,  1)
+fftctl 2500: cycle_num = 1
+
+top_fft  2500: BFLY0_twiddle_cos = 3f800000 ( 1.000000)
+
+top_fft t5
+top_fft t5  2500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  2500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft t5  2500: tw_cos  =      1.000000
+top_fft t5  2500: tw_sin  =      0.000000
+top_fft t5
+top_fft t5  2500: out1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  2500: out2(r,i)= ( 1.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  2500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  2500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  2500: t1  =  0.000000
+top_fft.BFLY0 t5  2500: t1a =  0.000000
+top_fft.BFLY0 t5  2500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  2500: t2  =  0.000000
+top_fft.BFLY0 t5  2500: t2a =  0.000000
+top_fft.BFLY0 t5  2500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  2500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  2500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 2500: fft_started = 1
+fftram 2500: BFLY0_op1_bnum_i = 0
+
+fftram 2500: SRAM000_ez = 0
+fftram 2500: SRAM001_ez = 0
+fftram 2500: SRAM002_ez = 1
+fftram 2500: SRAM003_ez = 1
+
+fftram 2500: SRAM000_wz = 0
+fftram 2500: SRAM001_wz = 0
+fftram 2500: SRAM002_wz = 1
+fftram 2500: SRAM003_wz = 1
+
+top_fft.fftram.SRAM000 2500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM000 2500: Wrote   wr_data_i mem[0] <= 3f80000000000000
+SRAM000 t5  2500: Wrote(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM001 2500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM001 2500: Wrote   wr_data_i mem[0] <= 3f80000000000000
+SRAM001 t5  2500: Wrote(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM002 2500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 2500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM002 t5  2500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 2500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 2500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM003 t5  2500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM002 2500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 2500: Reading rd_data_o mem[0] <= 3f80000000000000
+SRAM002 t5  2500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM003 2500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 2500: Reading rd_data_o mem[0] <= 0000000000000000
+SRAM003 t5  2500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  3000: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  3000: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  3000: t1  =  0.000000
+top_fft.BFLY0 t5  3000: t1a =  0.000000
+top_fft.BFLY0 t5  3000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  3000: t2  =  0.000000
+top_fft.BFLY0 t5  3000: t2a =  0.000000
+top_fft.BFLY0 t5  3000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  3000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  3000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 3000: fft_started = 1
+fftram 3000: BFLY0_op1_bnum_i = 2
+
+fftram 3000: SRAM000_ez = 0
+fftram 3000: SRAM001_ez = 0
+fftram 3000: SRAM002_ez = 0
+fftram 3000: SRAM003_ez = 0
+
+fftram 3000: SRAM000_wz = 0
+fftram 3000: SRAM001_wz = 0
+fftram 3000: SRAM002_wz = 1
+fftram 3000: SRAM003_wz = 1
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   3, time=     3 ns
+------------------------------------------------------------------------------
+top_fft 3500: BFLY0_op1 ix 02 comes from bank  2 row   0
+top_fft 3500: BFLY0_op2 ix 03 comes from bank  3 row   0
+top_fft
+fftctl 3500: cycle_num = 2 BOTF
+fftram   3500 bypass_valid[2]=0 SRAM002_active=1 bypassed_rnum[2]=0 SRAM002_ix=0 GLOOP
+
+fftram 3500: BFLY0_op1_match[0] = 0
+fftram 3500: BFLY0_out1_data_i = 3f80000000000000
+
+fftctl 3500: cycle_num = 2
+fftctl 3500: fftctl_cycle_num_o = 1
+fftctl 3500: out2_offset = 1
+GENOPS2 (t=003500) ii,i: (4,5) => (4,5)
+GENOPS2
+GENOPS2 (t=003500) > P = 00000101
+GENOPS2 (t=003500) > ir= 00000101
+GENOPS2
+GENOPS2 (t=003500) > op1= 00000100
+GENOPS2 (t=003500) > op2= 00000101
+GENOPS2
+GENOPS2 (t=003500) ops=(4,5)
+GENOPS2 -----------------------------------------------------
+fftctl 3500: in( 2, 3), out( 2,  3)
+fftctl 3500: cycle_num = 2
+
+top_fft swizzle  3500: BFLY0_op1 ix02 => SRAM002 mem[00]
+top_fft swizzle  3500: BFLY0_op2 ix03 => SRAM003 mem[00]
+
+
+top_fft  3500: BFLY0_twiddle_cos = 3f800000 ( 1.000000)
+
+top_fft t5
+top_fft t5  3500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  3500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft t5  3500: tw_cos  =      1.000000
+top_fft t5  3500: tw_sin  =      0.000000
+top_fft t5
+top_fft t5  3500: out1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  3500: out2(r,i)= ( 1.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  3500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  3500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  3500: t1  =  0.000000
+top_fft.BFLY0 t5  3500: t1a =  0.000000
+top_fft.BFLY0 t5  3500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  3500: t2  =  0.000000
+top_fft.BFLY0 t5  3500: t2a =  0.000000
+top_fft.BFLY0 t5  3500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  3500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  3500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 3500: fft_started = 1
+fftram 3500: BFLY0_op1_bnum_i = 2
+
+fftram 3500: SRAM000_ez = 0
+fftram 3500: SRAM001_ez = 0
+fftram 3500: SRAM002_ez = 0
+fftram 3500: SRAM003_ez = 0
+
+fftram 3500: SRAM000_wz = 1
+fftram 3500: SRAM001_wz = 1
+fftram 3500: SRAM002_wz = 0
+fftram 3500: SRAM003_wz = 0
+
+top_fft.fftram.SRAM002 3500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM002 3500: Wrote   wr_data_i mem[0] <= 3f80000000000000
+SRAM002 t5  3500: Wrote(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM003 3500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM003 3500: Wrote   wr_data_i mem[0] <= 3f80000000000000
+SRAM003 t5  3500: Wrote(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM000 3500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 3500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM000 t5  3500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM001 3500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 3500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM001 t5  3500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM000 3500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 3500: Reading rd_data_o mem[1] <= 0000000000000000
+SRAM000 t5  3500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM001 3500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 3500: Reading rd_data_o mem[1] <= 3f80000000000000
+SRAM001 t5  3500: Read(f) wr_data_i mem[1] <= ( 1.000000, 0.000000)
+
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  4000: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  4000: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  4000: t1  =  0.000000
+top_fft.BFLY0 t5  4000: t1a =  0.000000
+top_fft.BFLY0 t5  4000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  4000: t2  =  0.000000
+top_fft.BFLY0 t5  4000: t2a =  0.000000
+top_fft.BFLY0 t5  4000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  4000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  4000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 4000: fft_started = 1
+fftram 4000: BFLY0_op1_bnum_i = 1
+
+fftram 4000: SRAM000_ez = 0
+fftram 4000: SRAM001_ez = 0
+fftram 4000: SRAM002_ez = 0
+fftram 4000: SRAM003_ez = 0
+
+fftram 4000: SRAM000_wz = 1
+fftram 4000: SRAM001_wz = 1
+fftram 4000: SRAM002_wz = 0
+fftram 4000: SRAM003_wz = 0
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   4, time=     4 ns
+------------------------------------------------------------------------------
+top_fft 4500: BFLY0_op1 ix 04 comes from bank  1 row   1
+top_fft 4500: BFLY0_op2 ix 05 comes from bank  0 row   1
+top_fft
+fftctl 4500: cycle_num = 3 BOTF
+fftram   4500 bypass_valid[2]=0 SRAM002_active=0 bypassed_rnum[2]=0 SRAM002_ix=x GLOOP
+
+fftram 4500: BFLY0_op1_match[0] = 0
+fftram 4500: BFLY0_out1_data_i = 3f80000000000000
+
+fftctl 4500: cycle_num = 3
+fftctl 4500: fftctl_cycle_num_o = 2
+fftctl 4500: out2_offset = 1
+GENOPS2 (t=004500) ii,i: (6,7) => (6,7)
+GENOPS2
+GENOPS2 (t=004500) > P = 00000111
+GENOPS2 (t=004500) > ir= 00000111
+GENOPS2
+GENOPS2 (t=004500) > op1= 00000110
+GENOPS2 (t=004500) > op2= 00000111
+GENOPS2
+GENOPS2 (t=004500) ops=(6,7)
+GENOPS2 -----------------------------------------------------
+fftctl 4500: in( 4, 5), out( 4,  5)
+GENOPS2 (t=004500) STAGE 1
+fftctl 4500: cycle_num = 3
+
+top_fft swizzle  4500: BFLY0_op1 ix04 => SRAM001 mem[01]
+top_fft swizzle  4500: BFLY0_op2 ix05 => SRAM000 mem[01]
+
+
+top_fft  4500: BFLY0_twiddle_cos = 3f800000 ( 1.000000)
+
+top_fft t5
+top_fft t5  4500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  4500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft t5  4500: tw_cos  =      1.000000
+top_fft t5  4500: tw_sin  =      0.000000
+top_fft t5
+top_fft t5  4500: out1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  4500: out2(r,i)= ( 1.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  4500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  4500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  4500: t1  =  0.000000
+top_fft.BFLY0 t5  4500: t1a =  0.000000
+top_fft.BFLY0 t5  4500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  4500: t2  =  0.000000
+top_fft.BFLY0 t5  4500: t2a =  0.000000
+top_fft.BFLY0 t5  4500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  4500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  4500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 4500: fft_started = 1
+fftram 4500: BFLY0_op1_bnum_i = 1
+
+fftram 4500: SRAM000_ez = 0
+fftram 4500: SRAM001_ez = 0
+fftram 4500: SRAM002_ez = 0
+fftram 4500: SRAM003_ez = 0
+
+fftram 4500: SRAM000_wz = 0
+fftram 4500: SRAM001_wz = 0
+fftram 4500: SRAM002_wz = 1
+fftram 4500: SRAM003_wz = 1
+
+top_fft.fftram.SRAM000 4500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM000 4500: Wrote   wr_data_i mem[1] <= 3f80000000000000
+SRAM000 t5  4500: Wrote(f) wr_data_i mem[1] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM001 4500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM001 4500: Wrote   wr_data_i mem[1] <= 3f80000000000000
+SRAM001 t5  4500: Wrote(f) wr_data_i mem[1] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM002 4500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 4500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM002 t5  4500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 4500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 4500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM003 t5  4500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM002 4500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 4500: Reading rd_data_o mem[1] <= 0000000000000000
+SRAM002 t5  4500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 4500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 4500: Reading rd_data_o mem[1] <= 3f80000000000000
+SRAM003 t5  4500: Read(f) wr_data_i mem[1] <= ( 1.000000, 0.000000)
+
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  5000: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  5000: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  5000: t1  =  0.000000
+top_fft.BFLY0 t5  5000: t1a =  0.000000
+top_fft.BFLY0 t5  5000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  5000: t2  =  0.000000
+top_fft.BFLY0 t5  5000: t2a =  0.000000
+top_fft.BFLY0 t5  5000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  5000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  5000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 5000: fft_started = 1
+fftram 5000: BFLY0_op1_bnum_i = 3
+
+fftram 5000: SRAM000_ez = 0
+fftram 5000: SRAM001_ez = 0
+fftram 5000: SRAM002_ez = 0
+fftram 5000: SRAM003_ez = 0
+
+fftram 5000: SRAM000_wz = 0
+fftram 5000: SRAM001_wz = 0
+fftram 5000: SRAM002_wz = 1
+fftram 5000: SRAM003_wz = 1
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   5, time=     5 ns
+------------------------------------------------------------------------------
+top_fft 5500: BFLY0_op1 ix 06 comes from bank  3 row   1
+top_fft 5500: BFLY0_op2 ix 07 comes from bank  2 row   1
+top_fft
+fftctl 5500: cycle_num = 4 BOTF
+fftram   5500 bypass_valid[2]=0 SRAM002_active=1 bypassed_rnum[2]=0 SRAM002_ix=1 GLOOP
+
+fftram 5500: BFLY0_op1_match[0] = 0
+fftram 5500: BFLY0_out1_data_i = 3f80000000000000
+
+fftctl 5500: cycle_num = 4
+fftctl 5500: fftctl_cycle_num_o = 3
+fftctl 5500: out2_offset = 2
+GENOPS2 (t=005500) ii,i: (0,1) => (0,2)
+GENOPS2
+GENOPS2 (t=005500) > P = 00000000
+GENOPS2 (t=005500) > ir= 00000000
+GENOPS2
+GENOPS2 (t=005500) > op1= 00000000
+GENOPS2 (t=005500) > op2= 00000010
+GENOPS2
+GENOPS2 (t=005500) ops=(0,2)
+GENOPS2 -----------------------------------------------------
+fftctl 5500: in( 6, 7), out( 6,  7)
+fftctl 5500: cycle_num = 4
+
+top_fft swizzle  5500: BFLY0_op1 ix06 => SRAM003 mem[01]
+top_fft swizzle  5500: BFLY0_op2 ix07 => SRAM002 mem[01]
+
+
+top_fft  5500: BFLY0_twiddle_cos = 3f800000 ( 1.000000)
+
+top_fft t5
+top_fft t5  5500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  5500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft t5  5500: tw_cos  =      1.000000
+top_fft t5  5500: tw_sin  =      0.000000
+top_fft t5
+top_fft t5  5500: out1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  5500: out2(r,i)= ( 1.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  5500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  5500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  5500: t1  =  0.000000
+top_fft.BFLY0 t5  5500: t1a =  0.000000
+top_fft.BFLY0 t5  5500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  5500: t2  =  0.000000
+top_fft.BFLY0 t5  5500: t2a =  0.000000
+top_fft.BFLY0 t5  5500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  5500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  5500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+FLOOF 5500 prev was 1, swz is 0 (suppress) - I predicted it!!!
+fftram   5500 Bypassed SRAM 2, wrote ( 1.000000, 0.000000) to bypassed_data[2] BTOF row 0
+FLOOF 5500 prev was 1, swz is 0 (suppress) - I predicted it!!!
+fftram   5500 Bypassed SRAM 3, wrote ( 1.000000, 0.000000) to bypassed_data[3] BTOF row 0
+
+fftram 5500: fft_started = 1
+fftram 5500: BFLY0_op1_bnum_i = 3
+
+fftram 5500: SRAM000_ez = 0
+fftram 5500: SRAM001_ez = 0
+fftram 5500: SRAM002_ez = 0
+fftram 5500: SRAM003_ez = 0
+
+fftram 5500: SRAM000_wz = 1
+fftram 5500: SRAM001_wz = 1
+fftram 5500: SRAM002_wz = 1
+fftram 5500: SRAM003_wz = 0
+
+top_fft.fftram.SRAM003 5500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM003 5500: Wrote   wr_data_i mem[1] <= 3f80000000000000
+SRAM003 t5  5500: Wrote(f) wr_data_i mem[1] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM000 5500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 5500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM000 t5  5500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM002 5500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 5500: Reading rd_data_o mem[0] <= 3f80000000000000
+SRAM002 t5  5500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM000 5500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 5500: Reading rd_data_o mem[0] <= 3f80000000000000
+SRAM000 t5  5500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+srmul a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 0.000000 (00000000)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=000000000
+srmul ae9=001111111 be9=001111111 ze9=000000000
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=000000000
+srmul aeb=000000000 beb=000000000 zeb=110000001
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 0.000000 (00000000)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=000000000
+srmul ae9=001111111 be9=001111111 ze9=001111111
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000000 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 1.000000 (3f800000)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=001111111
+srmul ae9=001111111 be9=001111111 ze9=001111111
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000000 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  6000: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  6000: in2(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  6000: t1  =  1.000000
+top_fft.BFLY0 t5  6000: t1a =  1.000000
+top_fft.BFLY0 t5  6000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  6000: t2  =  0.000000
+top_fft.BFLY0 t5  6000: t2a =  0.000000
+top_fft.BFLY0 t5  6000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  6000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 2.000000, 0.000000)
+top_fft.BFLY0 t5  6000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 6000: fft_started = 1
+fftram 6000: BFLY0_op1_bnum_i = 0
+
+fftram 6000: SRAM000_ez = 0
+fftram 6000: SRAM001_ez = 1
+fftram 6000: SRAM002_ez = 0
+fftram 6000: SRAM003_ez = 0
+
+fftram 6000: SRAM000_wz = 1
+fftram 6000: SRAM001_wz = 1
+fftram 6000: SRAM002_wz = 1
+fftram 6000: SRAM003_wz = 0
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   6, time=     6 ns
+------------------------------------------------------------------------------
+top_fft 6500: BFLY0_op1 ix 00 comes from bank  0 row   0
+top_fft 6500: BFLY0_op2 ix 02 comes from bank  2 row   0
+top_fft
+fftctl 6500: cycle_num = 5 BOTF
+fftram   6500 bypass_valid[2]=1 SRAM002_active=1 bypassed_rnum[2]=1 SRAM002_ix=0 GLOOP
+
+fftram 6500: BFLY0_op1_match[0] = 1
+fftram 6500: BFLY0_out1_data_i = 4000000000000000
+
+fftctl 6500: cycle_num = 5
+fftctl 6500: fftctl_cycle_num_o = 4
+fftctl 6500: out2_offset = 2
+GENOPS2 (t=006500) ii,i: (2,3) => (4,6)
+GENOPS2
+GENOPS2 (t=006500) > P = 00000101
+GENOPS2 (t=006500) > ir= 00000100
+GENOPS2
+GENOPS2 (t=006500) > op1= 00000100
+GENOPS2 (t=006500) > op2= 00000110
+GENOPS2
+GENOPS2 (t=006500) ops=(4,6)
+GENOPS2 -----------------------------------------------------
+fftctl 6500: in( 0, 2), out( 0,  2)
+fftctl 6500: cycle_num = 5
+
+top_fft swizzle  6500: BFLY0_op1 ix00 => SRAM000 mem[00]
+top_fft swizzle  6500: BFLY0_op2 ix02 => SRAM002 mem[00]
+
+
+top_fft  6500: BFLY0_twiddle_cos = 3f800000 ( 1.000000)
+
+top_fft t5
+top_fft t5  6500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  6500: in2(r,i)= ( 1.000000, 0.000000)
+top_fft t5
+top_fft t5  6500: tw_cos  =      1.000000
+top_fft t5  6500: tw_sin  =      0.000000
+top_fft t5
+top_fft t5  6500: out1(r,i)= ( 2.000000, 0.000000)
+top_fft t5  6500: out2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  6500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  6500: in2(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  6500: t1  =  1.000000
+top_fft.BFLY0 t5  6500: t1a =  1.000000
+top_fft.BFLY0 t5  6500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  6500: t2  =  0.000000
+top_fft.BFLY0 t5  6500: t2a =  0.000000
+top_fft.BFLY0 t5  6500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  6500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 2.000000, 0.000000)
+top_fft.BFLY0 t5  6500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 6500: fft_started = 1
+fftram 6500: BFLY0_op1_bnum_i = 0
+
+fftram 6500: SRAM000_ez = 0
+fftram 6500: SRAM001_ez = 1
+fftram 6500: SRAM002_ez = 0
+fftram 6500: SRAM003_ez = 0
+
+fftram 6500: SRAM000_wz = 0
+fftram 6500: SRAM001_wz = 1
+fftram 6500: SRAM002_wz = 0
+fftram 6500: SRAM003_wz = 1
+
+top_fft.fftram.SRAM000 6500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM000 6500: Wrote   wr_data_i mem[0] <= 4000000000000000
+SRAM000 t5  6500: Wrote(f) wr_data_i mem[0] <= ( 2.000000, 0.000000)
+
+top_fft.fftram.SRAM002 6500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM002 6500: Wrote   wr_data_i mem[0] <= 0000000000000000
+SRAM002 t5  6500: Wrote(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM001 6500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 6500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM001 t5  6500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 6500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 6500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM003 t5  6500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM001 6500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 6500: Reading rd_data_o mem[1] <= 3f80000000000000
+SRAM001 t5  6500: Read(f) wr_data_i mem[1] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM003 6500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 6500: Reading rd_data_o mem[1] <= 3f80000000000000
+SRAM003 t5  6500: Read(f) wr_data_i mem[1] <= ( 1.000000, 0.000000)
+
+srmul a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111111 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=000000000 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=800000 bm=800000 zm=xxxxxx
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111111 be9=001111111 ze9=001111111
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000000 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 1.000000 (3f800000)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=001111111
+srmul ae9=001111111 be9=001111111 ze9=001111111
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000000 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  7000: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  7000: in2(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  7000: t1  =  1.000000
+top_fft.BFLY0 t5  7000: t1a =  1.000000
+top_fft.BFLY0 t5  7000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  7000: t2  =  0.000000
+top_fft.BFLY0 t5  7000: t2a =  0.000000
+top_fft.BFLY0 t5  7000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  7000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 2.000000, 0.000000)
+top_fft.BFLY0 t5  7000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 7000: fft_started = 1
+fftram 7000: BFLY0_op1_bnum_i = 1
+
+fftram 7000: SRAM000_ez = 0
+fftram 7000: SRAM001_ez = 0
+fftram 7000: SRAM002_ez = 0
+fftram 7000: SRAM003_ez = 0
+
+fftram 7000: SRAM000_wz = 0
+fftram 7000: SRAM001_wz = 1
+fftram 7000: SRAM002_wz = 0
+fftram 7000: SRAM003_wz = 1
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   7, time=     7 ns
+------------------------------------------------------------------------------
+top_fft 7500: BFLY0_op1 ix 04 comes from bank  1 row   1
+top_fft 7500: BFLY0_op2 ix 06 comes from bank  3 row   1
+top_fft
+fftctl 7500: cycle_num = 6 BOTF
+fftram   7500 bypass_valid[2]=1 SRAM002_active=0 bypassed_rnum[2]=1 SRAM002_ix=x GLOOP
+fftram   7500 Bypassed SRAM 3, read  ( 1.000000, 0.000000) from bypassed_data[3] BOTF
+
+fftram 7500: BFLY0_op1_match[0] = 0
+fftram 7500: BFLY0_out1_data_i = 4000000000000000
+
+fftctl 7500: cycle_num = 6
+fftctl 7500: fftctl_cycle_num_o = 5
+fftctl 7500: out2_offset = 2
+GENOPS2 (t=007500) ii,i: (4,5) => (1,3)
+GENOPS2
+GENOPS2 (t=007500) > P = 00000101
+GENOPS2 (t=007500) > ir= 00000101
+GENOPS2
+GENOPS2 (t=007500) > op1= 00000101
+GENOPS2 (t=007500) > op2= 00000111
+GENOPS2
+GENOPS2 (t=007500) ops=(5,7)
+GENOPS2 -----------------------------------------------------
+fftctl 7500: in( 4, 6), out( 4,  6)
+fftctl 7500: cycle_num = 6
+
+top_fft swizzle  7500: BFLY0_op1 ix04 => SRAM001 mem[01]
+top_fft swizzle  7500: BFLY0_op2 ix06 => SRAM003 mem[01]
+
+
+top_fft  7500: BFLY0_twiddle_cos = 3f800000 ( 1.000000)
+
+top_fft t5
+top_fft t5  7500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  7500: in2(r,i)= ( 1.000000, 0.000000)
+top_fft t5
+top_fft t5  7500: tw_cos  =      1.000000
+top_fft t5  7500: tw_sin  =      0.000000
+top_fft t5
+top_fft t5  7500: out1(r,i)= ( 2.000000, 0.000000)
+top_fft t5  7500: out2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  7500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  7500: in2(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  7500: t1  =  1.000000
+top_fft.BFLY0 t5  7500: t1a =  1.000000
+top_fft.BFLY0 t5  7500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  7500: t2  =  0.000000
+top_fft.BFLY0 t5  7500: t2a =  0.000000
+top_fft.BFLY0 t5  7500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  7500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 2.000000, 0.000000)
+top_fft.BFLY0 t5  7500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 7500: fft_started = 1
+fftram 7500: BFLY0_op1_bnum_i = 1
+
+fftram 7500: SRAM000_ez = 0
+fftram 7500: SRAM001_ez = 0
+fftram 7500: SRAM002_ez = 0
+fftram 7500: SRAM003_ez = 0
+
+fftram 7500: SRAM000_wz = 1
+fftram 7500: SRAM001_wz = 0
+fftram 7500: SRAM002_wz = 1
+fftram 7500: SRAM003_wz = 0
+
+top_fft.fftram.SRAM001 7500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM001 7500: Wrote   wr_data_i mem[1] <= 4000000000000000
+SRAM001 t5  7500: Wrote(f) wr_data_i mem[1] <= ( 2.000000, 0.000000)
+
+top_fft.fftram.SRAM003 7500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM003 7500: Wrote   wr_data_i mem[1] <= 0000000000000000
+SRAM003 t5  7500: Wrote(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM000 7500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 7500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM000 t5  7500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM002 7500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 7500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM002 t5  7500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM000 7500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 7500: Reading rd_data_o mem[1] <= 3f80000000000000
+SRAM000 t5  7500: Read(f) wr_data_i mem[1] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM002 7500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 7500: Reading rd_data_o mem[1] <= 0000000000000000
+SRAM002 t5  7500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+srmul a=-1.000000 (bf800000) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111111 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=000000000 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=800000 bm=800000 zm=xxxxxx
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a= 0.000000 (248d3132) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001001001 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001001001 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011001000
+srmul   ze_prenorm=001001001
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111001010 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=8d3132 bm=800000 zm=xxxxxx
+srmul ab=469899000000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a=-1.000000 (bf800000) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111111 be9=001111111 ze9=001111111
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000000 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 0.000000 (248d3132) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001001001 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001001001 be9=001111111 ze9=001001001
+srmul   ae_plus_be=011001000
+srmul   ze_prenorm=001001001
+srmul   too_big=0 ze_norm=001001001
+srmul aeb=111001010 beb=000000000 zeb=111001010
+srmul ----
+srmul am=8d3132 bm=800000 zm=0d3132
+srmul ab=469899000000 ab[47:46]=01
+srmul   zm_true=8d3132
+srmul   zm_hidden=0d3132
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-1.000000 (bf800000) b= 1.000000 (3f800000) z=-1.000000 (bf800000)
+srmul as=1 bs=0 zs=1
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=001111111
+srmul ae9=001111111 be9=001111111 ze9=001111111
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000000 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 0.000000 (248d3132) b= 1.000000 (3f800000) z= 0.000000 (248d3132)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001001001 be8=001111111 ze8=001001001
+srmul ae9=001001001 be9=001111111 ze9=001001001
+srmul   ae_plus_be=011001000
+srmul   ze_prenorm=001001001
+srmul   too_big=0 ze_norm=001001001
+srmul aeb=111001010 beb=000000000 zeb=111001010
+srmul ----
+srmul am=8d3132 bm=800000 zm=0d3132
+srmul ab=469899000000 ab[47:46]=01
+srmul   zm_true=8d3132
+srmul   zm_hidden=0d3132
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  8000: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  8000: in2(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  8000: t1  =  0.000000
+top_fft.BFLY0 t5  8000: t1a =  0.000000
+top_fft.BFLY0 t5  8000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  8000: t2  = -1.000000
+top_fft.BFLY0 t5  8000: t2a = -1.000000
+top_fft.BFLY0 t5  8000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  8000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000,-1.000000)
+top_fft.BFLY0 t5  8000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 1.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 8000: fft_started = 1
+fftram 8000: BFLY0_op1_bnum_i = 0
+
+fftram 8000: SRAM000_ez = 0
+fftram 8000: SRAM001_ez = 0
+fftram 8000: SRAM002_ez = 0
+fftram 8000: SRAM003_ez = 0
+
+fftram 8000: SRAM000_wz = 1
+fftram 8000: SRAM001_wz = 0
+fftram 8000: SRAM002_wz = 1
+fftram 8000: SRAM003_wz = 0
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   8, time=     8 ns
+------------------------------------------------------------------------------
+top_fft 8500: BFLY0_op1 ix 05 comes from bank  0 row   1
+top_fft 8500: BFLY0_op2 ix 07 comes from bank  2 row   1
+top_fft
+fftctl 8500: cycle_num = 7 BOTF
+fftram   8500 bypass_valid[2]=1 SRAM002_active=1 bypassed_rnum[2]=1 SRAM002_ix=1 GLOOP
+fftram   8500 Bypassed SRAM 2, read  ( 1.000000, 0.000000) from bypassed_data[2] BOTF
+
+fftram 8500: BFLY0_op1_match[0] = 1
+fftram 8500: BFLY0_out1_data_i = 3f800000bf800000
+
+fftctl 8500: cycle_num = 7
+fftctl 8500: fftctl_cycle_num_o = 6
+fftctl 8500: out2_offset = 2
+GENOPS2 (t=008500) ii,i: (6,7) => (5,7)
+GENOPS2
+GENOPS2 (t=008500) > P = 00000000
+GENOPS2 (t=008500) > ir= 00000001
+GENOPS2
+GENOPS2 (t=008500) > op1= 00000001
+GENOPS2 (t=008500) > op2= 00000011
+GENOPS2
+GENOPS2 (t=008500) ops=(1,3)
+GENOPS2 -----------------------------------------------------
+fftctl 8500: in( 5, 7), out( 5,  7)
+GENOPS2 (t=008500) STAGE 2
+fftctl 8500: cycle_num = 7
+
+top_fft swizzle  8500: BFLY0_op1 ix05 => SRAM000 mem[01]
+top_fft swizzle  8500: BFLY0_op2 ix07 => SRAM002 mem[01]
+
+
+top_fft  8500: BFLY0_twiddle_cos = 248d3132 ( 0.000000)
+
+top_fft t5
+top_fft t5  8500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  8500: in2(r,i)= ( 1.000000, 0.000000)
+top_fft t5
+top_fft t5  8500: tw_cos  =      0.000000
+top_fft t5  8500: tw_sin  =     -1.000000
+top_fft t5
+top_fft t5  8500: out1(r,i)= ( 1.000000,-1.000000)
+top_fft t5  8500: out2(r,i)= ( 1.000000, 1.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  8500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  8500: in2(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  8500: t1  =  0.000000
+top_fft.BFLY0 t5  8500: t1a =  0.000000
+top_fft.BFLY0 t5  8500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  8500: t2  = -1.000000
+top_fft.BFLY0 t5  8500: t2a = -1.000000
+top_fft.BFLY0 t5  8500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  8500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000,-1.000000)
+top_fft.BFLY0 t5  8500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 1.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 8500: fft_started = 1
+fftram 8500: BFLY0_op1_bnum_i = 0
+
+fftram 8500: SRAM000_ez = 0
+fftram 8500: SRAM001_ez = 0
+fftram 8500: SRAM002_ez = 0
+fftram 8500: SRAM003_ez = 0
+
+fftram 8500: SRAM000_wz = 0
+fftram 8500: SRAM001_wz = 1
+fftram 8500: SRAM002_wz = 0
+fftram 8500: SRAM003_wz = 1
+
+top_fft.fftram.SRAM000 8500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM000 8500: Wrote   wr_data_i mem[1] <= 3f800000bf800000
+SRAM000 t5  8500: Wrote(f) wr_data_i mem[1] <= ( 1.000000,-1.000000)
+
+top_fft.fftram.SRAM002 8500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM002 8500: Wrote   wr_data_i mem[1] <= 3f8000003f800000
+SRAM002 t5  8500: Wrote(f) wr_data_i mem[1] <= ( 1.000000, 1.000000)
+
+top_fft.fftram.SRAM001 8500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 8500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM001 t5  8500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 8500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 8500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM003 t5  8500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM001 8500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 8500: Reading rd_data_o mem[0] <= 3f80000000000000
+SRAM001 t5  8500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+top_fft.fftram.SRAM003 8500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 8500: Reading rd_data_o mem[0] <= 3f80000000000000
+SRAM003 t5  8500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+srmul a=-1.000000 (bf800000) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111111 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=000000000 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=800000 bm=800000 zm=xxxxxx
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a= 0.000000 (248d3132) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001001001 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001001001 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011001000
+srmul   ze_prenorm=001001001
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111001010 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=8d3132 bm=800000 zm=xxxxxx
+srmul ab=469899000000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a=-1.000000 (bf800000) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111111 be9=001111111 ze9=001111111
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000000 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 0.000000 (248d3132) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001001001 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001001001 be9=001111111 ze9=001001001
+srmul   ae_plus_be=011001000
+srmul   ze_prenorm=001001001
+srmul   too_big=0 ze_norm=001001001
+srmul aeb=111001010 beb=000000000 zeb=111001010
+srmul ----
+srmul am=8d3132 bm=800000 zm=0d3132
+srmul ab=469899000000 ab[47:46]=01
+srmul   zm_true=8d3132
+srmul   zm_hidden=0d3132
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-1.000000 (bf800000) b= 1.000000 (3f800000) z=-1.000000 (bf800000)
+srmul as=1 bs=0 zs=1
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=001111111
+srmul ae9=001111111 be9=001111111 ze9=001111111
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000000 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 0.000000 (248d3132) b= 1.000000 (3f800000) z= 0.000000 (248d3132)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001001001 be8=001111111 ze8=001001001
+srmul ae9=001001001 be9=001111111 ze9=001001001
+srmul   ae_plus_be=011001000
+srmul   ze_prenorm=001001001
+srmul   too_big=0 ze_norm=001001001
+srmul aeb=111001010 beb=000000000 zeb=111001010
+srmul ----
+srmul am=8d3132 bm=800000 zm=0d3132
+srmul ab=469899000000 ab[47:46]=01
+srmul   zm_true=8d3132
+srmul   zm_hidden=0d3132
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  9000: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  9000: in2(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  9000: t1  =  0.000000
+top_fft.BFLY0 t5  9000: t1a =  0.000000
+top_fft.BFLY0 t5  9000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  9000: t2  = -1.000000
+top_fft.BFLY0 t5  9000: t2a = -1.000000
+top_fft.BFLY0 t5  9000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  9000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000,-1.000000)
+top_fft.BFLY0 t5  9000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 1.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 9000: fft_started = 1
+fftram 9000: BFLY0_op1_bnum_i = 1
+
+fftram 9000: SRAM000_ez = 0
+fftram 9000: SRAM001_ez = 0
+fftram 9000: SRAM002_ez = 0
+fftram 9000: SRAM003_ez = 0
+
+fftram 9000: SRAM000_wz = 0
+fftram 9000: SRAM001_wz = 1
+fftram 9000: SRAM002_wz = 0
+fftram 9000: SRAM003_wz = 1
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=   9, time=     9 ns
+------------------------------------------------------------------------------
+top_fft 9500: BFLY0_op1 ix 01 comes from bank  1 row   0
+top_fft 9500: BFLY0_op2 ix 03 comes from bank  3 row   0
+top_fft
+fftctl 9500: cycle_num = 8 BOTF
+fftram   9500 bypass_valid[2]=0 SRAM002_active=0 bypassed_rnum[2]=1 SRAM002_ix=x GLOOP
+
+fftram 9500: BFLY0_op1_match[0] = 0
+fftram 9500: BFLY0_out1_data_i = 3f800000bf800000
+
+fftctl 9500: cycle_num = 8
+fftctl 9500: fftctl_cycle_num_o = 7
+fftctl 9500: out2_offset = 4
+GENOPS2 (t=009500) ii,i: (0,1) => (0,4)
+GENOPS2
+GENOPS2 (t=009500) > P = 00000000
+GENOPS2 (t=009500) > ir= 00000000
+GENOPS2
+GENOPS2 (t=009500) > op1= 00000000
+GENOPS2 (t=009500) > op2= 00000100
+GENOPS2
+GENOPS2 (t=009500) ops=(0,4)
+GENOPS2 -----------------------------------------------------
+fftctl 9500: in( 1, 3), out( 1,  3)
+fftctl 9500: cycle_num = 8
+
+top_fft swizzle  9500: BFLY0_op1 ix01 => SRAM001 mem[00]
+top_fft swizzle  9500: BFLY0_op2 ix03 => SRAM003 mem[00]
+
+
+top_fft  9500: BFLY0_twiddle_cos = 248d3132 ( 0.000000)
+
+top_fft t5
+top_fft t5  9500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft t5  9500: in2(r,i)= ( 1.000000, 0.000000)
+top_fft t5
+top_fft t5  9500: tw_cos  =      0.000000
+top_fft t5  9500: tw_sin  =     -1.000000
+top_fft t5
+top_fft t5  9500: out1(r,i)= ( 1.000000,-1.000000)
+top_fft t5  9500: out2(r,i)= ( 1.000000, 1.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5  9500: in1(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5  9500: in2(r,i)= ( 1.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  9500: t1  =  0.000000
+top_fft.BFLY0 t5  9500: t1a =  0.000000
+top_fft.BFLY0 t5  9500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  9500: t2  = -1.000000
+top_fft.BFLY0 t5  9500: t2a = -1.000000
+top_fft.BFLY0 t5  9500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5  9500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000,-1.000000)
+top_fft.BFLY0 t5  9500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 1.000000)
+top_fft.BFLY0 t5 ------------------------
+FLOOF 9500 prev was 1, swz is 0 (suppress) - I predicted it!!!
+fftram   9500 Bypassed SRAM 1, wrote ( 1.000000,-1.000000) to bypassed_data[1] BTOF row 0
+FLOOF 9500 prev was 1, swz is 0 (suppress) - I predicted it!!!
+fftram   9500 Bypassed SRAM 3, wrote ( 1.000000, 1.000000) to bypassed_data[3] BTOF row 1
+
+fftram 9500: fft_started = 1
+fftram 9500: BFLY0_op1_bnum_i = 1
+
+fftram 9500: SRAM000_ez = 0
+fftram 9500: SRAM001_ez = 0
+fftram 9500: SRAM002_ez = 0
+fftram 9500: SRAM003_ez = 0
+
+fftram 9500: SRAM000_wz = 1
+fftram 9500: SRAM001_wz = 1
+fftram 9500: SRAM002_wz = 1
+fftram 9500: SRAM003_wz = 0
+
+top_fft.fftram.SRAM003 9500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM003 9500: Wrote   wr_data_i mem[0] <= 3f8000003f800000
+SRAM003 t5  9500: Wrote(f) wr_data_i mem[0] <= ( 1.000000, 1.000000)
+
+top_fft.fftram.SRAM000 9500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 9500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM000 t5  9500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM001 9500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 9500: Reading rd_data_o mem[1] <= 4000000000000000
+SRAM001 t5  9500: Read(f) wr_data_i mem[1] <= ( 2.000000, 0.000000)
+
+top_fft.fftram.SRAM000 9500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 9500: Reading rd_data_o mem[0] <= 4000000000000000
+SRAM000 t5  9500: Read(f) wr_data_i mem[0] <= ( 2.000000, 0.000000)
+
+srmul a= 1.000000 (3f800000) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001111111 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111111 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111110
+srmul   ze_prenorm=001111111
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=000000000 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=800000 bm=800000 zm=xxxxxx
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a= 1.000000 (3f800000) b= 2.000000 (40000000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001111111 be8=010000000 ze8=0xxxxxxxx
+srmul ae9=001111111 be9=010000000 ze9=001111111
+srmul   ae_plus_be=011111111
+srmul   ze_prenorm=010000000
+srmul   too_big=0 ze_norm=001111111
+srmul aeb=000000000 beb=000000001 zeb=000000000
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 1.000000 (3f800000) b= 2.000000 (40000000) z= 1.000000 (3f800000)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001111111 be8=010000000 ze8=001111111
+srmul ae9=001111111 be9=010000000 ze9=010000000
+srmul   ae_plus_be=011111111
+srmul   ze_prenorm=010000000
+srmul   too_big=0 ze_norm=010000000
+srmul aeb=000000000 beb=000000001 zeb=000000001
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 1.000000 (3f800000) b= 2.000000 (40000000) z= 2.000000 (40000000)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001111111 be8=010000000 ze8=010000000
+srmul ae9=001111111 be9=010000000 ze9=010000000
+srmul   ae_plus_be=011111111
+srmul   ze_prenorm=010000000
+srmul   too_big=0 ze_norm=010000000
+srmul aeb=000000000 beb=000000001 zeb=000000001
+srmul ----
+srmul am=800000 bm=800000 zm=000000
+srmul ab=400000000000 ab[47:46]=01
+srmul   zm_true=800000
+srmul   zm_hidden=000000
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5 10000: in1(r,i)= ( 2.000000, 0.000000)
+top_fft.BFLY0 t5 10000: in2(r,i)= ( 2.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 10000: t1  =  2.000000
+top_fft.BFLY0 t5 10000: t1a =  2.000000
+top_fft.BFLY0 t5 10000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 10000: t2  =  0.000000
+top_fft.BFLY0 t5 10000: t2a =  0.000000
+top_fft.BFLY0 t5 10000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 10000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 4.000000, 0.000000)
+top_fft.BFLY0 t5 10000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 10000: fft_started = 1
+fftram 10000: BFLY0_op1_bnum_i = 0
+
+fftram 10000: SRAM000_ez = 0
+fftram 10000: SRAM001_ez = 0
+fftram 10000: SRAM002_ez = 1
+fftram 10000: SRAM003_ez = 0
+
+fftram 10000: SRAM000_wz = 1
+fftram 10000: SRAM001_wz = 1
+fftram 10000: SRAM002_wz = 1
+fftram 10000: SRAM003_wz = 0
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=  10, time=    10 ns
+------------------------------------------------------------------------------
+top_fft 10500: BFLY0_op1 ix 00 comes from bank  0 row   0
+top_fft 10500: BFLY0_op2 ix 04 comes from bank  1 row   1
+top_fft
+fftctl 10500: cycle_num = 9 BOTF
+fftram  10500 bypass_valid[2]=0 SRAM002_active=0 bypassed_rnum[2]=1 SRAM002_ix=x GLOOP
+
+fftram 10500: BFLY0_op1_match[0] = 1
+fftram 10500: BFLY0_out1_data_i = 4080000000000000
+
+fftctl 10500: cycle_num = 9
+fftctl 10500: fftctl_cycle_num_o = 8
+fftctl 10500: out2_offset = 4
+GENOPS2 (t=010500) ii,i: (2,3) => (2,6)
+GENOPS2
+GENOPS2 (t=010500) > P = 00000010
+GENOPS2 (t=010500) > ir= 00000010
+GENOPS2
+GENOPS2 (t=010500) > op1= 00000010
+GENOPS2 (t=010500) > op2= 00000110
+GENOPS2
+GENOPS2 (t=010500) ops=(2,6)
+GENOPS2 -----------------------------------------------------
+fftctl 10500: in( 0, 4), out( 0,  4)
+fftctl 10500: cycle_num = 9
+
+top_fft swizzle 10500: BFLY0_op1 ix00 => SRAM000 mem[00]
+top_fft swizzle 10500: BFLY0_op2 ix04 => SRAM001 mem[01]
+
+
+top_fft 10500: BFLY0_twiddle_cos = 3f800000 ( 1.000000)
+
+top_fft t5
+top_fft t5 10500: in1(r,i)= ( 2.000000, 0.000000)
+top_fft t5 10500: in2(r,i)= ( 2.000000, 0.000000)
+top_fft t5
+top_fft t5 10500: tw_cos  =      1.000000
+top_fft t5 10500: tw_sin  =      0.000000
+top_fft t5
+top_fft t5 10500: out1(r,i)= ( 4.000000, 0.000000)
+top_fft t5 10500: out2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5 10500: in1(r,i)= ( 2.000000, 0.000000)
+top_fft.BFLY0 t5 10500: in2(r,i)= ( 2.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 10500: t1  =  2.000000
+top_fft.BFLY0 t5 10500: t1a =  2.000000
+top_fft.BFLY0 t5 10500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 10500: t2  =  0.000000
+top_fft.BFLY0 t5 10500: t2a =  0.000000
+top_fft.BFLY0 t5 10500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 10500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 4.000000, 0.000000)
+top_fft.BFLY0 t5 10500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 10500: fft_started = 1
+fftram 10500: BFLY0_op1_bnum_i = 0
+
+fftram 10500: SRAM000_ez = 0
+fftram 10500: SRAM001_ez = 0
+fftram 10500: SRAM002_ez = 1
+fftram 10500: SRAM003_ez = 0
+
+fftram 10500: SRAM000_wz = 0
+fftram 10500: SRAM001_wz = 0
+fftram 10500: SRAM002_wz = 1
+fftram 10500: SRAM003_wz = 1
+
+top_fft.fftram.SRAM000 10500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM000 10500: Wrote   wr_data_i mem[0] <= 4080000000000000
+SRAM000 t5 10500: Wrote(f) wr_data_i mem[0] <= ( 4.000000, 0.000000)
+
+top_fft.fftram.SRAM001 10500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM001 10500: Wrote   wr_data_i mem[1] <= 0000000000000000
+SRAM001 t5 10500: Wrote(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM002 10500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 10500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM002 t5 10500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 10500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 10500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM003 t5 10500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM002 10500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 10500: Reading rd_data_o mem[0] <= 0000000000000000
+SRAM002 t5 10500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 10500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 10500: Reading rd_data_o mem[1] <= 0000000000000000
+SRAM003 t5 10500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5 11000: in1(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 11000: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 11000: t1  =  0.000000
+top_fft.BFLY0 t5 11000: t1a =  0.000000
+top_fft.BFLY0 t5 11000: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 11000: t2  =  0.000000
+top_fft.BFLY0 t5 11000: t2a =  0.000000
+top_fft.BFLY0 t5 11000: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 11000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 11000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 11000: fft_started = 1
+fftram 11000: BFLY0_op1_bnum_i = 2
+
+fftram 11000: SRAM000_ez = 0
+fftram 11000: SRAM001_ez = 0
+fftram 11000: SRAM002_ez = 0
+fftram 11000: SRAM003_ez = 0
+
+fftram 11000: SRAM000_wz = 0
+fftram 11000: SRAM001_wz = 0
+fftram 11000: SRAM002_wz = 1
+fftram 11000: SRAM003_wz = 1
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=  11, time=    11 ns
+------------------------------------------------------------------------------
+top_fft 11500: BFLY0_op1 ix 02 comes from bank  2 row   0
+top_fft 11500: BFLY0_op2 ix 06 comes from bank  3 row   1
+top_fft
+fftctl 11500: cycle_num = 10 BOTF
+fftram  11500 bypass_valid[2]=0 SRAM002_active=1 bypassed_rnum[2]=1 SRAM002_ix=0 GLOOP
+
+fftram 11500: BFLY0_op1_match[0] = 0
+fftram 11500: BFLY0_out1_data_i = 0000000000000000
+
+fftctl 11500: cycle_num = 10
+fftctl 11500: fftctl_cycle_num_o = 9
+fftctl 11500: out2_offset = 4
+GENOPS2 (t=011500) ii,i: (4,5) => (1,5)
+GENOPS2
+GENOPS2 (t=011500) > P = 00000101
+GENOPS2 (t=011500) > ir= 00000101
+GENOPS2
+GENOPS2 (t=011500) > op1= 00000001
+GENOPS2 (t=011500) > op2= 00000101
+GENOPS2
+GENOPS2 (t=011500) ops=(1,5)
+GENOPS2 -----------------------------------------------------
+fftctl 11500: in( 2, 6), out( 2,  6)
+fftctl 11500: cycle_num = 10
+
+top_fft swizzle 11500: BFLY0_op1 ix02 => SRAM002 mem[00]
+top_fft swizzle 11500: BFLY0_op2 ix06 => SRAM003 mem[01]
+
+
+top_fft 11500: BFLY0_twiddle_cos = 248d3132 ( 0.000000)
+
+top_fft t5
+top_fft t5 11500: in1(r,i)= ( 0.000000, 0.000000)
+top_fft t5 11500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft t5 11500: tw_cos  =      0.000000
+top_fft t5 11500: tw_sin  =     -1.000000
+top_fft t5
+top_fft t5 11500: out1(r,i)= ( 0.000000, 0.000000)
+top_fft t5 11500: out2(r,i)= ( 0.000000, 0.000000)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5 11500: in1(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 11500: in2(r,i)= ( 0.000000, 0.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 11500: t1  =  0.000000
+top_fft.BFLY0 t5 11500: t1a =  0.000000
+top_fft.BFLY0 t5 11500: t1b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 11500: t2  =  0.000000
+top_fft.BFLY0 t5 11500: t2a =  0.000000
+top_fft.BFLY0 t5 11500: t2b =  0.000000
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 11500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 11500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 11500: fft_started = 1
+fftram 11500: BFLY0_op1_bnum_i = 2
+
+fftram 11500: SRAM000_ez = 0
+fftram 11500: SRAM001_ez = 0
+fftram 11500: SRAM002_ez = 0
+fftram 11500: SRAM003_ez = 0
+
+fftram 11500: SRAM000_wz = 1
+fftram 11500: SRAM001_wz = 1
+fftram 11500: SRAM002_wz = 0
+fftram 11500: SRAM003_wz = 0
+
+top_fft.fftram.SRAM002 11500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM002 11500: Wrote   wr_data_i mem[0] <= 0000000000000000
+SRAM002 t5 11500: Wrote(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 11500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM003 11500: Wrote   wr_data_i mem[1] <= 0000000000000000
+SRAM003 t5 11500: Wrote(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM000 11500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 11500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM000 t5 11500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM001 11500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 11500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM001 t5 11500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM000 11500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM000 11500: Reading rd_data_o mem[1] <= 3f800000bf800000
+SRAM000 t5 11500: Read(f) wr_data_i mem[1] <= ( 1.000000,-1.000000)
+
+top_fft.fftram.SRAM001 11500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM001 11500: Reading rd_data_o mem[0] <= 3f80000000000000
+SRAM001 t5 11500: Read(f) wr_data_i mem[0] <= ( 1.000000, 0.000000)
+
+srmul a= 0.707107 (3f3504f3) b=-1.000000 (bf800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=1 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111111111 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=b504f3 bm=800000 zm=xxxxxx
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a=-0.707107 (bf3504f3) b=-1.000000 (bf800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=1 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111111111 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=b504f3 bm=800000 zm=xxxxxx
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111111111 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=b504f3 bm=800000 zm=xxxxxx
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a= 0.707107 (3f3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111111111 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=b504f3 bm=800000 zm=xxxxxx
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a= 0.707107 (3f3504f3) b=-1.000000 (bf800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=1 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b=-1.000000 (bf800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=1 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 0.707107 (3f3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=0 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 0.707107 (3f3504f3) b=-1.000000 (bf800000) z=-0.707107 (bf3504f3)
+srmul as=0 bs=1 zs=1
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=001111110
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b=-1.000000 (bf800000) z= 0.707107 (3f3504f3)
+srmul as=1 bs=1 zs=0
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=001111110
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z=-0.707107 (bf3504f3)
+srmul as=1 bs=0 zs=1
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=001111110
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a= 0.707107 (3f3504f3) b= 1.000000 (3f800000) z= 0.707107 (3f3504f3)
+srmul as=0 bs=0 zs=0
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=001111110
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5 12000: in1(r,i)= ( 1.000000,-1.000000)
+top_fft.BFLY0 t5 12000: in2(r,i)= ( 1.000000,-1.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 12000: t1  =  0.000000
+top_fft.BFLY0 t5 12000: t1a =  0.707107
+top_fft.BFLY0 t5 12000: t1b =  0.707107
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 12000: t2  = -1.414214
+top_fft.BFLY0 t5 12000: t2a = -0.707107
+top_fft.BFLY0 t5 12000: t2b = -0.707107
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 12000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000,-2.414213)
+top_fft.BFLY0 t5 12000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.414214)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 12000: fft_started = 1
+fftram 12000: BFLY0_op1_bnum_i = 1
+
+fftram 12000: SRAM000_ez = 0
+fftram 12000: SRAM001_ez = 0
+fftram 12000: SRAM002_ez = 0
+fftram 12000: SRAM003_ez = 0
+
+fftram 12000: SRAM000_wz = 1
+fftram 12000: SRAM001_wz = 1
+fftram 12000: SRAM002_wz = 0
+fftram 12000: SRAM003_wz = 0
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=  12, time=    12 ns
+------------------------------------------------------------------------------
+top_fft 12500: BFLY0_op1 ix 01 comes from bank  1 row   0
+top_fft 12500: BFLY0_op2 ix 05 comes from bank  0 row   1
+top_fft
+fftctl 12500: cycle_num = 11 BOTF
+fftram  12500 bypass_valid[2]=0 SRAM002_active=0 bypassed_rnum[2]=1 SRAM002_ix=x GLOOP
+fftram  12500 Bypassed SRAM 1, read  ( 1.000000,-1.000000) from bypassed_data[1] BOTF
+
+fftram 12500: BFLY0_op1_match[0] = 0
+fftram 12500: BFLY0_out1_data_i = 3f800000c01a8279
+
+fftctl 12500: cycle_num = 11
+fftctl 12500: fftctl_cycle_num_o = 10
+fftctl 12500: out2_offset = 4
+GENOPS2 (t=012500) ii,i: (6,7) => (3,7)
+GENOPS2
+GENOPS2 (t=012500) > P = 00000111
+GENOPS2 (t=012500) > ir= 00000111
+GENOPS2
+GENOPS2 (t=012500) > op1= 00000011
+GENOPS2 (t=012500) > op2= 00000111
+GENOPS2
+GENOPS2 (t=012500) ops=(3,7)
+GENOPS2 -----------------------------------------------------
+fftctl 12500: in( 1, 5), out( 1,  5)
+GENOPS2 (t=012500) STAGE 3
+fftctl 12500: cycle_num = 11
+
+top_fft swizzle 12500: BFLY0_op1 ix01 => SRAM001 mem[00]
+top_fft swizzle 12500: BFLY0_op2 ix05 => SRAM000 mem[01]
+
+
+top_fft 12500: BFLY0_twiddle_cos = 3f3504f3 ( 0.707107)
+
+top_fft t5
+top_fft t5 12500: in1(r,i)= ( 1.000000,-1.000000)
+top_fft t5 12500: in2(r,i)= ( 1.000000,-1.000000)
+top_fft t5
+top_fft t5 12500: tw_cos  =      0.707107
+top_fft t5 12500: tw_sin  =     -0.707107
+top_fft t5
+top_fft t5 12500: out1(r,i)= ( 1.000000,-2.414213)
+top_fft t5 12500: out2(r,i)= ( 1.000000, 0.414214)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5 12500: in1(r,i)= ( 1.000000,-1.000000)
+top_fft.BFLY0 t5 12500: in2(r,i)= ( 1.000000,-1.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 12500: t1  =  0.000000
+top_fft.BFLY0 t5 12500: t1a =  0.707107
+top_fft.BFLY0 t5 12500: t1b =  0.707107
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 12500: t2  = -1.414214
+top_fft.BFLY0 t5 12500: t2a = -0.707107
+top_fft.BFLY0 t5 12500: t2b = -0.707107
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 12500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000,-2.414213)
+top_fft.BFLY0 t5 12500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 0.414214)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 12500: fft_started = 1
+fftram 12500: BFLY0_op1_bnum_i = 1
+
+fftram 12500: SRAM000_ez = 0
+fftram 12500: SRAM001_ez = 0
+fftram 12500: SRAM002_ez = 0
+fftram 12500: SRAM003_ez = 0
+
+fftram 12500: SRAM000_wz = 0
+fftram 12500: SRAM001_wz = 0
+fftram 12500: SRAM002_wz = 1
+fftram 12500: SRAM003_wz = 1
+
+top_fft.fftram.SRAM000 12500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM000 12500: Wrote   wr_data_i mem[1] <= 3f8000003ed413cc
+SRAM000 t5 12500: Wrote(f) wr_data_i mem[1] <= ( 1.000000, 0.414214)
+
+top_fft.fftram.SRAM001 12500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM001 12500: Wrote   wr_data_i mem[0] <= 3f800000c01a8279
+SRAM001 t5 12500: Wrote(f) wr_data_i mem[0] <= ( 1.000000,-2.414213)
+
+top_fft.fftram.SRAM002 12500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 12500: Reading rd_data_o mem[1] <= xxxxxxxxxxxxxxxx
+SRAM002 t5 12500: Read(f) wr_data_i mem[1] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM003 12500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 12500: Reading rd_data_o mem[0] <= xxxxxxxxxxxxxxxx
+SRAM003 t5 12500: Read(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
+
+top_fft.fftram.SRAM002 12500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM002 12500: Reading rd_data_o mem[1] <= 3f8000003f800000
+SRAM002 t5 12500: Read(f) wr_data_i mem[1] <= ( 1.000000, 1.000000)
+
+top_fft.fftram.SRAM003 12500: ez_i=0 and wz_i=1
+top_fft.fftram.SRAM003 12500: Reading rd_data_o mem[0] <= 3f8000003f800000
+SRAM003 t5 12500: Read(f) wr_data_i mem[0] <= ( 1.000000, 1.000000)
+
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111111111 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=b504f3 bm=800000 zm=xxxxxx
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111111111 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=b504f3 bm=800000 zm=xxxxxx
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111111111 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=b504f3 bm=800000 zm=xxxxxx
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=0xxxxxxxx
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=xxxxxxxxx
+srmul aeb=111111111 beb=000000000 zeb=xxxxxxxxx
+srmul ----
+srmul am=b504f3 bm=800000 zm=xxxxxx
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=xxxxxx
+srmul   zm_hidden=xxxxxx
+srmul   zm_true[23]=x ab[46]=1
+srmul ----
+srmul ufw=x ofw=x
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z= 0.000000 (xxxxxxxx)
+srmul as=1 bs=0 zs=x
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=0xxxxxxxx
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z=-0.707107 (bf3504f3)
+srmul as=1 bs=0 zs=1
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=001111110
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z=-0.707107 (bf3504f3)
+srmul as=1 bs=0 zs=1
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=001111110
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z=-0.707107 (bf3504f3)
+srmul as=1 bs=0 zs=1
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=001111110
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+srmul a=-0.707107 (bf3504f3) b= 1.000000 (3f800000) z=-0.707107 (bf3504f3)
+srmul as=1 bs=0 zs=1
+srmul ----
+srmul ae8=001111110 be8=001111111 ze8=001111110
+srmul ae9=001111110 be9=001111111 ze9=001111110
+srmul   ae_plus_be=011111101
+srmul   ze_prenorm=001111110
+srmul   too_big=0 ze_norm=001111110
+srmul aeb=111111111 beb=000000000 zeb=111111111
+srmul ----
+srmul am=b504f3 bm=800000 zm=3504f3
+srmul ab=5a8279800000 ab[47:46]=01
+srmul   zm_true=b504f3
+srmul   zm_hidden=3504f3
+srmul   zm_true[23]=1 ab[46]=1
+srmul ----
+srmul ufw=0 ofw=0
+srmul 
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5 13000: in1(r,i)= ( 1.000000, 1.000000)
+top_fft.BFLY0 t5 13000: in2(r,i)= ( 1.000000, 1.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 13000: t1  =  0.000000
+top_fft.BFLY0 t5 13000: t1a = -0.707107
+top_fft.BFLY0 t5 13000: t1b = -0.707107
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 13000: t2  = -1.414214
+top_fft.BFLY0 t5 13000: t2a = -0.707107
+top_fft.BFLY0 t5 13000: t2b = -0.707107
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 13000: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000,-0.414214)
+top_fft.BFLY0 t5 13000: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 2.414213)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 13000: fft_started = 1
+fftram 13000: BFLY0_op1_bnum_i = 3
+
+fftram 13000: SRAM000_ez = 0
+fftram 13000: SRAM001_ez = 0
+fftram 13000: SRAM002_ez = 0
+fftram 13000: SRAM003_ez = 0
+
+fftram 13000: SRAM000_wz = 0
+fftram 13000: SRAM001_wz = 0
+fftram 13000: SRAM002_wz = 1
+fftram 13000: SRAM003_wz = 1
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=  13, time=    13 ns
+------------------------------------------------------------------------------
+top_fft 13500: BFLY0_op1 ix 03 comes from bank  3 row   0
+top_fft 13500: BFLY0_op2 ix 07 comes from bank  2 row   1
+top_fft
+fftctl 13500: cycle_num = 12 BOTF
+fftram  13500 bypass_valid[2]=0 SRAM002_active=1 bypassed_rnum[2]=1 SRAM002_ix=1 GLOOP
+fftram  13500 Bypassed SRAM 3, read  ( 1.000000, 1.000000) from bypassed_data[3] BOTF
+
+fftram 13500: BFLY0_op1_match[0] = 0
+fftram 13500: BFLY0_out1_data_i = 3f800000bed413cc
+
+fftctl 13500: cycle_num = 12
+fftctl 13500: fftctl_cycle_num_o = 11
+fftctl 13500: out2_offset = 8
+GENOPS2 (t=013500) ii,i: (0,1) => (0,8)
+GENOPS2
+GENOPS2 (t=013500) > P = 00000000
+GENOPS2 (t=013500) > ir= 00000111
+GENOPS2
+GENOPS2 (t=013500) > op1= 00000111
+GENOPS2 (t=013500) > op2= 00000111
+GENOPS2
+GENOPS2 (t=013500) ops=(7,7)
+GENOPS2 -----------------------------------------------------
+fftctl 13500: in( 3, 7), out( 3,  7)
+fftctl 13500: cycle_num = 12
+
+top_fft swizzle 13500: BFLY0_op1 ix03 => SRAM003 mem[00]
+top_fft swizzle 13500: BFLY0_op2 ix07 => SRAM002 mem[01]
+
+
+top_fft 13500: BFLY0_twiddle_cos = bf3504f3 (-0.707107)
+
+top_fft t5
+top_fft t5 13500: in1(r,i)= ( 1.000000, 1.000000)
+top_fft t5 13500: in2(r,i)= ( 1.000000, 1.000000)
+top_fft t5
+top_fft t5 13500: tw_cos  =     -0.707107
+top_fft t5 13500: tw_sin  =     -0.707107
+top_fft t5
+top_fft t5 13500: out1(r,i)= ( 1.000000,-0.414214)
+top_fft t5 13500: out2(r,i)= ( 1.000000, 2.414213)
+top_fft t5
+top_fft.BFLY0 t5 ------------------------
+top_fft.BFLY0 t5 13500: in1(r,i)= ( 1.000000, 1.000000)
+top_fft.BFLY0 t5 13500: in2(r,i)= ( 1.000000, 1.000000)
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 13500: t1  =  0.000000
+top_fft.BFLY0 t5 13500: t1a = -0.707107
+top_fft.BFLY0 t5 13500: t1b = -0.707107
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 13500: t2  = -1.414214
+top_fft.BFLY0 t5 13500: t2a = -0.707107
+top_fft.BFLY0 t5 13500: t2b = -0.707107
+top_fft.BFLY0 t5
+top_fft.BFLY0 t5 13500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 1.000000,-0.414214)
+top_fft.BFLY0 t5 13500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 1.000000, 2.414213)
+top_fft.BFLY0 t5 ------------------------
+
+fftram 13500: fft_started = 1
+fftram 13500: BFLY0_op1_bnum_i = 3
+
+fftram 13500: SRAM000_ez = 0
+fftram 13500: SRAM001_ez = 0
+fftram 13500: SRAM002_ez = 0
+fftram 13500: SRAM003_ez = 0
+
+fftram 13500: SRAM000_wz = 1
+fftram 13500: SRAM001_wz = 1
+fftram 13500: SRAM002_wz = 0
+fftram 13500: SRAM003_wz = 0
+
+top_fft.fftram.SRAM002 13500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM002 13500: Wrote   wr_data_i mem[1] <= 3f800000401a8279
+SRAM002 t5 13500: Wrote(f) wr_data_i mem[1] <= ( 1.000000, 2.414213)
+
+top_fft.fftram.SRAM003 13500: ez_i=0 and wz_i=0
+top_fft.fftram.SRAM003 13500: Wrote   wr_data_i mem[0] <= 3f800000bed413cc
+SRAM003 t5 13500: Wrote(f) wr_data_i mem[0] <= ( 1.000000,-0.414214)
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=  14, time=    14 ns
+------------------------------------------------------------------------------
+top_fft 14500: BFLY0_op1 ix 07 comes from bank  2 row   1
+top_fft 14500: BFLY0_op2 ix 07 comes from bank  2 row   1
+top_fft
+fftctl 14500: cycle_num = 13 BOTF
+fftram  14500 bypass_valid[2]=0 SRAM002_active=1 bypassed_rnum[2]=1 SRAM002_ix=1 GLOOP
+
+fftram 14500: BFLY0_op1_match[0] = 0
+fftram 14500: BFLY0_out1_data_i = xxxxxxxxxxxxxxxx
+
+fftctl 14500: cycle_num = 13
+fftctl 14500: fftctl_cycle_num_o = 12
+fftctl 14500: out2_offset = 8
+GENOPS2 (t=014500) ii,i: (2,3) => (4,12)
+GENOPS2
+GENOPS2 (t=014500) > P = 00000101
+GENOPS2 (t=014500) > ir= 00000111
+GENOPS2
+GENOPS2 (t=014500) > op1= 00000111
+GENOPS2 (t=014500) > op2= 00000111
+GENOPS2
+GENOPS2 (t=014500) ops=(7,7)
+GENOPS2 -----------------------------------------------------
+fftctl 14500: in( 7, 7), out( 7,  7)
+fftctl 14500: cycle_num = 13
+
+top_fft swizzle 14500: BFLY0_op1 ix07 => SRAM002 mem[01]
+top_fft swizzle 14500: BFLY0_op2 ix07 => SRAM002 mem[01]
+
+
+top_fft 14500: BFLY0_twiddle_cos = xxxxxxxx ( 0.000000)
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=  15, time=    15 ns
+------------------------------------------------------------------------------
+top_fft 15500: BFLY0_op1 ix  x comes from bank  x row   x
+top_fft 15500: BFLY0_op2 ix 07 comes from bank  2 row   1
+top_fft
+fftctl 15500: cycle_num = 0 BOTF
+fftram  15500 bypass_valid[2]=0 SRAM002_active=1 bypassed_rnum[2]=1 SRAM002_ix=x GLOOP
+
+fftram 15500: BFLY0_op1_match[0] = x
+fftram 15500: BFLY0_out1_data_i = xxxxxxxxxxxxxxxx
+
+
+top_fft swizzle 15500: BFLY0_op1 ix x => SRAM  x mem[ x]
+top_fft swizzle 15500: BFLY0_op2 ix07 => SRAM002 mem[01]
+
+
+top_fft 15500: BFLY0_twiddle_cos = xxxxxxxx ( 0.000000)
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=  16, time=    16 ns
+------------------------------------------------------------------------------
+top_fft 16500: BFLY0_op1 ix  x comes from bank  x row   x
+top_fft 16500: BFLY0_op2 ix 07 comes from bank  2 row   1
+top_fft
+fftctl 16500: cycle_num = 0 BOTF
+fftram  16500 bypass_valid[2]=0 SRAM002_active=1 bypassed_rnum[2]=1 SRAM002_ix=x GLOOP
+
+fftram 16500: BFLY0_op1_match[0] = x
+fftram 16500: BFLY0_out1_data_i = xxxxxxxxxxxxxxxx
+
+
+top_fft swizzle 16500: BFLY0_op1 ix x => SRAM  x mem[ x]
+top_fft swizzle 16500: BFLY0_op2 ix07 => SRAM002 mem[01]
+
+
+top_fft 16500: BFLY0_twiddle_cos = xxxxxxxx ( 0.000000)
+
+------------------------------------------------------------------------------
+clock.vp: reset=0, ncy=  17, time=    17 ns
+------------------------------------------------------------------------------
+top_fft 17500: BFLY0_op1 ix  x comes from bank  x row   x
+top_fft 17500: BFLY0_op2 ix 07 comes from bank  2 row   1
+top_fft
+fftctl 17500: cycle_num = 0 BOTF
+fftram  17500 bypass_valid[2]=0 SRAM002_active=1 bypassed_rnum[2]=1 SRAM002_ix=x GLOOP
+
+fftram 17500: BFLY0_op1_match[0] = x
+fftram 17500: BFLY0_out1_data_i = xxxxxxxxxxxxxxxx
+
+
+top_fft swizzle 17500: BFLY0_op1 ix x => SRAM  x mem[ x]
+top_fft swizzle 17500: BFLY0_op2 ix07 => SRAM002 mem[01]
+
+
+top_fft 17500: BFLY0_twiddle_cos = xxxxxxxx ( 0.000000)
+
+
+
+clock.vp: ENDING AFTER 18 CLOCKS time=18000 ps,  ncy=18
+
+
+$finish called from file "genesis_verif/clock_unq1.v", line 116.
+$finish at simulation time                18000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 18000 ps
+CPU Time:      0.610 seconds;       Data structure size:   0.1Mb
+Wed Jun 19 08:09:14 2019

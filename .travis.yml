@@ -38,4 +38,5 @@ script:
   # Also---FIXME---above command should be responsible for PASS/FAIL exit codes
   - egrep 'FAIL|ERR' test_results.log && exit 13 || exit 0
 
-
+  # I have this test for the analyzer, why not use it.
+  - (cd bin/simv_analysis; make test)
