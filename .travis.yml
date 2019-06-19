@@ -30,15 +30,12 @@ script:
   # set -e => exit on failure "you can sandwich stuff in script w/ set -e and set +e."
   - set -e
 
-  # 47/48 tests should run and pass; 48th test is *supposed* to fail
-
   - mkdir regression; cd regression
   # - ls -l ../bin
-  # - ../bin/golden_test.csh -sim verilator 8 1 1port |& tee test_results.log
   - ../bin/golden_test.csh -sim verilator |& tee test_results.log | egrep 'PASS|FAIL|ERR'
-  # - cat /tmp/test_8_1_1port.log
-  # - ls -l fft.log; wc -l fft.log; grep "Wrote" fft.log
-  # - cat /tmp/golden_test_8_1_1port.log
-  - egrep 'FAIL|ERR' test_results.log && exit 13
+
+  # Here's a tricky thing...it passes when it fails and it fails when it passes :(
+  # Also---FIXME---above command should be responsible for PASS/FAIL exit codes
+  - egrep 'FAIL|ERR' test_results.log && exit 13 || exit 0
 
 
