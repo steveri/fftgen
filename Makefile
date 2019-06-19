@@ -19,8 +19,8 @@ howto:
 #   - make TOP=clock to test clock.vp module only.
 TOP := fft
 
-# Simulator can be "vs" or "verilator". For now, default is vcs.
-SIM := vcs
+# Simulator can be "vs" or "verilator"
+SIM := verilator
 $(warning SIMULATOR set to $(SIM))
 
 # This little trick finds where the makefile exists (not used so far as I can tell)
