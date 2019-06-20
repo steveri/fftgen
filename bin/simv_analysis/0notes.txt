@@ -1,0 +1,45 @@
+June 2019
+
+Seems to work! E.g.
+
+  % log=/nobackup/steveri/github/fftgen/examples/test8.vcs/simv.log
+  % c ; analyze_reads_and_writes.pl -d $log |\
+    summarize_reads_and_writes.pl | egrep -v '^IGNORE|BB|wr' |\
+    uniq | sed 's/.*BREAK//' | less
+
+sort 001500 mem2r dp0 <- SRAM000     -- DBG2-ix0 FINAL 001500  reads  ( 0.000000, 0.000000) from SRAM000[0] (ix0)
+sort 001500 mem2r dp1 <- SRAM001     -- DBG2-ix1 FINAL 001500  reads  ( 0.000000, 0.000000) from SRAM001[0] (ix1)
+sort 001500 mem2r dp0 <- SRAM000     -- DBG2-ix0 FINAL 001500  reads  ( 1.000000, 0.000000) from SRAM000[0] (ix0)
+sort 001500 mem2r dp1 <- SRAM001     -- DBG2-ix1 FINAL 001500  reads  ( 0.000000, 0.000000) from SRAM001[0] (ix1)
+sort 002500 twiddle s0/dp0:  1.000   --               top_fft  2500: BFLY0_twiddle_cos = 3f800000 ( 1.000000)
+
+Also see example simv log and analysis result in examples/ subdirectory.
+
+Also should be able to do "make test" to verify that everything still works.
+
+------------------------------------------------------------------------
+July 2014
+
+I think this does what I want for now:
+
+c ; analyze_reads_and_writes.pl -d simv.log |\
+summarize_reads_and_writes.pl | egrep -v '^IGNORE|BB|wr' |\
+ uniq | sed 's/.*BREAK//' | less
+
+
+------------------------------------------------------------------------
+Current usage looks like this:
+
+c ; analyze_reads_and_writes.pl -d simv.log |\
+summarize_reads_and_writes.pl | sort | uniq | egrep -v 'zDBG|wr|BB' |\
+grep read | awk '{ print; if (NR%4==0) { print ""; } }'
+
+
+
+
+analyze_reads_and_writes.pl -d simv.log | summarize_reads_and_writes.pl | sort | uniq | less
+
+
+  Take output of
+     analyze_reads_and_writes.pl -d simv.log | summarize_analysis.csh | less
+  and turn it into a readable schedule inc. twiddles.

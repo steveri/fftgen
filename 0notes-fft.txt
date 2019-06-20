@@ -1,3 +1,6 @@
+TODO
+- clean up gt8k nonsense, see below etc.
+
 haha at long last, all tests pass
 
 NEXT
@@ -9,7 +12,22 @@ NEXT
 - add dependences to README, maybe see slang for template https://github.com/MikePopoloski/slang
 - set up a nightly cron job
 
+------------------------------------------------------------------------------
+FIXME add to README somewhere (tst/ subdir maybe)
+
+To test clocks (from deleted bin file "test0_clock.csh"
+  make clean; make gen TOP=clock; make run TOP=clock
+
+
+
 ==============================================================================
+
+20 jun 2019
+
+removed switch.csh, gt8k* from bin directory, these are obsolete now i guess
+
+
+------------------------------------------------------------------------------
 
 for SRAM/2PORT, try always @ (poedge clk_i or negedge clk_i) or whatever
 
@@ -1007,6 +1025,7 @@ TODO
 
 
 7 may 2019
+
 This is the fftgen directory ~/chipgen/fftgen
 
 To run exhaustive regression test on kiwi (? not yet verified)
@@ -1019,6 +1038,9 @@ To run exhaustive regression test on kiwi (? not yet verified)
   kiwi% ~/fftgen/bin/golden_test.csh -abbrev   # For D={8,16,32} only
   kiwi% ~/fftgen/bin/gt8k.csh                  # For D=(8,8192,4096,2048) only
 
+**** Note 6/2019 switch.csh, gt8k.csh no longer used
+**** gt8k.csh was just a symlink to golden_test.csh
+**** switch.csh simply set env var "SCHED_ALG" to e.g. "round7" or "mod_bn_combo"
 
 
 
@@ -1051,6 +1073,11 @@ To run exhaustive regression test:
   kiwi% ~/fftgen/bin/golden_test.csh -abbrev   # For D={8,16,32} only
   kiwi% ~/fftgen/bin/gt8k.csh                  # For D=(8,8192,4096,2048) only
 
+**** Note 6/2019 switch.csh, gt8k.csh no longer used
+**** gt8k.csh was just a symlink to golden_test.csh
+**** switch.csh simply set env var "SCHED_ALG" to e.g. "round7" or "mod_bn_combo"
+
+
 Also, new golden test incorporates choice of algorithm.  New
 formal-proof algorithm 'round7' is now the default; to use old
 previously-correct-ish version specify 'mod_bn_combo' use command-line
@@ -1064,6 +1091,11 @@ For old algorithm, do e.g.:
   kiwi% ~/fftgen/bin/golden_test.csh 8 1 1port mod_bn_combo
   kiwi% ~/fftgen/bin/golden_test.csh -alg mod_bn_combo -abbrev  
   kiwi% ~/fftgen/bin/gt8k.csh -alg mod_bn_combo
+
+**** Note 6/2019 switch.csh, gt8k.csh no longer used
+**** gt8k.csh was just a symlink to golden_test.csh
+**** switch.csh simply set env var "SCHED_ALG" to e.g. "round7" or "mod_bn_combo"
+
 
 To analyze simv.log, try:
   set b=~/fftgen/bin/simv_analysis
@@ -1091,6 +1123,10 @@ Default is (1,2)ports x (1,2,4)butterflies x (8,16,32...1024)datapoints
   kiwi% ~/fftgen/bin/golden_test.csh 8 1 1port # For single test
   kiwi% ~/fftgen/bin/golden_test.csh -abbrev   # For D={8,16,32} only
   kiwi% ~/fftgen/bin/gt8k.csh                  # For D=(8,8192,4096,2048) only
+
+**** Note 6/2019 switch.csh, gt8k.csh no longer used
+**** gt8k.csh was just a symlink to golden_test.csh
+**** switch.csh simply set env var "SCHED_ALG" to e.g. "round7" or "mod_bn_combo"
 
 
 Prev simv.log appears to be for nunits=4 and npoints=2048.  Let's try duplicating that:
