@@ -1,3 +1,12 @@
+#### add_copyright.csh
+
+<pre>
+add_copyright.csh - add copyright info to a file
+EXAMPLE: "add_copyright.csh rtl/mux.vp"
+</pre>
+
+
+#### bsr.awk
 <pre>
 
 bsr.awk - Because verilator does not support $bitstoreal, and because
@@ -38,3 +47,11 @@ TODO
 
 
 </pre>
+
+#### simv_analysis
+
+tools for analyzing simv log for correctness
+
+FIXME/TODO should move to ../tst/bin probably
+
+

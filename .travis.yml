@@ -30,18 +30,22 @@ script:
   # set -e => exit on failure "you can sandwich stuff in script w/ set -e and set +e."
   - set -e
 
+  ### Temporarily put a copy of this at the top of the script for quickfail debugging ###
+  # I have this test for the analyzer, why not use it.
+  - cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
+
+  ### FFT REGRESSIONS
+  - cd ${TRAVIS_BUILD_DIR}
   - mkdir regression; cd regression
   # - ls -l ../bin
   - ../bin/golden_test.csh -sim verilator |& tee test_results.log | egrep 'PASS|FAIL|ERR'
-
+  #
   # Here's a tricky thing...it passes when it fails and it fails when it passes :(
   # Also---FIXME---above command should be responsible for PASS/FAIL exit codes
   - egrep 'FAIL|ERR' test_results.log && exit 13 || echo okay
 
+  ### SIMV ANALYZER
   # I have this test for the analyzer, why not use it.
-  - (cd bin/simv_analysis; make test)
+  - cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
 
-  # Does cd persist?
-  - cd bin/simv_analysis
-  - pwd
 

@@ -1,5 +1,15 @@
+NOW
+- cleaning up bin/
+
 TODO
+- grep everywhere for FIXME, TODO
 - clean up gt8k nonsense, see below etc.
+- update bin/README
+
+LATER
+- bin/simv_analysis should move to tst/bin probably
+- may need to rethink test dir(s)
+-- e.g. bin/simv_analysis should move to tst/bin or something
 
 haha at long last, all tests pass
 

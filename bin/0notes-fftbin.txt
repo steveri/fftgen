@@ -1,0 +1,95 @@
+See README.md
+
+
+
+------------------------------------------------------------------------------
+DONE superceded by simv_analysis, see simv_analysis/README.md
+# log=simv.log
+# log=/nobackup/steveri/github/fftgen/examples/test8.vcs/simv.log
+# c ; analyze_reads_and_writes.pl -d $log |\
+# summarize_reads_and_writes.pl | egrep -v '^IGNORE|BB|wr' |\
+#  uniq | sed 's/.*BREAK//' | less
+
+DONE added gui/ to repo
+add gui subdir to repo? -- tradeoffs:
+- it doesn't really belong there
+- don't need it there
+- but it would be a place to keep it around
+- fine so maybe make a trash directory or something
+
+DONE - ADDED TO $fftgen/0notes-fft.txt
+- may need to rethink test dir(s)
+
+
+DONE - ADDED TO README
+add_copyright.csh - add copyright info to a file
+EXAMPLE: "add_copyright.csh rtl/mux.vp"
+
+DONE moved to archives
+# switch.csh - sets env variables that change the fft scheduling
+# 4algorithm. I don't think it's used anymore.
+
+DONE
+  test0_clock.csh moved to archives; was "make gen TOP=clock; make run TOP=clock"
+  test1_fftclock.csh moved to archives; was "make gen TOP=fftclock; make run TOP=fftclock"
+  test_scheduler.pl moved to tst/bin and checked in
+  test_swizzler.pl moved to tst/bin and checked in
+  vlsiweb_hack.csh moved to gui/
+
+DONE/KEPT
+  add_copyright.csh - add copyright info to a file
+  setup_genesis.csh
+  simv_analysis/ - tools for analyzing simv log for correctness
+  switch.csh NOPE DID NOT KEEP AFTER ALL, see below
+
+DONE: LOSE / MOVE TO ARCHIVES
+  analyze_reads_and_writes.pl
+  count_collisions.pl
+  gt8k.csh
+  gt8kfoo.csh
+  make_distribution.csh
+  setup_genesis.sh.orig
+  stanford_vcs_hack
+  summarize_analysis.csh
+  switch.csh.old
+
+DONE superceded by simv_analysis, see simv_analysis/README.md
+  analyze_reads_and_writes.pl, summarize_analysis.csh
+  - tools to analyze reads and writes in simv.log;  doesn't seem to work very well
+  - I think these are superceded by the contents of subdir simv_analysis
+
+
+DONE moved to archives
+  count_collisions.pl
+  - not sure what this is/was, but it does not seem to work...
+
+DONE moved to archives
+  gt8k* - pretty sure these have been subsumed by golden_test.*
+
+DONE moved to archives
+  make_distribution.csh - github / "git clone" makes this unnecessary...right?
+
+
+
+DONE checked in as gui/ subdirectory see gui/README
+  TEST5.bash
+  gui_extras.template
+  gui_extras.template.0
+  gui_hello.csh
+  gui_test5.csh
+  gui_test5.csh.0
+  sorry.csh - apology message for test5 not working
+
+DONE
+- swizzle0* moved to doc/takala-table-compare, see README.md there.
+- simv_analysis/ checked in
+- switch.csh moved to archives
+- gt8k* (symlinks) moved to archives
+
+DONE
+- combine bsr.awk, bsr_fix.awk into one
+- make a wrapper I guess NOPE no need wrapper it's just too perfect as is :)
+
+1906 bsr.awk is DONE
+# For a good time try:
+#   % bsr.awk help
