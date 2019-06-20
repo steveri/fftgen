@@ -7,12 +7,13 @@ TMP := $(shell mktemp)
 
 .PHONY: test
 test:
-	echo $$PATH
-	analyze_reads_and_writes.pl -d $(LOG) |\
+	@echo analyze_reads_and_writes.pl
+	@analyze_reads_and_writes.pl -d $(LOG) |\
 	  summarize_reads_and_writes.pl |\
 	  egrep -v '^IGNORE|BB|wr' |\
 	  uniq | sed 's/.*BREAK//' > $(TMP)
-	cmp examples/analysis_results.txt $(TMP) && res="PASS" || res="FAIL";\
+	@echo Compare results...
+	@cmp examples/analysis_results.txt $(TMP) && res="PASS" || res="FAIL";\
 	  rm $(TMP); echo $$res;\
 	  [ "$$res" == "PASS" ] && exit 0 || exit 13
 

@@ -30,10 +30,6 @@ script:
   # set -e => exit on failure "you can sandwich stuff in script w/ set -e and set +e."
   - set -e
 
-  ### Temporarily put a copy of this at the top of the script for quickfail debugging ###
-  # I have this test for the analyzer, why not use it.
-  - cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
-
   ### FFT REGRESSIONS
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir regression; cd regression
