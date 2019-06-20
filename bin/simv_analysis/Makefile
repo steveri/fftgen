@@ -1,9 +1,13 @@
+SHELL := /bin/bash
+export PATH := .:$(PATH)
+
 LOG := examples/simv.log
 # TMP := analysis_results.tmp
 TMP := $(shell mktemp)
 
 .PHONY: test
 test:
+	echo $$PATH
 	analyze_reads_and_writes.pl -d $(LOG) |\
 	  summarize_reads_and_writes.pl |\
 	  egrep -v '^IGNORE|BB|wr' |\
