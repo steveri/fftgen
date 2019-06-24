@@ -1,0 +1,40 @@
+Makefile:24: SIMULATOR set to vcs
+Makefile:30: Home dir set to /nobackup/steveri/github/fftgen
+Makefile:34: Work started at /nobackup/steveri/github/fftgen
+tmpdir=`mktemp -d tmp.test8.XXX`;\
+  cd $tmpdir;\
+  ../bin/golden_test.csh -sim vcs 8 1 1port
+Wed Jun 19 08:09:05 PDT 2019
+8_1_1port: npoints=8, nunits=1, sram=TRUE_1PORT; alg=round7
+
+Processing bsr macros in simv.log...
+  awk -f ../bin/../bin/bsr.awk %9.6f < simv.log > simv.log.bsr2480
+  mv simv.log.bsr2480 simv.log
+
+26 writes (4 bypass writes), 13 cycles
+ix00: SRAM000 t5 10500: Wrote(f) wr_data_i mem[0] <= ( 4.000000, 0.000000)
+ix07: SRAM002 t5 13500: Wrote(f) wr_data_i mem[1] <= ( 1.000000, 2.414213)
+Lint-[VNGS] Variable never gets set --- 8 1 1port
+Lint-[WMIA-L] Width mismatch in assignment --- 8 1 1port
+Lint-[UI] Unused input --- 8 1 1port
+Lint-[UI] Unused input --- 8 1 1port
+Lint-[UI] Unused input --- 8 1 1port
+Lint-[UI] Unused input --- 8 1 1port
+Lint-[WMIA-L] Width mismatch in assignment --- 8 1 1port
+Lint-[WMIA-L] Width mismatch in assignment --- 8 1 1port
+Lint-[WMIA-L] Width mismatch in assignment --- 8 1 1port
+Lint-[WMIA-L] Width mismatch in assignment --- 8 1 1port
+Lint-[CAWM-L] Width mismatch --- 8 1 1port
+Lint-[CAWM-L] Width mismatch --- 8 1 1port
+Lint-[CAWM-L] Width mismatch --- 8 1 1port
+Lint-[CAWM-L] Width mismatch --- 8 1 1port
+Lint-[CAWM-L] Width mismatch --- 8 1 1port
+TR PASS: 0 mismatched results --- 8 1 1port (vcs)
+-------------------------------------------
+1/1 tests PASSED
+    (NOTE 47/48 pass is normal because '8 4 1' not supported.)
+Warnings:
+   (no warnings found.)
+Errors:
+   (no errors found.)
+Result summary is here: '/tmp/golden-test_summary.2480'
