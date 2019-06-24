@@ -1,3 +1,13 @@
+SUMMARY 1906
+
+Summary of what happened:
+- initially used designware, but that's not free is it
+- looked for freeware. looked here, looked there. freeware sucked
+- finally wrote my own
+
+
+
+------------------------------------------------------------------------
 STATUS 1905
 - seems stable for now, works on 47 fft regressions
 - could use a severe cleaning up
@@ -119,9 +129,6 @@ MULTIPLIER NOTES
 # sp format:
 #   https://www.quora.com/How-can-I-design-a-floating-point-multiplier-in-Verilog
 #   https://en.wikipedia.org/wiki/Single-precision_floating-point_format
-
-
-
 
 ==============================================================================
 DONE
@@ -285,6 +292,34 @@ OLD
 # /nobackup/steveri/github/fftgen/build/genesis_vlog.vf \
 # |& less
 
-
-
-
+------------------------------------------------------------------------------
+NOTES from other (retired) 0notes file in $top/doc/
+# 
+# DESIGNWARE
+#   /hd/cad/synopsys/dc_shell/latest/dw/doc/datasheets/dw_fp_mult.pdf
+#   /hd/cad/synopsys/dc_shell/latest/dw/sim_ver/DW_fp_mult.v 
+# 
+# MY CODE
+# * op_width 64 (i.e. TEST5) means two 32-bit single-precision fp
+#   numbers (real, imag) packed into one 32-bit quantity!
+# 
+# 
+# * all the fp ops are in rtl/butterfly.v e.g.
+# 
+# module `mname` (
+#    ...
+#     input logic [`$op_width-1`:0] in1, in2,
+#     input logic [`$op_width/2-1`:0] twc, tws, // twiddle (cos, sin)
+#     output logic [`$op_width-1`:0] out1, out2
+#    );
+#    //; if ($test_mode eq "TEST0") { $op_width = 32; }
+#    //; if ($test_mode eq "TEST1") { $op_width = 64; }
+#    ...
+#    //; if ($test_mode eq "TEST5") { $op_width = 64; }
+#    ...
+#    DW_fp_addsub #(23, 8, 1) // #(sig, exp, compliance (0 or 1)) //cad/synopsys/dc_shell/latest/dw/sim_ver
+#    spadd_t2 (.a(t2a), .b(t2b), .z(t2), .op(`$add_op`), .rnd(3'b000), .status(status_t2));
+# 
+# * maybe want stubs for add, sub, mul e.g.
+# 
+# * TODO need a check in butterfly.v, should choke if op_width != 64

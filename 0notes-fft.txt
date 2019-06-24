@@ -1,10 +1,51 @@
-NOW
-- cleaning up bin/
+TODO
+- clean up below
+- cron job for fft tests inc. ncsim
+- test README in a clean directory
+- clean up ./archives => ~/fft/archives
+
+
+LATER
+- "make bigtest", see below
+- what do we do with fptest3.awk? Maybe "make fptest" 
+
+
+
+
+
+MAKE TEST_BIG or MAKE BIGTEST
+  golden_test is capable of bigger tests (takes longer), search for
+  "gt8k" in golden_tests.csh...maybe put them in a cron job...
+
+
+
+
+= CLEAN TO HERE ===============================================
+
+
+
+TODO
+- cleaning up fftgen repo
+-- "git status" to minimize untracked files
+- bin/ DONE move on to the next one
+-- cleaning up bin/ subdir, see bin/0notes* DONE
+-- cd bin/ ; git status * DONE
+
 
 TODO
 - grep everywhere for FIXME, TODO
 - clean up gt8k nonsense, see below etc.
 - update bin/README
+
+
+TODO golden_test exit codes
+test golden_test exit codes with goal of getting rid of this in travis script:
+>  # Here's a tricky thing...it passes when it fails and it fails when it passes :(
+>  # Also---FIXME---above command should be responsible for PASS/FAIL exit codes
+>  - egrep 'FAIL|ERR' test_results.log && exit 13 || exit 0
+
+
+
 
 LATER
 - bin/simv_analysis should move to tst/bin probably
@@ -12,6 +53,54 @@ LATER
 -- e.g. bin/simv_analysis should move to tst/bin or something
 
 haha at long last, all tests pass
+
+Used to have a test/ subdir with the following Makefile. What do we do with this now?
+# ------------------------------------------------------------------------------
+# test_64_1_1port: cleanall
+#         ../bin/golden_test.csh 64 1 1port |& tee gold_64_1_1port.log
+#         cp /tmp/test_64_1_1port.log test_64_1_1port.log
+# 
+# fptest_64_1_1port: test_64_1_1port.log
+#         ../bin/fptest3.awk test_64_1_1port.log |& egrep ' (true|false)' | sort | uniq
+# 
+# 
+# 
+# test_8_1_1port: cleanall
+#         ../bin/golden_test.csh 8 1 1port |& tee gold_8_1_1port.log
+#         cp /tmp/test_8_1_1port.log test_8_1_1port.log
+# 
+# fptest_8_1_1port: test_8_1_1port.log
+#         ../bin/fptest3.awk test_8_1_1port.log |& egrep ' (true|false)' | sort | uniq
+# ------------------------------------------------------------------------------
+
+fftgen issues
+- LINT clean, both verilator and ncsim
+- move repo to genesis2?
+- separate fpu repo etc
+- golden_test(s) should have correct exit code depending on PASS/FAIL
+- separate "tst" directory and Makefile for extensive tests, yes?
+-- hmm maybe not, remember already have a 'tst' directory...?
+- generate and repo sample 8-1-1 run inc. waveforms, see subdir "examples"
+- Need "examples/README" telling how examples are generated
+
+- verilator still generates waveforms named "counter", right? thats-a no good
+today
+
+FIX fft travis logs---pass when fail, see past logs
+
+
+FIXED I think - genesis2 setup problems
+# working setup_genesis2.sh (works for CGRAFlow) is here, I think:
+# $gen/hardware/generator_z/top/
+# 
+# Compilation failed in require at
+# /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Archive/Zip.pm
+# line 12.
+# 
+# BEGIN failed--compilation aborted at
+# /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Archive/Zip.pm
+# line 12.
+
 
 NEXT
 - check everything in
