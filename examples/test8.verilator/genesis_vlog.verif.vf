@@ -1,0 +1,14 @@
+genesis_verif/fftclock_unq1.v
+genesis_verif/fftctl_unq1.v
+genesis_verif/twiddle_unq1.v
+genesis_verif/swizzle_unq1.v
+genesis_verif/SRAM_unq1.v
+genesis_verif/SRAM_unq2.v
+genesis_verif/SRAM_unq3.v
+genesis_verif/SRAM_unq4.v
+genesis_verif/fftram_unq1.v
+genesis_verif/fpu_unq1.v
+genesis_verif/fpu_unq2.v
+genesis_verif/fpu_unq3.v
+genesis_verif/butterfly_unq1.v
+genesis_verif/top_fft.v

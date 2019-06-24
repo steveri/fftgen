@@ -1,0 +1,92 @@
+
+Genesis2::Manager->print_cmdline: Your Complete Genesis2 Command Line:
+/tmp/Genesis2/Genesis2Tools/bin/Genesis2.pl                                                         \
+    -gen                                                                                            \
+    -top top_fft                                                                                    \
+    -synthtop top_fft.fft                                                                           \
+    -depend depend.list                                                                             \
+    -product genesis_vlog.vf                                                                        \
+    -hierarchy fft.xml                                                                              \
+    -cfgpath ./                                                                                     \
+    -cfgpath /nobackup/steveri/github/fftgen/SysCfgs                                                \
+    -parameter top_fft.n_fft_points=8 top_fft.units_per_cycle=1 top_fft.SRAM_TYPE=TRUE_1PORT        \
+        top_fft.swizzle_algorithm=round7 top_fft.SIMULATOR=verilator                                \
+    -parse                                                                                          \
+    -srcpath ./                                                                                     \
+    -srcpath /nobackup/steveri/github/fftgen/rtl                                                    \
+    -srcpath /nobackup/steveri/github/fftgen/tst                                                    \
+    -incpath ./                                                                                     \
+    -incpath /nobackup/steveri/github/fftgen/rtl                                                    \
+    -incpath /nobackup/steveri/github/fftgen/tst                                                    \
+    -perl_libs ./                                                                                   \
+    -perl_libs /nobackup/steveri/github/fftgen/rtl                                                  \
+    -perl_libs /nobackup/steveri/github/fftgen/tst                                                  \
+    -input top_fft.vp clock.vp top_swizzle.vp top_fftctl.vp top_swizzle0.vp top_fftram.vp           \
+        top_fftram0.vp top_clock.vp top_fftclock.vp fftram.vp swizzle.vp fftctl_old.vp fftclock.vp  \
+        fpu.vp SRAM.vp tmp.vp fftctl_orig.vp butterfly.vp fftctl.vp twiddle.vp                      \
+    -debug 0 
+
+-----------------------------------------------
+--- Genesis Is Starting Work On Your Design ---
+-----------------------------------------------
+
+-----------------------------------------------
+|            Genesis Release Info             |
+|  $Change: 11904 $ --- $Date: 2013/08/03 $   |
+-----------------------------------------------
+
+---------------------------------------------------------------------------
+    !! THIS VERSION OF GENESIS2 IS NOT FOR ANY COMMERCIAL USE !!
+     FOR COMMERCIAL LICENSE CONTACT SHACHAM@ALUMNI.STANFORD.EDU
+---------------------------------------------------------------------------
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file top_fft.vp
+Genesis2::Manager->parse_files: Now parsing file clock.vp
+Genesis2::Manager->parse_files: Now parsing file top_swizzle.vp
+Genesis2::Manager->parse_files: Now parsing file top_fftctl.vp
+Genesis2::Manager->parse_files: Now parsing file top_swizzle0.vp
+Genesis2::Manager->parse_files: Now parsing file top_fftram.vp
+Genesis2::Manager->parse_files: Now parsing file top_fftram0.vp
+Genesis2::Manager->parse_files: Now parsing file top_clock.vp
+Genesis2::Manager->parse_files: Now parsing file top_fftclock.vp
+Genesis2::Manager->parse_files: Now parsing file fftram.vp
+Genesis2::Manager->parse_files: Now parsing file swizzle.vp
+Genesis2::Manager->parse_files: Now parsing file fftctl_old.vp
+Genesis2::Manager->parse_files: Now parsing file fftclock.vp
+Genesis2::Manager->parse_files: Now parsing file fpu.vp
+WARNING: Line 52, of File /nobackup/steveri/github/fftgen/rtl/fpu.vp 
+WARNING: You are using an old Verilog style macro. This is not safe and thus highly unrecommended.
+		---> You should be using Genesis2 parameters instead
+WARNING: Line 54, of File /nobackup/steveri/github/fftgen/rtl/fpu.vp 
+WARNING: You are using an old Verilog style macro. This is not safe and thus highly unrecommended.
+		---> You should be using Genesis2 parameters instead
+WARNING: Line 62, of File /nobackup/steveri/github/fftgen/rtl/fpu.vp 
+WARNING: You are using an old Verilog style macro. This is not safe and thus highly unrecommended.
+		---> You should be using Genesis2 parameters instead
+Genesis2::Manager->parse_files: Now parsing file SRAM.vp
+Genesis2::Manager->parse_files: Now parsing file tmp.vp
+Genesis2::Manager->parse_files: Now parsing file fftctl_orig.vp
+Genesis2::Manager->parse_files: Now parsing file butterfly.vp
+Genesis2::Manager->parse_files: Now parsing file fftctl.vp
+Genesis2::Manager->parse_files: Now parsing file twiddle.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Genesis2::Manager->execute: Starting Verilog Code Generation Phase
+Genesis2::ConfigHandler->SetPrmOverrides: Now processing command line parameter overrides
+	INFO:	Command line parameter override: path=top_fft, param name=n_fft_points, override val='8'
+	INFO:	Command line parameter override: path=top_fft, param name=units_per_cycle, override val='1'
+	INFO:	Command line parameter override: path=top_fft, param name=SRAM_TYPE, override val='TRUE_1PORT'
+	INFO:	Command line parameter override: path=top_fft, param name=swizzle_algorithm, override val='round7'
+	INFO:	Command line parameter override: path=top_fft, param name=SIMULATOR, override val='verilator'
+Genesis2::Manager->gen_verilog: Starting code generation from module top_fft
+Genesis2::Manager->execute: Done With Verilog Code Generation Phase
+
+Genesis2::Manager->execute: Starting Auxiliary File Generation Phase
+Genesis2::ConfigHandler->WriteXml: Now writing output XML file: fft.xml
+Genesis2::Manager->execute: Done With Auxiliary File Generation Phase
+
+-----------------------------------------------
+--- Genesis Finished Generating Your Design ---
+-----------------------------------------------
+

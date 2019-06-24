@@ -1,0 +1,64 @@
+<HierarchyTop>
+  <InstanceName>top_fft</InstanceName>
+  <Parameters>
+    <ParameterItem>
+      <Doc>Number of complex data values to process.</Doc>
+      <Name>n_fft_points</Name>
+      <Range>
+        <List>8</List>
+        <List>16</List>
+        <List>32</List>
+        <List>64</List>
+        <List>128</List>
+        <List>256</List>
+        <List>512</List>
+        <List>1024</List>
+        <List>2048</List>
+        <List>4096</List>
+        <List>8192</List>
+      </Range>
+      <Val>8</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc>Butterfly units per cycle (0.25, 0.5, 1.0, 2.0 or 4.0).</Doc>
+      <Name>units_per_cycle</Name>
+      <Range>
+        <List>0.25</List>
+        <List>0.5</List>
+        <List>1</List>
+        <List>2</List>
+        <List>4</List>
+      </Range>
+      <Val>1</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc>What kind of SRAM should the FFT use?</Doc>
+      <Name>SRAM_TYPE</Name>
+      <Range>
+        <List>TRUE_1PORT</List>
+        <List>TRUE_2PORT</List>
+        <List>1PORT_DBLPUMP</List>
+      </Range>
+      <Val>TRUE_1PORT</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc>round7 is the only one that works(!)</Doc>
+      <Name>swizzle_algorithm</Name>
+      <Range>
+        <List>round7</List>
+        <List>mod_bn_combo</List>
+        <List>takala</List>
+      </Range>
+      <Val>round7</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc>Simulator: &quot;verilator&quot; or &quot;vcs&quot;</Doc>
+      <Name>SIMULATOR</Name>
+      <Range>
+        <List>verilator</List>
+        <List>vcs</List>
+      </Range>
+      <Val>verilator</Val>
+    </ParameterItem>
+  </Parameters>
+</HierarchyTop>
