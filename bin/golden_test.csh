@@ -174,7 +174,6 @@ foreach t ($tests:q)
     # echo -n " $t"
     @ ntests = $ntests + 1
   endif
-  echo ""
 end
 echo Total $ntests tests.
 echo
