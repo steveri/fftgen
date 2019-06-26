@@ -1,3 +1,13 @@
+TODO
+- add notification to regressions, start them running every night
+- daily travis test
+
+
+../bin/golden_test.csh -sim verilator |& tee test_results.log | egrep 'PASS|FAIL|ERR'
+
+
+
+
 Cleaning this file, search "CLEAN TO HERE"
 Move DONE/OLD/NOTES (see below) to archives 0notes-fft-1906.txt or something maybe
 

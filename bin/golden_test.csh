@@ -230,7 +230,7 @@ foreach t ($tests:q)
   if ($sfx == "8_4_1port") echo "*** NOTE $sfx is SUPPOSED to fail! (16 SRAM's for 8 points\!?) ***"
 
   # Print out date, id info
-  date; echo $sfx": npoints=$npoints, nunits=$nunits, sram=$sram; alg=$swizzalg; sim=$SIM"
+  date; echo $sfx": npoints=$npoints, nunits=$nunits, sram=$sram; alg=$swizzalg; sim=$SIMULATOR"
 
   set cmd = "make -f $MAKEFILE clean gen SIM=$SIMULATOR TOP=fft"
 
