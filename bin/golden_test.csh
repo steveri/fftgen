@@ -167,13 +167,14 @@ set ntests = 0;
 echo "Tests to run:"
 foreach t ($tests:q)
   if ("$t" == "hline 2 3") then
-    echo
+    echo ""
    #echo "   -----------------------------------------"
   else
-    # echo "   $t" | awk '{ printf("%16s",$0); }'
-    echo " $t"
+    echo "   $t" | awk '{ printf("%16s",$0); }'
+    # echo -n " $t"
     @ ntests = $ntests + 1
   endif
+  echo ""
 end
 echo Total $ntests tests.
 echo
