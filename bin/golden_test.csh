@@ -8,20 +8,33 @@ set TRAVIS
 if ("$1" == "--help") then
 cat <<EOF
 
+SYNOPSIS
+  $0
+  $0 -sim vcs
+  $0 8 1 1port
+  $0 -sim verilator 128 8 2port
+  $0 -sim vcs -gt8k
+
+DESCRIPTION
+
   Build one or more FFT designs and test against a golden model.  The
   FFT uses an in-place algorithm, i.e. an n-point FFT requires exactly
   n words of memory. The algorithm is capable of operating with area-
-  and energy-saving single-port SRAM without collisions. A
-  fully-specified FFT (i.e. number of butterflies == n/2)
-  would thus complete its transform in (n/2)log2(n) cycles.
-  For now, however, the generator can build at most four butterfly
-  units, and there are 6 cycles of overhead in each test, so the
-  actual time is (n/2)log2(n)/b, where b is the number of butterfly
-  units. I.e. a 1024-point FFT with one butterfly unit completes its
-  transform in 5,126 cycles.
+  and energy-saving single-port SRAM without collisions. A fully
+  specified FFT (i.e. number of butterflies == n/2) would thus
+  complete its transform in (n/2)log2(n) cycles.  For now, however,
+  the generator can build at most four butterfly units, and there are
+  6 cycles of overhead in each test, so the actual time is
+  (n/2)log2(n)/b, where b is the number of butterfly units. I.e. a
+  1024-point FFT with one butterfly unit completes its transform in
+  5,126 cycles.
 
-  To run an exhaustive regression test of multiple designs:
+HOW-TO
+  To run an exhaustive regression test of multiple designs (verilator)
     $0
+
+  To run an exhaustive regression test of multiple designs (vcs)
+    $0 -sim vcs
 
   To build and run a single design:
     $0 <n_points> <n_butterfly_units> <memory_type>
@@ -36,11 +49,11 @@ cat <<EOF
    "2port" for true dual-port SRAM
    "dpump" for double-pump single-port (virtual 2-port)
 
-  E.g. to build a 32-point in-place FFT using two butterfly units and
-  one bank of single-port DRAM:
+EXAMPLES
+  32-point in-place FFT using two butterfly units and one bank of single-port DRAM
     $0 32 2 1port
 
-  Example2 fully-specified 32-point FFT should complete in log2(32) or five cycles
+  Fully-specified 32-point FFT should complete in log2(32) or five cycles
     $0 32 32 1port
 
 EOF
@@ -67,7 +80,7 @@ set tests = ()
 set ntests = 1
 
 # simulator can be either vcs or verilator
-set SIMULATOR = 'vcs'
+set SIMULATOR = 'verilator'
 if ("$1" == "-sim") then
   set SIMULATOR=$2
   shift; shift;
@@ -118,8 +131,10 @@ endif
 
 set npoints_array = (8 16 32 64 128 256 512 1024)
 
-# Use "-abbrev" to run only the short tests.
-if ("$1" == "-abbrev") set npoints_array = (8 16 32)
+# Use "-abbrev" to run only the short tests. See below for '-gt8k'
+if      ("$1" == "-abbrev") set npoints_array = (8 16 32)
+else if ("$1" == "-gt8k") set gt8k
+
 
 # To infinity...and BEYOND!
 # if ($?gt8k)            set npoints_array = (8 2048 4096 8192)

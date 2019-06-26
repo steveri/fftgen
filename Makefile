@@ -394,15 +394,31 @@ cleanall: clean
 ##############################################################################
 # TESTING
 
+.PHONY: test
+test:
+	@echo ""
+	@echo "Quick test"
+	@echo "  " make test8 "(default)"
+	@echo "  " make quicktest
+	@echo "  " make quicktest SIM=vcs
+	@echo "Complete regressions"
+	@echo "  " make regress
+	@echo "  " make regress SIM=vcs
+	@echo "  " make regress SIM=vcs TEST_SUITE=-gt8k
+	@echo "  " make regress SIM=verilator "(default)"
+	@echo ""
+
 # 1905 regression tests; regressions/ subdir should already exist!! (as part of dist)
+# For BIG tests test TEST_SUITE="-gt8k" on make command line
+TEST_SUITE := ""
 .PHONY: regress regressions
 regress regressions:
 	tmpdir=`mktemp -d tmp.regressions.XXX`;
-	  cd $$tmpdir; ../bin/golden_test.csh
+	  cd $$tmpdir; ../bin/golden_test.csh SIM=$(SIM) $(TEST_SUITE)
 
 
-.PHONY: quicktest test
-test quicktest: test8
+.PHONY: quicktest
+quicktest: test8
 
 .PHONY: test8
 test8:

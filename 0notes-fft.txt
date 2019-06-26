@@ -1,15 +1,38 @@
-TODO
+Cleaning this file, search "CLEAN TO HERE"
+Move DONE/OLD/NOTES (see below) to archives 0notes-fft-1906.txt or something maybe
+
+TODO NOW
 - clean up below
-- cron job for fft tests inc. ncsim
+- cron job for fft tests inc. vcs
+- set up a nightly cron job
+- LINT CLEAN for verilator (first), then vcs
+- golden_test exit codes, see below
+- golden_test(s) should have correct exit code depending on PASS/FAIL
+
+TODO
+- verilator still generates waveforms named "counter", right? thats-a no good
 - test README in a clean directory
-- clean up ./archives => ~/fft/archives
+- grep everywhere for FIXME, TODO
+- clean up gt8k nonsense, see below etc.
+- update bin/README
+- add dependences to README, maybe see slang for template https://github.com/MikePopoloski/slang
 
-
-LATER
+LATER 1906
 - "make bigtest", see below
 - what do we do with fptest3.awk? Maybe "make fptest" 
+- clean up ./archives => ~/fft/archives
+- bin/simv_analysis should move to tst/bin probably
+- may need to rethink test dir(s)
+-- e.g. bin/simv_analysis should move to tst/bin or something
+- more tests, see "moar tests" below
 
-
+LATER 1905
+- move repo to genesis2?
+- separate fpu repo etc
+- separate "tst" directory and Makefile for extensive tests, yes?
+-- hmm maybe not, remember already have a 'tst' directory...?
+- Need "examples/README" telling how examples are generated
+- should rtl/ subdir  be renamed gsource/ or something?
 
 
 
@@ -17,43 +40,25 @@ MAKE TEST_BIG or MAKE BIGTEST
   golden_test is capable of bigger tests (takes longer), search for
   "gt8k" in golden_tests.csh...maybe put them in a cron job...
 
-
-
-
-= CLEAN TO HERE ===============================================
-
-
-
-TODO
-- cleaning up fftgen repo
--- "git status" to minimize untracked files
-- bin/ DONE move on to the next one
--- cleaning up bin/ subdir, see bin/0notes* DONE
--- cd bin/ ; git status * DONE
-
-
-TODO
-- grep everywhere for FIXME, TODO
-- clean up gt8k nonsense, see below etc.
-- update bin/README
-
-
 TODO golden_test exit codes
 test golden_test exit codes with goal of getting rid of this in travis script:
 >  # Here's a tricky thing...it passes when it fails and it fails when it passes :(
 >  # Also---FIXME---above command should be responsible for PASS/FAIL exit codes
 >  - egrep 'FAIL|ERR' test_results.log && exit 13 || exit 0
 
+1906 haha at long last, all tests pass
 
+ADD TO bin/README
+------------------------------------------------------------------------------
+GOLDEN TESTS csh vs. pl
+  # To build and check a new simv.log from scratch:
+  ../bin/golden_test.csh 8 1 1port |& tee gold.log$i | tail
+  
+  # To check an existing simv.log:
+  ../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
+------------------------------------------------------------------------------
 
-
-LATER
-- bin/simv_analysis should move to tst/bin probably
-- may need to rethink test dir(s)
--- e.g. bin/simv_analysis should move to tst/bin or something
-
-haha at long last, all tests pass
-
+MOAR TESTS
 Used to have a test/ subdir with the following Makefile. What do we do with this now?
 # ------------------------------------------------------------------------------
 # test_64_1_1port: cleanall
@@ -73,478 +78,38 @@ Used to have a test/ subdir with the following Makefile. What do we do with this
 #         ../bin/fptest3.awk test_8_1_1port.log |& egrep ' (true|false)' | sort | uniq
 # ------------------------------------------------------------------------------
 
-fftgen issues
-- LINT clean, both verilator and ncsim
-- move repo to genesis2?
-- separate fpu repo etc
-- golden_test(s) should have correct exit code depending on PASS/FAIL
-- separate "tst" directory and Makefile for extensive tests, yes?
--- hmm maybe not, remember already have a 'tst' directory...?
-- generate and repo sample 8-1-1 run inc. waveforms, see subdir "examples"
-- Need "examples/README" telling how examples are generated
-
-- verilator still generates waveforms named "counter", right? thats-a no good
-today
-
-FIX fft travis logs---pass when fail, see past logs
-
-
-FIXED I think - genesis2 setup problems
-# working setup_genesis2.sh (works for CGRAFlow) is here, I think:
-# $gen/hardware/generator_z/top/
-# 
-# Compilation failed in require at
-# /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Archive/Zip.pm
-# line 12.
-# 
-# BEGIN failed--compilation aborted at
-# /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Archive/Zip.pm
-# line 12.
-
-
-NEXT
-- check everything in
-- set up travis to run w/ verilator
-- clean everything up, maybe start with README
-- maybe try a clean install based on the new README
-- haha just for fun maybe find all the FIXME's
-- add dependences to README, maybe see slang for template https://github.com/MikePopoloski/slang
-- set up a nightly cron job
-
 ------------------------------------------------------------------------------
-FIXME add to README somewhere (tst/ subdir maybe)
+FIXME add to README somewhere (tst/ subdir maybe):
+  To test clocks (from deleted bin file "test0_clock.csh"
+    make clean; make gen TOP=clock; make run TOP=clock
 
-To test clocks (from deleted bin file "test0_clock.csh"
-  make clean; make gen TOP=clock; make run TOP=clock
+STATUS 20 jun 2019
+  cd regression; ../bin/golden_test.csh -sim vcs
+  all 47 vcs tests PASS 
 
-
+  cd regression; ../bin/golden_test.csh -sim verilator
+  19 1port tests PASS
+  19 2port tests FAIL
+   9 dpump tests PASS
+  47 tests total
 
 ==============================================================================
-
 20 jun 2019
+- debugging, see doc/debugging-1906.txt
 
-removed switch.csh, gt8k* from bin directory, these are obsolete now i guess
 
-
-------------------------------------------------------------------------------
-
-for SRAM/2PORT, try always @ (poedge clk_i or negedge clk_i) or whatever
-
-
-
-Verilated model didn't converge
-
-    Verilator sometimes has to evaluate combinatorial logic multiple
-    times, usually around code where a UNOPTFLAT warning was issued,
-    but disabled. For example:
-
-    always @ (a)  b=~a;
-    always @ (b)  a=b
-
-    will toggle forever and thus the executable will give the didn't
-    converge error to prevent an infinite loop.
-
-    To debug this, run Verilator with --profile-cfuncs. Run make on
-    the generated files with "OPT=-DVL_DEBUG". Then call
-    Verilated::debug(1) in your main.cpp.
-
-    This will cause each change in a variable to print a message. Near
-    the bottom you'll see the code and variable that causes the
-    problem. For the program above:
-
-    CHANGE: filename.v:1: b
-    CHANGE: filename.v:2: a
-
-
- verilator --profile-cfuncs -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace \
-  -y ${vdir} -y ${fpu} |& tee verilator.log$i
-
-
-make OPT=-DVL_DEBUG -j -C obj_dir/ -f Vtop_fft.mk Vtop_fft |& tee make.log$i | less
-
-obj_dir/Vtop_fft  | tee tmp.log | less
-
-
-
-        CHANGE: genesis_verif//fftram_unq1.v:104: v.fftram.SRAM000_wr_data
-        CHANGE: genesis_verif//fftram_unq1.v:105: v.fftram.SRAM001_wr_data
-
-
-------------------------------------------------------------------------------
-
-
-
-
-
-STATUS
-
-    cd regression; ../bin/golden_test.csh -sim vcs
-    all 47 vcs tests PASS 
-
-    cd regression; ../bin/golden_test.csh -sim verilator
-    19 1port tests PASS
-    19 2port tests FAIL
-     9 dpump tests PASS
-    47 tests total
-
-NEXT
- - clean up
- - re-regress vcs and verilator
- - check in
-
-DONE - CLEAN SO FAR
-- Makefile
-- gold...test.csh
-- gold...test.pl
-- Makefile (reg)
-- fftctl
-- addsub, sradd, srmul, srsub
-- fft.cpp
-- ...and the rest.
-
-
-(../bin/golden_test.csh -sim verilator >& gold_ver.log1;\
-../bin/golden_test.csh -sim vcs       >& gold_vcs.log1) &
-
-
-
-------------------------------------------------------------------------------
-huh.
-looks like we may have fixed 1port problem by commenting out this line in fftctl:
-     //; #if ($SRAM_TYPE eq "TRUE_1PORT") { $last_cycle++; } # Plus one cycle for the final write.
-
-BUT still don't know why 16-1-1 got different op1 results at t=33500 (see below)
-
-
-
-------------------------------------------------------------------------------
-Looks like maybe P, ir are too small inverilator version (beelow).
-Also: why does verilator do it TWICE?
-
-verilator:
-GENOPS2 (t=033500) ii,i: (0,1) => (0,16)
-GENOPS2 (t=033500) > P = 0000
-GENOPS2 (t=033500) > ir= 1111
-GENOPS2 (t=033500) > op1= 000001101111
-GENOPS2 (t=033500) > op2= 000000001111
-
-vcs:
-GENOPS2 (t=033500) ii,i: (0,1) => (0,16)
-GENOPS2 (t=033500) > P = 00000000
-GENOPS2 (t=033500) > ir= 00001011
-GENOPS2 (t=033500) > op1= 00001011
-GENOPS2 (t=033500) > op2= 00001011
-
-
-
-verilator:
-fftctl 33500: cycle_num = 32
-fftctl 33500: fftctl_cycle_num_o = 31
-fftctl 33500: out2_offset = 16
-GENOPS2 (t=033500) ii,i: (0,1) => (0,16)
-GENOPS2
-GENOPS2 (t=033500) > P = 0000
-GENOPS2 (t=033500) > ir= 0000
-GENOPS2
-GENOPS2 (t=033500) > op1= 000000000000
-GENOPS2 (t=033500) > op2= 000000000000
-GENOPS2
-GENOPS2 (t=033500) ops=( 0, 0)
-GENOPS2 -----------------------------------------------------
-GENOPS2 (t=033500) ii,i: (0,1) => (0,16)
-GENOPS2
-GENOPS2 (t=033500) > P = 0000
-GENOPS2 (t=033500) > ir= 1111
-GENOPS2
-GENOPS2 (t=033500) > op1= 000001101111
-GENOPS2 (t=033500) > op2= 000000001111
-GENOPS2
-GENOPS2 (t=033500) ops=(111,15)
-GENOPS2 -----------------------------------------------------
-
-vcs:
-fftctl 33500: cycle_num = 32
-fftctl 33500: fftctl_cycle_num_o = 31
-fftctl 33500: out2_offset = 16
-GENOPS2 (t=033500) ii,i: (0,1) => (0,16)
-GENOPS2
-GENOPS2 (t=033500) > P = 00000000
-GENOPS2 (t=033500) > ir= 00001011
-GENOPS2
-GENOPS2 (t=033500) > op1= 00001011
-GENOPS2 (t=033500) > op2= 00001011
-GENOPS2
-GENOPS2 (t=033500) ops=(11,11)
-GENOPS2 -----------------------------------------------------
-
-
-
-
-problem: in SRAM000 verilator version, wz_i goes negative at beginning of cy 34. why?
-
-
-------------------------------------------------------------------------------
-
-
-16-1-1 too many writes:
-
-egrep 'Wrote|ncy' fft.log | t40
-
-TOP.v.fftram.SRAM001 33500: Wrote   wr_data_i mem[2] <= 3f8000003f2b0dc0
-SRAM001 t5 33500: Wrote(f) wr_data_i mem[2] <= ( 1.000000, 0.668179)
-TOP.v.fftram.SRAM003 33500: Wrote   wr_data_i mem[0] <= 3f800000bfbf90c6
-SRAM003 t5 33500: Wrote(f) wr_data_i mem[0] <= ( 1.000000,-1.496606)
-clock.vp: reset=0, ncy=  34, time= 34500 ns
-TOP.v.fftram.SRAM000 34500: Wrote   wr_data_i mem[0] <= 4180000000000000
-SRAM000 t5 34500: Wrote(f) wr_data_i mem[0] <= (16.000000, 0.000000)
-clock.vp: reset=0, ncy=  35, time= 35500 ns
-clock.vp: reset=0, ncy=  36, time= 36500 ns
-clock.vp: reset=0, ncy=  37, time= 37500 ns
-
-
-
-------------------------------------------------------------------------------
-
-
-
-haha ENDED TOO EARLY!!! for verilator
-
-
-tail 1611*simlog
-==> 1611_vcs.simlog <==
-
-clock.vp: ENDING AFTER 38 CLOCKS time=38000 ps,  ncy=38
-
-
-$finish called from file "genesis_verif/clock_unq1.v", line 116.
-$finish at simulation time                38000
-           V C S   S i m u l a t i o n   R e p o r t 
-Time: 38000 ps
-CPU Time:      0.670 seconds;       Data structure size:   0.1Mb
-Sat Jun 15 19:45:54 2019
-
-==> 1611_verilator.simlog <==
-TOP.v.BFLY0 t5 17500: t1a =  2.000000
-TOP.v.BFLY0 t5 17500: t1b =  0.000000
-TOP.v.BFLY0 t5
-TOP.v.BFLY0 t5 17500: t2  =  0.000000
-TOP.v.BFLY0 t5 17500: t2a =  0.000000
-TOP.v.BFLY0 t5 17500: t2b =  0.000000
-TOP.v.BFLY0 t5
-TOP.v.BFLY0 t5 17500: out1(r,i)= (in1_real+t1, in1_imag+t2) = ( 4.000000, 0.000000)
-TOP.v.BFLY0 t5 17500: out2(r,i)= (in1_real-t1, in1_imag-t2) = ( 0.000000, 0.000000)
-TOP.v.BFLY0 t5 ------------------------
-
-
-------------------------------------------------------------------------
-
-some pass, some fail
-
-e.g. 16 1 1:
-TR FAIL: 12 mismatched results --- 16 1 1port (verilator)
-less /tmp/golden_test_16_1_1port.log
-Real results:  GM        FFT
-                 8.000        2.000 *** ERROR '    8.00' ne '    2.00'
-                 1.000        1.000
-                 0.000        0.000
-                 1.000        1.000
-...
-
-
-
-------------------------------------------------------------------------
-
+STATUS 20 jun 2019
 so this happened:
-
-cd fftgen/regressions
-../bin/golden_test.csh -sim verilator 8 1 1port |& tee 811_verilator.log
-1/1 tests PASSED
-
-
-------------------------------------------------------------------------------
-
-top=genesis_verif/top_fft.v
-cpp=../tst/fft.cpp
-vdir=genesis_verif/
-fpu=../rtl/lib/
-
-verilator -Wno-fatal -Wall --cc 
-${VTOP} --exe ${cpp} --trace -y ${vdir} -y ${fpu}\
-
-
-
-verilator -Wno-fatal -Wall --cc 
-genesis_verif/top_fft.v --exe ../tst/fft.cpp 
---trace -y genesis_verif/ -y ../rtl/lib/
-
-
-
-This works, in tmp.verilator directory:
-mf cleanall
-mf run_verilator |& tee run.log
-
-
-what's next?
+  cd fftgen/regressions
+  ../bin/golden_test.csh -sim verilator 8 1 1port |& tee 811_verilator.log
+  1/1 tests PASSED
 
 
 ------------------------------------------------------------------------------
-
-TODO
-- "cleanall" should delete obj_dir, yes??
-
-
-no errors
-go check mail for awhile i guess
-
-STATUS
-cd fftgen/tmp.verilator
-
-grep -v top_fft.v genesis_vlog.vf > verilator_list.vf
-c; verilator -Wno-fatal -Wall --exe --trace --cc \
-  /nobackup/steveri/github/fftgen/tmp.verilator/genesis_verif/top_fft.v \
-  -f /nobackup/steveri/github/fftgen/tmp.verilator/verilator_list.vf \
-  -y /nobackup/steveri/github/fftgen/rtl/lib \
-  |& tee tmp.log
-
-  -f /nobackup/steveri/github/fftgen/tmp.verilator/genesis_vlog.vf \
-
-
-------------------------------------------------------------------------------
-Debugging, current status:
-
-c; verilator -Wno-fatal -Wall --exe --trace --cc   
--f /nobackup/steveri/github/fftgen/tmp.verilator/genesis_vlog.vf   
--y /nobackup/steveri/github/fftgen/rtl/lib
-
-%Error: /nobackup/steveri/github/fftgen/rtl/lib/addsub.v:83: Unsupported or unknown PLI call: $bitstoshortreal
-%Error: /nobackup/steveri/github/fftgen/rtl/lib/addsub.v:86: Unsupported or unknown PLI call: $bitstoshortreal
-
-
-
-
-doing this now, thought it had already been done...
-  diff genesis_verif/top_fft.v ../verilator/rtl/top_fft.v | less
-
-
-
-OKAY should now be able to build verilator using
-make -f ../Makefile SIM=verilator
-...right???
-
-
-
-
-
-WHEN WE COME BACK:
-- untangle that crap below down there
-
-
-Makefile before:
-  all: run
-  run: 
-  gen: $(GENESIS_VLOG_LIST) $(GENESIS_SYNTH_LIST) $(GENESIS_VERIF_LIST)
-  $(SIMV):$(GENESIS_VLOG_LIST)
-	vcs  $(VERILOG_COMPILE_FLAGS) -f $(RUNDIR)/$(GENESIS_VLOG_LIST) $(COMP)
-	@echo ""
-	@echo Now Running simv
-	@echo ==================================================
-	$(SIMV) $(VERILOG_SIMULATION_FLAGS) $(RUN)
-  .PHONY: run
-  run: $(SIMV)
-	vcs  $(VERILOG_COMPILE_FLAGS) -f $(RUNDIR)/$(GENESIS_VLOG_LIST) $(COMP)
-
-.PHONY: run_verilator
-run_verilator: obj_dir/Vtop_fft $(DESIGN_HOME)/bin/bsr.awk
-	obj_dir/Vtop_fft |& ../bin/bsr.awk %9.6f > fft.log
-
-
-
-obj_dir/Vtop_fft: obj_dir/Vtop_fft.mk
-make -j -C obj_dir/ -f Vtop_fft.mk Vtop_fft |& tee make.log$i | less
-
-
-
-# top=rtl/top_fft.v - use $(GENESIS_TOP)
-# cpp=fft.cpp; 
-VERILATOR_TESTBENCH := $(TOP).cpp
-# vdir=rtl/ - use $(RUNDIR) (should be location of genesis_verif/)
-# handwritten fpu components are in rtl/lib (for now)
-obj_dir/Vtop_fft.mk:
-	# verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir}
-	verilator ${VERILATOR_TESTBENCH} -Wno-fatal -Wall --exe --trace \
-	  --cc ${GENESIS_TOP} \
-	  -f $(RUNDIR)/$(GENESIS_VLOG_LIST) \
-	  -y  $(DESIGN_HOME)/rtl/lib
-
-
-
-RUNDIR := $(shell cd ./; pwd -P)
-GENESIS_VLOG_LIST := genesis_vlog.vf
-
-
-
-
-
-
-
-
-
-	vcs  $(VERILOG_COMPILE_FLAGS) -f $(RUNDIR)/$(GENESIS_VLOG_LIST) $(COMP)
-VERILOG_COMPILE_FLAGS := 	-sverilog 					\
-                                ...
-				-ld $(VCS_CC) 					\
-				-top $(SIM_TOP)					\
-				$(VERILOG_FILES) $(VERILOG_LIBS)
-VERILOG_LIBS := \
-  -y $(RUNDIR) +incdir+$(RUNDIR) \
-  -y      $(SYNOPSYS)/dw/sim_ver \
-  +incdir+$(SYNOPSYS)/dw/sim_ver \
-  -y      $(DESIGN_HOME)/rtl/lib \
-  +incdir+$(DESIGN_HOME)/rtl/lib
-
-
-
-cd $fft/verilator
-top=rtl/top_fft.v; cpp=fft.cpp; vdir=rtl/
-echo $top $cpp $vdir
-
-top=genesis_verif/top_fft.v
-cpp=../tst/fft.cpp
-vdir=genesis_verif/
-fpu=../rtl/lib/
-
-verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} -y ${fpu}\
-  |& tee verilator.log$i | tail
-
-
-
-
-HOW-TO verilator - RUN
-i=4
-echo mv obj_dir obj_dir`expr $i - 1`
-verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} \
-  |& tee verilator.log$i | less
-make -j -C obj_dir/ -f Vtop_fft.mk Vtop_fft |& tee make.log$i | less
-
-obj_dir/Vtop_fft |& ../bin/bsr.awk %9.6f\
-  | egrep -v 'srmul|FPU' \
-  | sed 's/^TOP.v/top_fft/' \
-  | tee fft.log$i | less
-
-
-
-NEXT verilator
-- build golden -sim verilator
-
-
-
-14 jun 2019 all regression tests pass (vcs):
+STATUS 14 jun 2019 all regression tests pass (vcs):
   mkdir regression; cd regression
   ../bin/golden_test.csh >& gold.log &
   tail -f gold.log | egrep 'PASS|ERR'
-
-
-
 
 HOLY CRAP it's gonna pass
 So maybe everything works with vcs and bsr
@@ -552,32 +117,18 @@ So what's next?
 - check everything in
 - see where we are with the verilator
 
-
-OLD maybe
-  i=69
-  cd build
-  ../bin/golden_test.csh >& gold.log$i &
-  tail -f $log | egrep "PASS|FAIL|ERR"
-
-HOWTO do a quick test maybe (does this work?)
+HOWTO do a quick test maybe (does this work?) (vcs)
   mkdir build
   alias mf='make -f ../Makefile'
   cd build
-  mf test8
+  mf TEST8
 
 
-------------------------------------------------------------------------------
-GOLDEN TESTS csh vs. pl
-  # To build and check a new simv.log from scratch:
-  ../bin/golden_test.csh 8 1 1port |& tee gold.log$i | tail
-  
-  # To check an existing simv.log:
-  ../bin/golden_test.pl 8 1 1port |& tee gold.log$i | tail
-------------------------------------------------------------------------------
 
 
-LATER
-- should rtl/ subdir  be renamed gsource/ or something?
+CLEAN TO HERE ===============================================================
+
+
 
 ------------------------------------------------------------------------
 HOWTO check vcs/rtl
@@ -1387,6 +938,11 @@ TWO THINGS
 
 
 ==============================================================================
+==============================================================================
+==============================================================================
+DONE/OLD/NOTES
+
+==============================================================================
 NOTES from 8 jun 2019 ish
 # 
 # i think it will work! see below
@@ -1656,4 +1212,177 @@ REBOOT DONE 1906
 - build new verilator directory
 - build 811v.vcd
 - CONVERGE
+
+DONE 1906
+- cleaning up fftgen repo
+-- "git status" to minimize untracked files
+- bin/ DONE move on to the next one
+-- cleaning up bin/ subdir, see bin/0notes* DONE
+-- cd bin/ ; git status * DONE
+
+DONE 1906
+- generate and repo sample 8-1-1 run inc. waveforms, see subdir "examples"
+
+FIXED 1906 I think fft travis logs---pass when fail, see past logs
+
+
+1906 FIXED I think - genesis2 setup problems
+# working setup_genesis2.sh (works for CGRAFlow) is here, I think:
+# $gen/hardware/generator_z/top/
+# 
+# Compilation failed in require at
+# /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Archive/Zip.pm
+# line 12.
+# 
+# BEGIN failed--compilation aborted at
+# /tmp/Genesis2/Genesis2Tools/PerlLibs/ExtrasForOldPerlDistributions/Archive/Zip.pm
+# line 12.
+
+DONE
+- check everything in
+- set up travis to run w/ verilator
+- clean everything up, maybe start with README
+- maybe try a clean install based on the new README
+- haha just for fun maybe find all the FIXME's
+
+DONE 1906
+- removed switch.csh, gt8k* from bin directory, these are obsolete now i guess
+- for SRAM/2PORT, try always @ (poedge clk_i or negedge clk_i) or whatever
+
+FIXED 1906 (it was SRAM problems)
+# Verilated model didn't converge
+# 
+#     Verilator sometimes has to evaluate combinatorial logic multiple
+#     times, usually around code where a UNOPTFLAT warning was issued,
+#     but disabled. For example:
+# 
+#     always @ (a)  b=~a;
+#     always @ (b)  a=b
+# 
+#     will toggle forever and thus the executable will give the didn't
+#     converge error to prevent an infinite loop.
+# 
+#     To debug this, run Verilator with --profile-cfuncs. Run make on
+#     the generated files with "OPT=-DVL_DEBUG". Then call
+#     Verilated::debug(1) in your main.cpp.
+# 
+#     This will cause each change in a variable to print a message. Near
+#     the bottom you'll see the code and variable that causes the
+#     problem. For the program above:
+# 
+#     CHANGE: filename.v:1: b
+#     CHANGE: filename.v:2: a
+# 
+#  verilator --profile-cfuncs -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace \
+#   -y ${vdir} -y ${fpu} |& tee verilator.log$i
+# 
+# make OPT=-DVL_DEBUG -j -C obj_dir/ -f Vtop_fft.mk Vtop_fft |& tee make.log$i | less
+# 
+# obj_dir/Vtop_fft  | tee tmp.log | less
+# 
+#         CHANGE: genesis_verif//fftram_unq1.v:104: v.fftram.SRAM000_wr_data
+#         CHANGE: genesis_verif//fftram_unq1.v:105: v.fftram.SRAM001_wr_data
+
+DONE 1906
+ - clean up
+ - re-regress vcs and verilator
+ - check in
+
+DONE - CLEAN SO FAR 1906
+- Makefile
+- gold...test.csh
+- gold...test.pl
+- Makefile (reg)
+- fftctl
+- addsub, sradd, srmul, srsub
+- fft.cpp
+- ...and the rest.
+
+DONE 1906 i think
+# (../bin/golden_test.csh -sim verilator >& gold_ver.log1;\
+# ../bin/golden_test.csh -sim vcs       >& gold_vcs.log1) &
+
+IGNORE 1906
+- "cleanall" should delete obj_dir, yes??
+
+OLD 1906
+# verilator -Wno-fatal -Wall --cc \
+#   genesis_verif/top_fft.v --exe ../tst/fft.cpp \
+#   --trace -y genesis_verif/ -y ../rtl/lib/
+# 
+# top=genesis_verif/top_fft.v
+# cpp=../tst/fft.cpp
+# vdir=genesis_verif/
+# fpu=../rtl/lib/
+# 
+# verilator -Wno-fatal -Wall --cc 
+# ${VTOP} --exe ${cpp} --trace -y ${vdir} -y ${fpu}\
+
+OLD 1906
+# cd fftgen/tmp.verilator
+# 
+# grep -v top_fft.v genesis_vlog.vf > verilator_list.vf
+# c; verilator -Wno-fatal -Wall --exe --trace --cc \
+#   /nobackup/steveri/github/fftgen/tmp.verilator/genesis_verif/top_fft.v \
+#   -f /nobackup/steveri/github/fftgen/tmp.verilator/verilator_list.vf \
+#   -y /nobackup/steveri/github/fftgen/rtl/lib \
+#   |& tee tmp.log
+
+OLD 1906
+# Debugging, current status:
+# 
+# c; verilator -Wno-fatal -Wall --exe --trace --cc   
+# -f /nobackup/steveri/github/fftgen/tmp.verilator/genesis_vlog.vf   
+# -y /nobackup/steveri/github/fftgen/rtl/lib
+# 
+# %Error: addsub.v:83: Unsupported or unknown PLI call: $bitstoshortreal
+
+OLD 1906
+# This works, in tmp.verilator directory:
+# mf cleanall
+# mf run_verilator |& tee run.log
+# 
+# doing this now, thought it had already been done...
+#   diff genesis_verif/top_fft.v ../verilator/rtl/top_fft.v | less
+# 
+# OKAY should now be able to build verilator using
+# make -f ../Makefile SIM=verilator
+# ...right???
+
+OLD 1906
+# HOW-TO verilator - SETUP (rtl)
+# cd $fft/verilator
+# top=rtl/top_fft.v; cpp=fft.cpp; vdir=rtl/
+# echo $top $cpp $vdir
+# 
+# HOW-TO verilator - SETUP (gv)
+# top=genesis_verif/top_fft.v
+# cpp=../tst/fft.cpp
+# vdir=genesis_verif/
+# fpu=../rtl/lib/
+# 
+# verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} -y ${fpu}\
+#   |& tee verilator.log$i | tail
+# 
+# HOW-TO verilator - RUN
+# i=4
+# echo mv obj_dir obj_dir`expr $i - 1`
+# verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir} \
+#   |& tee verilator.log$i | less
+# make -j -C obj_dir/ -f Vtop_fft.mk Vtop_fft |& tee make.log$i | less
+# 
+# obj_dir/Vtop_fft |& ../bin/bsr.awk %9.6f\
+#   | egrep -v 'srmul|FPU' \
+#   | sed 's/^TOP.v/top_fft/' \
+#   | tee fft.log$i | less
+
+OLD maybe
+#   i=69
+#   cd build
+#   ../bin/golden_test.csh >& gold.log$i &
+#   tail -f $log | egrep "PASS|FAIL|ERR"
+
+
+DONE 1906 verilator
+- build golden -sim verilator
 
