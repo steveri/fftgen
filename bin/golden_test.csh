@@ -258,7 +258,7 @@ foreach t ($tests:q)
       continue
   endif
 
-  # Run the generator
+  # Run the simulation
   # alias mr   make -j 1 run TOP=fft
   alias mr   make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR
 
@@ -312,6 +312,11 @@ foreach t ($tests:q)
   ########################################################################
   # Lint errors?
   egrep '^Lint' $tmp | awk '{print $0 "'" --- $npoints $nunits $nports"'"; }'
+
+  # FIXME
+  echo "Deleting tmp file $tmp b/c OMG it's HUGE"
+  /bin/ls -l $tmp
+  /bin/rm $tmp
 
   ########################################################################
   # Now check against the golden model.

@@ -5,36 +5,41 @@ tmpdir=`mktemp -d /tmp/fftgen_daily_regressions.XXX` || exit
 cd $tmpdir || exit
 
   # Standard regressions, vcs
+  test=vcs_std; echo "TEST $test"
   git clone https://github.com/steveri/fftgen; cd fftgen
   source bin/setup_genesis.sh; source bin/setup_vcs_kiwi.sh
-  make regress SIM=vcs | tee ../vcs_std.log
+  make regress SIM=vcs | tee ../$test.log
   cd ..; /bin/rm -rf fftgen
   echo ""; echo ""; echo ""
 
   # Extended regressions, vcs
+  test=vcs_ext; echo "TEST $test"
   git clone https://github.com/steveri/fftgen; cd fftgen
   source bin/setup_genesis.sh; source bin/setup_vcs_kiwi.sh
-  make regress SIM=vcs TEST_SUITE=-gt8k | tee ../vcs_ext.log
+  make regress SIM=vcs TEST_SUITE=-gt8k | tee ../$test.log
   cd ..; /bin/rm -rf fftgen
   echo ""; echo ""; echo ""
 
   # Extended regressions, verilator
+  test=ver_ext; echo "TEST $test"
   git clone https://github.com/steveri/fftgen; cd fftgen
   source bin/setup_genesis.sh; source bin/setup_vcs_kiwi.sh
-  make regress SIM=verilator TEST_SUITE=-gt8k | tee ../ver_ext.log
+  make regress SIM=verilator TEST_SUITE=-gt8k | tee ../$test.log
   cd ..; /bin/rm -rf fftgen
   echo ""; echo ""; echo ""
 
   # Standard regressions, verilator (redundant w/travis)
+  test=ver_std; echo "TEST $test"
   git clone https://github.com/steveri/fftgen; cd fftgen
   source bin/setup_genesis.sh; source bin/setup_vcs_kiwi.sh
-  make regress SIM=verilator | tee ../ver_std.log
+  make regress SIM=verilator | tee ../$test.log
   cd ..; /bin/rm -rf fftgen
   echo ""; echo ""; echo ""
 
 # Summarize
 echo "------------------------------------------------------------------------"
-for log in `/bin/ls ../v*.log`; do
+/bin/ls -l *.log
+for log in `/bin/ls *.log`; do
   echo $log
   egrep -i 'pass|fail|err' $log
   echo ""; echo ""; echo ""
