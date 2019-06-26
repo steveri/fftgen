@@ -132,8 +132,8 @@ endif
 set npoints_array = (8 16 32 64 128 256 512 1024)
 
 # Use "-abbrev" to run only the short tests. See below for '-gt8k'
-if      ("$1" == "-abbrev") set npoints_array = (8 16 32)
-else if ("$1" == "-gt8k") set gt8k
+if ("$1" == "-abbrev") set npoints_array = (8 16 32)
+if ("$1" == "-gt8k")   set gt8k
 
 
 # To infinity...and BEYOND!
@@ -170,7 +170,8 @@ foreach t ($tests:q)
     echo
    #echo "   -----------------------------------------"
   else
-    echo "   $t" | awk '{ printf("%16s",$0); }'
+    # echo "   $t" | awk '{ printf("%16s",$0); }'
+    echo " $t"
     @ ntests = $ntests + 1
   endif
 end
@@ -229,7 +230,7 @@ foreach t ($tests:q)
   if ($sfx == "8_4_1port") echo "*** NOTE $sfx is SUPPOSED to fail! (16 SRAM's for 8 points\!?) ***"
 
   # Print out date, id info
-  date; echo $sfx": npoints=$npoints, nunits=$nunits, sram=$sram; alg=$swizzalg"
+  date; echo $sfx": npoints=$npoints, nunits=$nunits, sram=$sram; alg=$swizzalg; sim=$SIM"
 
   set cmd = "make -f $MAKEFILE clean gen SIM=$SIMULATOR TOP=fft"
 

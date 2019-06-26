@@ -32,5 +32,14 @@ cd $tmpdir || exit
   cd ..; /bin/rm -rf fftgen
   echo ""; echo ""; echo ""
 
+# Summarize
+echo "------------------------------------------------------------------------"
+for log in `/bin/ls ../v*.log`; do
+  echo $log
+  egrep -i 'pass|fail|err' $log
+  echo ""; echo ""; echo ""
+done
+
+
 # Clean up
 cd $tmpdir/..; /bin/rm -rf $tmpdir

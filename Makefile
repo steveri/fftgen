@@ -413,8 +413,8 @@ test:
 TEST_SUITE := ""
 .PHONY: regress regressions
 regress regressions:
-	tmpdir=`mktemp -d tmp.regressions.XXX`;
-	  cd $$tmpdir; ../bin/golden_test.csh SIM=$(SIM) $(TEST_SUITE)
+	tmpdir=`mktemp -d tmp.regressions.XXX`;\
+	  cd $$tmpdir; ../bin/golden_test.csh -sim $(SIM) $(TEST_SUITE)
 
 
 .PHONY: quicktest
