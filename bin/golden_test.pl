@@ -219,34 +219,41 @@ sub print_results {
         #printf("             %6s    %9s\n", $gm_results[$i], $fft_results[$i]);
         #printf("             %6.3f    %6.3f\n", $gm_results[$i]+0, $fft_results[$i]+0);
 
-        # Warning if no match @ three sig figs.
-        my $status = "";
-
+        # Should match to three decimal places; two or one means WARNING
         my $gr3 = sprintf("%9.3f",  @{$gm_results}[$i]+0);
         my $fr3 = sprintf("%9.3f", @{$fft_results}[$i]+0);
-
         # Oh this is annoying; must canonicalize "-0.000" => "0.000"
-        # if ($gr3 eq '-0.000') { $gr3 = '0.000'; }
-        # if ($fr3 eq '-0.000') { $fr3 = '0.000'; }
-
         $gr3 =~ s/[-]0[.]000/ 0.000/;
         $fr3 =~ s/[-]0[.]000/ 0.000/;
 
-        if ($gr3 ne $fr3) {
+        my $gr2 = sprintf("%9.2f",  @{$gm_results}[$i]+0);
+        my $fr2 = sprintf("%9.2f", @{$fft_results}[$i]+0);
+        # Oh this is annoying; must canonicalize "-0.000" => "0.000"
+        $gr2 =~ s/[-]0[.]00/ 0.00/;
+        $fr2 =~ s/[-]0[.]00/ 0.00/;
 
-            # Well which is it, error or warning?
-            my $gr2 = $gr3; chop($gr2);
-            my $fr2 = $fr3; chop($fr2);
+        my $gr1 = sprintf("%9.1f",  @{$gm_results}[$i]+0);
+        my $fr1 = sprintf("%9.1f", @{$fft_results}[$i]+0);
+        # Oh this is annoying; must canonicalize "-0.000" => "0.000"
+        $gr1 =~ s/[-]0[.]0/ 0.0/;
+        $fr1 =~ s/[-]0[.]0/ 0.0/;
+
+        # Warning if no match @ three sig figs.
+        my $status = "";
+        if ($gr3 ne $fr3) {
             if ($gr2 ne $fr2) {
-                $status = " *** ERROR '$gr2' ne '$fr2'";
-                $nerrors++;
-            }
-            else {
+                if ($gr1 ne $fr1) {
+                    $status = " *** ERROR '$gr1' ne '$fr1'";
+                    $nerrors++;
+                } else {
+                    $status = " *** WARNING only match to 1 sig fig";
+                    $nwarnings++;
+                }
+            } else {
                 $status = " *** WARNING only match to 2 sig figs";
                 $nwarnings++;
             }
         }
-
         printf("             %s    %s$status\n", $gr3, $fr3);
     }
     print "\n";

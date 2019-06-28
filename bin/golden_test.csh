@@ -313,10 +313,12 @@ foreach t ($tests:q)
   # Lint errors?
   egrep '^Lint' $tmp | awk '{print $0 "'" --- $npoints $nunits $nports"'"; }'
 
-  # FIXME
+  # FIXME maybe want a --keep option or something for debugging
+  echo ""
   echo "Deleting tmp file $tmp b/c OMG it's HUGE"
   /bin/ls -l $tmp
   /bin/rm $tmp
+  echo ""
 
   ########################################################################
   # Now check against the golden model.
