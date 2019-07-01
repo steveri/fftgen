@@ -412,8 +412,10 @@ test:
 # For BIG tests test TEST_SUITE="-gt8k" on make command line
 TEST_SUITE := ""
 .PHONY: regress regressions
-regress regressions:
+regressions: regress
+regress:
 	tmpdir=`mktemp -d tmp.regressions.XXX`;\
+	  echo ../bin/golden_test.csh -sim $(SIM) $(TEST_SUITE); \
 	  cd $$tmpdir; ../bin/golden_test.csh -sim $(SIM) $(TEST_SUITE)
 
 
