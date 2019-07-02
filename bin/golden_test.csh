@@ -10,13 +10,31 @@ cat <<EOF
 
 SYNOPSIS
   $0
-  $0 -sim vcs
   $0 8 1 1port
-  $0 -sim verilator 128 8 2port
+  $0 -sim vcs
   $0 -sim vcs -gt8k
+  $0 -sim verilator 128 8 2port
+
+ARGUMENT SUMMARY
+  no arguments  - use standard test suite of 48 programs with npoints=(8,16,32..1024)
+  -gt8k         - use extra-large test suite w/ npoints=(2K, 4K, 8K)
+  -sim <sim>    - specify simulator to use, either "vcs" or "verilator"
+  <pts bts mem> - instead of running a suite, run a single test
+
+  where
+    <pts> = 8, 16, 32, 64, 128, 256, 512, or 1024
+
+  and
+    <bts> = 1, 2, or 4  (butterfly units working in parallel)
+    <bts> = 0.5 or 0.25 (one butterfly unit w/ latency of 2 or 4 instead of 1)
+
+  and <mem> is one of:
+   "1port" for true single-port SRAM
+   "2port" for true dual-port SRAM
+   "dpump" for double-pump single-port (virtual 2-port)
+
 
 DESCRIPTION
-
   Build one or more FFT designs and test against a golden model.  The
   FFT uses an in-place algorithm, i.e. an n-point FFT requires exactly
   n words of memory. The algorithm is capable of operating with area-

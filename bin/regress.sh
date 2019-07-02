@@ -29,14 +29,14 @@ cd $tmpdir || exit
     git clone -q https://github.com/steveri/fftgen
     cd fftgen
 
-      if test $DBG -gt 0; then
-        ################################################################
-        echo TEMPORARY LOCAL FIXUP for debugging - Makefile, summary.awk
-        fftgen=/nobackup/steveri/github/fftgen
-        cp $fftgen/Makefile .
-        cp $fftgen/bin/daily_regression_summary.awk bin/
-        ################################################################
-      fi
+#       if test $DBG -gt 0; then
+#         ################################################################
+#         echo TEMPORARY LOCAL FIXUP for debugging - Makefile, summary.awk
+#         fftgen=/nobackup/steveri/github/fftgen
+#         cp $fftgen/Makefile .
+#         cp $fftgen/bin/daily_regression_summary.awk bin/
+#         ################################################################
+#       fi
 
       # Avoid setup warning by ensuring .modules exists
       test -d ~/.modules || mkdir ~/.modules
@@ -123,8 +123,17 @@ cd $tmpdir || exit
   # echo "$passfail - $nwarn warnings, $nlint lint problems - $date ${rtime}m"
   echo -n "$sim3 $tst "
   echo $passfail $nwarn $nlint $date $rtime \
-    | awk '{printf("%s - %3d warnings, %3d lint problems - %s %s\n", $1, $2, $3, $4, $5)}'
+    | awk '{printf("%s - %3d warnings, %5d lint problems - %8s %3s\n", $1, $2, $3, $4, $5)}'
   test $DBG -gt 0 && echo ""
+
+# CLEAN UP!!!
+/bin/rm -rf $tmpdir
+
+# CLEAN UP!!!
+gtlog=golden_test_${npoints}_${nbutts}_${sram}.log
+# echo        /tmp/$gtlog
+# ls -l       /tmp/$gtlog
+/bin/rm -rf /tmp/$gtlog
 
 
 ##############################################################################
