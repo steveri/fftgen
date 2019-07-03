@@ -4,18 +4,42 @@
 # DBG=1
 DBG=0
 
+# Delete temporary files? Or no?
+delete_temp_files=true
+
+# After cloning, can update files from local repo
+want_local_updates=true
+local_repo="/nobackup/steveri/github/fftgen"
+local_updates="\
+  Makefile \
+  bin/do_one_random_test.sh \
+"
+function update_from_local_repo {
+  if $want_local_updates; then
+    echo "WARNING updating some files from local repo"
+    for f in $local_updates; do
+      echo "WARNING using local file '$f'"
+      cp $local_repo/$f $f
+    done
+    echo
+  fi
+}
+
+function where_this_script_lives {
+  # Where this script lives
+  scriptpath=$0      # E.g. "build_tarfile.sh" or "foo/bar/build_tarfile.sh"
+  scriptdir=${0%/*}  # E.g. "build_tarfile.sh" or "foo/bar"
+  if test "$scriptdir" == "$scriptpath"; then scriptdir="."; fi
+  s=`cd $scriptdir; pwd`
+  echo $s
+}
+
 # Timestamp
 time_begin=`date +%H%M%S`
 test $DBG -gt 1 && echo "BEGIN_TIME $time_begin"
 
-# Where we're starting
-test_dir=`pwd`
-
 # Where this script lives
-scriptpath=$0      # E.g. "build_tarfile.sh" or "foo/bar/build_tarfile.sh"
-scriptdir=${0%/*}  # E.g. "build_tarfile.sh" or "foo/bar"
-if test "$scriptdir" == "$scriptpath"; then scriptdir="."; fi
-scriptdir=`cd $scriptdir; pwd`
+scriptdir=`where_this_script_lives`
 
 # Where we do our work
 tmpdir=`mktemp -d /tmp/fftgen_regress.XXX` || exit
@@ -28,25 +52,14 @@ cd $tmpdir || exit
     # Oof. Do we really want a new "git clone" for every test!!?
     git clone -q https://github.com/steveri/fftgen
     cd fftgen
-
-#       if test $DBG -gt 0; then
-#         ################################################################
-#         echo TEMPORARY LOCAL FIXUP for debugging - Makefile, summary.awk
-#         fftgen=/nobackup/steveri/github/fftgen
-#         cp $fftgen/Makefile .
-#         cp $fftgen/bin/daily_regression_summary.awk bin/
-#         ################################################################
-#       fi
-
-      # Avoid setup warning by ensuring .modules exists
-      test -d ~/.modules || mkdir ~/.modules
+      update_from_local_repo;
       source bin/setup_genesis.sh; source bin/setup_vcs_kiwi.sh
-
-      # Do the test!
       $scriptdir/golden_test.csh -sim $which_sim $which_test |& cat
-
     cd ..
-    /bin/rm -rf fftgen
+    if $delete_temp_files;
+      then /bin/rm -rf fftgen
+      else echo "WARNING not removing working directory '`pwd`/fftgen/'"
+    fi
     echo ""; echo ""; echo ""
   }
 
@@ -73,8 +86,9 @@ cd $tmpdir || exit
       sram=${sram_choice[$i]}
 
 
-      # FIXME verilator doesn't work (yet)
-      sim=vcs
+#       # FIXME verilator doesn't work (yet)
+#       sim=vcs
+#       sim=verilator
 
       # E.g. sim="verilator"; npoints=8; nbutts=1; sram="1port"
 
@@ -89,7 +103,7 @@ cd $tmpdir || exit
   # E.g. "vcs    8  1 1port "
   test $DBG -gt 0 && echo "$sim3 $tst "
 
-  log=$test_dir/test.log
+  log=`pwd`/test.log
   if test $DBG -gt 1; then
     do_test $sim "$tst" |& tee $log
   else
@@ -127,14 +141,15 @@ cd $tmpdir || exit
   test $DBG -gt 0 && echo ""
 
 # CLEAN UP!!!
-/bin/rm -rf $tmpdir
-
-# CLEAN UP!!!
-gtlog=golden_test_${npoints}_${nbutts}_${sram}.log
-# echo        /tmp/$gtlog
-# ls -l       /tmp/$gtlog
-/bin/rm -rf /tmp/$gtlog
-
+if $delete_temp_files; then
+  /bin/rm -rf $tmpdir
+  gtlog=golden_test_${npoints}_${nbutts}_${sram}.log
+  /bin/rm -rf /tmp/$gtlog
+else
+  echo "WARNING no cleanup for"
+  echo "WARNING   $tmpdir" 
+  echo "WARNING   /tmp/$gtlog"
+fi
 
 ##############################################################################
 # NOTES

@@ -318,28 +318,28 @@ run_vcs: $(SIMV)
 # E.g. VTOP=Vtop_fft
 VTOP := Vtop_$(TOP)
 
-# E.g. obj_dir/Vtop_fft |& ../bin/bsr.awk %9.6f > Vtop_fft.log
+# E.g. obj_dir/Vtop_fft |& $(DESIGN_HOME)/bin/bsr.awk %9.6f > Vtop_fft.log
 .PHONY: run_verilator
 run_verilator: obj_dir/$(VTOP) $(DESIGN_HOME)/bin/bsr.awk
 	@echo ""
 	@echo Now Running verilator simulator obj_dir/$(VTOP)
 	@echo ==================================================
-	obj_dir/$(VTOP) |& ../bin/bsr.awk %9.6f > $(TOP).log
+	obj_dir/$(VTOP) |& $(DESIGN_HOME)/bin/bsr.awk %9.6f > $(TOP).log
 
 obj_dir/$(VTOP): obj_dir/$(VTOP).mk
 	make -j -C obj_dir/ -f $(VTOP).mk $(VTOP)
 
 
 # verilator -Wno-fatal -Wall --cc ${top} --exe ${cpp} --trace -y ${vdir}
-# verilator -Wno-fatal -Wall --cc genesis_verif/top_fft.v --exe ../tst/fft.cpp 
-#           --trace -y genesis_verif/ -y ../rtl/lib/
+# verilator -Wno-fatal -Wall --cc genesis_verif/top_fft.v --exe $(DESIGN_HOME)/tst/fft.cpp 
+#           --trace -y genesis_verif/ -y $(DESIGN_HOME)/rtl/lib/
 # 
 # FIXME shouldn't dependence be "$(RUNDIR)/$(GENESIS_VLOG_LIST)"???
-VERILATOR_TESTBENCH := ../tst/$(TOP).cpp
-obj_dir/$(VTOP).mk: ${VERILATOR_TESTBENCH} $(GENESIS_VLOG_LIST)
+VERILATOR_TESTBENCH := $(DESIGN_HOME)/tst/$(TOP).cpp
+obj_dir/$(VTOP).mk: $(VERILATOR_TESTBENCH) $(GENESIS_VLOG_LIST)
 	verilator -Wno-fatal -Wall --cc \
-	  genesis_verif/top_fft.v --exe ../tst/fft.cpp \
-	  --trace -y genesis_verif/ -y ../rtl/lib/
+	  genesis_verif/top_fft.v --exe $(VERILATOR_TESTBENCH) \
+	  --trace -y genesis_verif/ -y $(DESIGN_HOME)/rtl/lib/
 
 # Top module should be e.g. genesis_verif/top_fft.v
 VFILE_TOP := genesis_verif/$(GENESIS_TOP).v
@@ -415,8 +415,8 @@ TEST_SUITE := ""
 regressions: regress
 regress:
 	tmpdir=`mktemp -d tmp.regressions.XXX`;\
-	  echo ../bin/golden_test.csh -sim $(SIM) $(TEST_SUITE); \
-	  cd $$tmpdir; ../bin/golden_test.csh -sim $(SIM) $(TEST_SUITE)
+	  echo $(DESIGN_HOME)/bin/golden_test.csh -sim $(SIM) $(TEST_SUITE); \
+	  cd $$tmpdir; $(DESIGN_HOME)/bin/golden_test.csh -sim $(SIM) $(TEST_SUITE)
 
 
 .PHONY: quicktest
@@ -425,7 +425,7 @@ quicktest: test8
 .PHONY: test8
 test8:
 	tmpdir=`mktemp -d tmp.test8.XXX`;\
-	  cd $$tmpdir; ../bin/golden_test.csh -sim $(SIM) 8 1 1port
+	  cd $$tmpdir; $(DESIGN_HOME)/bin/golden_test.csh -sim $(SIM) 8 1 1port
 
 # AND/OR?
 # test8:

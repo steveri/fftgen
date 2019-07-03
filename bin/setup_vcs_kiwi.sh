@@ -3,10 +3,11 @@
 # Avoid setup warning by ensuring .modules dir exists
 test -d ~/.modules || mkdir ~/.modules
 
-which vcs
+echo -n "BEFORE: "; which vcs
 source /cad/modules/tcl/init/sh
 module load base
 module load vcs
+echo -n "AFTER: "; which vcs
 
 # export PATH=.:\
 #   /home/steveri/bin:\
