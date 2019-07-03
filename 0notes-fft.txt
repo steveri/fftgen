@@ -1,3 +1,28 @@
+1907
+
+TODO
+- golden_test leaves behind /tmp trash:
+lsl gold*
+-rw-r--r-- 1 steveri users 2484 Jul  2 15:04 golden_test_32_1_dpump.log
+-rw-r--r-- 1 steveri users   51 Jul  2 15:07 golden-test_summary.1347
+-rw-r--r-- 1 steveri users   51 Jul  2 15:04 golden-test_summary.28574
+
+
+DONE
+- change lint-warnings to %5d in regress.sh DONE
+- does it clean up after itself in /tmp? No but see 0notes
+- check it in I guess DONE
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------
+1906
+
 DOING
 - regressions are running, see ~/tmp.daily_regressions.dev
 - Cleaning this file, search "CLEAN TO HERE"
