@@ -1,5 +1,8 @@
 # This file is to be SOURCED, not EXECUTED, get it?
 
+# Avoid setup warning by ensuring .modules dir exists
+test -d ~/.modules || mkdir ~/.modules
+
 which vcs
 source /cad/modules/tcl/init/sh
 module load base

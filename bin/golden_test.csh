@@ -370,7 +370,8 @@ end
 # echo ==============================================================================
 
 if (! -e $summfile) then
-  exit
+  echo "ERROR golden_test.csh - no summary file generated"
+  exit 13
 endif
 
 
@@ -388,7 +389,11 @@ grep -i err $summfile || echo "   (no errors found.)"
 echo
 
 
-echo "Result summary is here: '$summfile'"##############################################################################
+echo "WRANING did not keep result summary file '$summfile'"
+# echo "Result summary is here: '$summfile'"
+
+
+##############################################################################
 ## Copyright Stephen Richardson and Stanford University.  All rights reserved.
 ##              Exclusively Licensed by Chip Genesis Inc.
 ##

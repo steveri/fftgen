@@ -1,5 +1,11 @@
 1907
 
+NEXT
+- fix verilator regressions
+- fix lint errors
+- clean up below
+
+
 TODO
 - golden_test leaves behind /tmp trash:
 lsl gold*
@@ -12,7 +18,21 @@ DONE
 - change lint-warnings to %5d in regress.sh DONE
 - does it clean up after itself in /tmp? No but see 0notes
 - check it in I guess DONE
+- start an endless job NICE 16 maybe from $fftgen dir somewheres maybe
+- rename "regress.sh" "do_one_random_test.sh" ?
+- clean up ~/tmp.daily*
+- okay, looks pretty good, let's go home
 
+
+LATER
+- need support for n_units = (0.25, 0.5) in golden_test.csh
+
+TODO someday
+- combine do_one_random_test, golden_test
+- what does regress do that gold test doesn't?
+-- git clone setup
+-- choose random parms
+-- final test filter
 
 
 
