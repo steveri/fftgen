@@ -13,6 +13,7 @@ local_repo="/nobackup/steveri/github/fftgen"
 local_updates="\
   Makefile \
   bin/do_one_random_test.sh \
+  bin/golden_test.csh \
 "
 function update_from_local_repo {
   if $want_local_updates; then
@@ -141,14 +142,13 @@ cd $tmpdir || exit
   test $DBG -gt 0 && echo ""
 
 # CLEAN UP!!!
+gtlog=golden_test_${npoints}_${nbutts}_${sram}.log
 if $delete_temp_files; then
   /bin/rm -rf $tmpdir
-  gtlog=golden_test_${npoints}_${nbutts}_${sram}.log
   /bin/rm -rf /tmp/$gtlog
 else
-  echo "WARNING no cleanup for"
-  echo "WARNING   $tmpdir" 
-  echo "WARNING   /tmp/$gtlog"
+  echo "WARNING no cleanup for $tmpdir"
+  echo "WARNING no cleanup for /tmp/$gtlog"
 fi
 
 ##############################################################################

@@ -331,6 +331,12 @@ foreach t ($tests:q)
   # Lint errors?
   egrep '^Lint' $tmp | awk '{print $0 "'" --- $npoints $nunits $nports"'"; }'
 
+  # Verilator lint problems look like this:
+  # "%Warning-SYNCASYNCNET: genesis_verif/top_fft.v:356: ... Location of sync usage"
+  egrep '^%Warning' $tmp \
+    | sed 's/^%Warning-/Lint /' \
+    | awk '{print $0 "'" --- $npoints $nunits $nports"'"; }'
+
   # FIXME maybe want a --keep option or something for debugging
   echo ""
   echo "Deleting tmp file $tmp b/c OMG it's HUGE"
