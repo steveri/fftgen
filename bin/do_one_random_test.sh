@@ -71,7 +71,7 @@ cd $tmpdir || exit
       test $((RANDOM%2)) -eq 0 && sim=vcs || sim=verilator
 
       # npoints = (8, 16, 32, ... 8192) (2^3..2^13)
-      npoints=$((2**(RANDOM%10+3)))
+      npoints=$((2**(RANDOM%11+3)))
 
       # For debug, limit to cmall tests only, npoints = 8, 16, or 32
       test $DBG -gt 1 && echo "DBG npoints limited to l.e. 32"
