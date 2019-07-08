@@ -1,5 +1,9 @@
 1907
 
+TODO
+- should probably move regression/ subdirectory to tst/ subdirectory :(
+
+
 NEXT
 - fix verilator regressions
 - fix lint errors
