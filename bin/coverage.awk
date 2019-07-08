@@ -13,7 +13,7 @@ END {
     for (npoints=8; npoints <= 8192; npoints *= 2) {
         printf(" %4d", npoints)
     }
-    print ("")
+    print(""); print("")
     
     # BODY
     for (nunits=1; nunits <= 4; nunits *= 2) {
@@ -29,6 +29,7 @@ END {
             }
             print ""
         }
+        print ""
     }
 }
 
