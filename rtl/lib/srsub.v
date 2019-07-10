@@ -18,7 +18,6 @@ module srsub(
 
   // Extract sign, exponent, mantissa  
   wire as = a[`sign];
-  wire bs = b[`sign];
 
   // Extract sign, exponent, mantissa  
   wire [7:0] ae; assign ae = a[`exponent];
@@ -57,7 +56,14 @@ module srsub(
   // Now we can shift back down (remember, ediff can be as small as 0 bits)
 
   // use bit range 23+ediff down to ediff, right?
-  wire [23:0] zm; assign zm = (abs_am_minus_bm >> ediff);
+  wire [47:0] zm48; assign zm48 = (abs_am_minus_bm >> ediff);
+  wire [23:0] zm; assign zm = zm48[23:0];
+
+  // 'magic name "unused" (-unused-regexp) is recognized by Verilator and suppresses warnings' //
+  wire _unused_ok_zm = &{1'b0, zm48[47:24]};
+
+
+
 
 // Huh this whole thing seems wrong
 //   wire [22:0] zm_final; assign zm_final = 
@@ -144,7 +150,8 @@ module srsub(
     zm[ 1] == 1'b1 ? 22 :
     zm[ 0] == 1'b1 ? 23 : 24;
 
-  wire [22:0] zm_final; assign zm_final = zm << need_shift;
+  // zm is 24 bits, verilator complains if zm_final is not also 24 bits
+  wire [23:0] zm_final; assign zm_final = zm << need_shift;
 
 
   // Remember, we adjusted the larger op to match the smaller...
@@ -155,7 +162,7 @@ module srsub(
   wire [7:0] ze; assign ze = (ae > be)? ae : be;
 
 
-// ae > be; ae=0x81; zm=0x600000; zm[22] = 1; want new ze = 0x80
+  // ae > be; ae=0x81; zm=0x600000; zm[22] = 1; want new ze = 0x80
 
   wire [7:0] ze_final; assign ze_final =
     zm[23] == 1'b1 ? ze - 7'd0 :
@@ -191,8 +198,8 @@ module srsub(
     a == b   ? 32'b0 :
     ignore_b ? a :
     ignore_a ? {~b[`sign],b[`exponent],b[`mantissa]} :
-    (a > b)  ? {as,ze_final,zm_final} :
-              {~as,ze_final,zm_final} ;
+    (a > b)  ? {as,ze_final,zm_final[22:0]} :
+              {~as,ze_final,zm_final[22:0]} ;
 
 // FIXME FIXME this little fixme block
 // Somebody else has to do this check now:
@@ -240,18 +247,3 @@ module srsub(
 `endif // DBG1
 
 endmodule
-
-// OLD DBG9 prints
-//        $display("%m  as=%1x bs=%1x zs=%1x", a[`sign], b[`sign], z[`sign]);
-//        $display("%m  ae8=%09b be8=%09b ze8=%09b", a[`exponent], b[`exponent], z[`exponent]);
-//        $display("%m  ae9=%09b be9=%09b ze9=%09b", a_exp, b_exp, ze);
-//        $display("%m    ae_plus_be=%09b", ae_plus_be);
-//        $display("%m    ze_prenorm=%09b", ze_prenorm);
-//        $display("%m    too_big=%1b ze_norm=%09b", too_big, ze_norm);
-//        $display("%m  aeb=%09b beb=%09b zeb=%09b", a_exp-bias, b_exp-bias, ze-bias);
-//        $display("%m  ----");
-//        $display("%m    zm_true=%06X",   zm_true);
-//        $display("%m    zm_hidden=%06X", zm_hidden);
-//        $display("%m    zm_true[23]=%1b ab[46]=%1b", zm_true[23], ab[46]);
-//        $display("%m  ----");
-//        $display("%m  ufw=%1b ofw=%1b", ufw, ofw);

@@ -337,12 +337,24 @@ foreach t ($tests:q)
     | sed 's/^%Warning-/Lint /' \
     | awk '{print $0 "'" --- $npoints $nunits $nports"'"; }'
 
-  # FIXME maybe want a --keep option or something for debugging
-  echo ""
-  echo "Deleting tmp file $tmp b/c OMG it's HUGE"
-  /bin/ls -l $tmp
-  /bin/rm $tmp
-  echo ""
+
+  set keep_abbrev
+  if ($?keep_abbrev) then
+    echo ""
+    echo "Keeping first 300 lines ONLY of $tmp"
+    wc -l $tmp
+    head -n 300 $tmp > $tmp.0
+    mv $tmp.0 $tmp
+    wc -l $tmp
+    echo ""
+  else
+    # FIXME maybe want a --keep option or something for debugging
+    echo ""
+    echo "Deleting tmp file $tmp b/c OMG it's HUGE"
+    /bin/ls -l $tmp
+    /bin/rm $tmp
+    echo ""
+  endif
 
   ########################################################################
   # Now check against the golden model.
@@ -394,8 +406,8 @@ echo Errors:
 grep -i err $summfile || echo "   (no errors found.)"
 echo
 
-
-echo "WRANING did not keep result summary file '$summfile'"
+/bin/rm $summfile
+echo "WARNING did not keep result summary file '$summfile'"
 # echo "Result summary is here: '$summfile'"
 
 

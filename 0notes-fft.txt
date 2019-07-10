@@ -1,7 +1,20 @@
 1907
+FIX LINT ERRORS see lint/0notes-lint.txt
+
+
+LATER:
+- note FAILURE in log; should be reflected in summaries
+  % grep FAIL tst/regress/examples/190703.log
+  ver    8  4 1port FAIL -   4 warnings,     0 lint problems -   
+
+
+
+==============================================================================
+1907
 
 TODO
-- should probably move regression/ subdirectory to tst/ subdirectory :(
+- create some issues
+- pointer to tst/regress in top-level README and/or tst/README
 
 
 NEXT
@@ -1462,4 +1475,8 @@ OLD maybe
 
 DONE 1906 verilator
 - build golden -sim verilator
+
+DONE 1907
+- should probably move regression/ subdirectory to tst/ subdirectory :(
+- DONE moved to tst/regress
 
