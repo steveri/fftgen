@@ -738,20 +738,22 @@ module `mname`
 
 //;#         //; }
 
-
-//;#      $display("EYE NORMAL0 (t=%06d) op1=%d op2=%d", $time, BFLY0_op1_ix_o, BFLY0_op2_ix_o);
-//;#      $display("EYE CRAZED0 (t=%06d) op1=%d op2=%d", $time, BFLY0_op1_ix_new, BFLY0_op2_ix_new);
-
+         //;# $display("EYE NORMAL0 (t=%06d) op1=%d op2=%d", $time, BFLY0_op1_ix_o, BFLY0_op2_ix_o);
+         //;# $display("EYE CRAZED0 (t=%06d) op1=%d op2=%d", $time, BFLY0_op1_ix_new, BFLY0_op2_ix_new);
+         //; #
+         //; # Lint WIDTH 425: Bit extraction of array[11:0] requires 4 bit index, not 5 bits.
+         //; my $chop1 = $n_cycle_num_bits - 1;
+         //; #
          // And now for access type!
          // (Needed only for TRUE_1PORT.  Otherwise will be eliminated as unused...right?)
          // TODO: Make this conditional on SRAM_TYPE==TRUE_1PORT
          //; for (my $i = 0; $i < $nunits; $i++) {   
-         BFLY`${i}`_access_type_o <= BFLY`${i}`_access_type[cycle_num];
+         BFLY`${i}`_access_type_o <= BFLY`${i}`_access_type[cycle_num[`$chop1`:0]];
          //; }
 
          // New bypass controls.
-         suppress_wz_o <= precomputed_suppress_wz[cycle_num];
-         bypass_read_o <= precomputed_bypass_read[cycle_num];
+         suppress_wz_o <= precomputed_suppress_wz[cycle_num[`$chop1`:0]];
+         bypass_read_o <= precomputed_bypass_read[cycle_num[`$chop1`:0]];
 
          //; my $nbanks = $nunits * 4;
          //; for (my $i=0; $i<$nbanks; $i++) {
@@ -759,7 +761,7 @@ module `mname`
          //;     if ($nunits == 1) {
          bufnum_o[`$ii`] <= 1'b0;
          //;     } else {
-         bufnum_o[`$ii`] <= precomputed_bufnum[`$ii`][cycle_num];
+         bufnum_o[`$ii`] <= precomputed_bufnum[`$ii`][cycle_num[`$chop1`:0]];
          //;     }
          //; }
 
