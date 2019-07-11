@@ -22,7 +22,6 @@ module sradd(
 
 // Extract sign, exponent, mantissa  
 wire as = a[`sign];
-wire bs = b[`sign];
 
 // Extract sign, exponent, mantissa  
 wire [7:0] ae; assign ae = a[`exponent];
@@ -60,9 +59,14 @@ wire [7:0] ze; assign ze = (ae > be) ? ae : be;
 // zm range 0000_0080_0000 to  0000_01FF_FFFF maybe?
 
 wire [47:0] am_plus_bm; assign am_plus_bm = am_adj + bm_adj;
-wire [24:0] zm;         assign zm = am_plus_bm >> ediff;
+// wire [24:0] zm; assign zm = am_plus_bm >> ediff;
+wire [47:0] zm48; assign zm48 = am_plus_bm >> ediff;
+wire [24:0] zm; assign zm = zm48[24:0];
 
-// The one bit will *always* be at position 23 or 24, RIGHT??
+// 'magic name "unused" (-unused-regexp) is recognized by Verilator and suppresses warnings' //
+wire _unused_ok_zm = &{1'b0, zm48[47:23]};
+
+// The 'one' bit will *always* be at position 23 or 24, RIGHT??
 // So adjust exp, mantissa accordingly.
 // Hidden one happens at the end...RIGHT???
 
@@ -120,5 +124,3 @@ assign z =
 `endif // DBG1
 
 endmodule
-
-//$display("%m as=%1x bs=%1x zs=%1x", a[`sign], b[`sign], z[`sign]);

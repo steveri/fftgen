@@ -62,9 +62,6 @@ module srsub(
   // 'magic name "unused" (-unused-regexp) is recognized by Verilator and suppresses warnings' //
   wire _unused_ok_zm = &{1'b0, zm48[47:24]};
 
-
-
-
 // Huh this whole thing seems wrong
 //   wire [22:0] zm_final; assign zm_final = 
 //     zm[23+ediff] == 1'b1 ? zm >> ediff :
