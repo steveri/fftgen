@@ -410,15 +410,14 @@ module `mname`
 
       integer shift_amt;
 
-      // For verilator width-error suppression
-      logic [31:0] _unused_ok_2;
+      logic [31:0] _unused_ok_32; // Good for up to 4G datapoints I think
 
       begin
          //; my $which_i = "i";  # By default, use wire "i"
 
          //////////////////////////////////////////////////////////////////////////////////////
          // Step 0, convert cynum/buttnum into an index.  RIGHT!??
-         {_unused_ok_2,ii}  = (((CyNum << `fftgen::log2($nunits)`) + {4'b0,ButtNum}) & `($npoints/2-1)`) << 1;
+         {_unused_ok_32,ii}  = (((CyNum << `fftgen::log2($nunits)`) + {4'b0,ButtNum}) & `($npoints/2-1)`) << 1;
          //$display("GENOPS2 (t=%06d)           ii= %d", $time, ii);
 
          //////////////////////////////////////////////////////////////////////////////////////
