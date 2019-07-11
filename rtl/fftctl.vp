@@ -396,7 +396,7 @@ module `mname`
       //; # For each stage, i counts from 0 to npoints...or is it npoints/2?
       //; # FIXME definitely try golden test with imax=f(npoints/2) instead of npoints below
       //; my $imax = (fftgen::log2($npoints)-1);  
-      //; my $nstages   = fftgen::log2($npoints);     # not used?
+      //; my $nstages   = fftgen::log2($npoints);
       //; my $groupsize = $nunits*4;
       //; my $ntoggles  = fftgen::log2($groupsize);
 
@@ -409,21 +409,41 @@ module `mname`
       logic [`$imax`:0] op2;
 
       integer shift_amt;
-
-      logic [31:0] _unused_ok_32; // Good for up to 4G datapoints I think
+   //; #
+   //; # May need filler bits for width match
+   //; my $cynum_width = fftgen::log2($ncalcs_per_unit) + 1;
+   //; my $ii_width    = $imax + 1;
+   //; my $ii_filler   = $cynum_width - $ii_width;
+   //; #
+   //; # FIXME what happens if $ii_filler is negative? Can that happen?
+   //; if ($ii_filler > 0) {
+      // LHS produces cynum_width == `$cynum_width` bits (5)
+      // ii width is $ii_width=$imax+1 == `$imax` (3)
+      // so need cynum_width-ii_width == `$ii_filler` filler bits (2)
+      logic [`$ii_filler-1`:0] _unused_ok_ii;
+   //;}
 
       begin
          //; my $which_i = "i";  # By default, use wire "i"
 
          //////////////////////////////////////////////////////////////////////////////////////
          // Step 0, convert cynum/buttnum into an index.  RIGHT!??
-         {_unused_ok_32,ii}  = (((CyNum << `fftgen::log2($nunits)`) + {4'b0,ButtNum}) & `($npoints/2-1)`) << 1;
+     //;
+     //; # May need filler bits for width match (see above)
+     //; # FIXME what happens if $ii_filler is negative? Can that happen?
+     //; if ($ii_filler > 0) {
+         {_unused_ok_ii,ii}  = (((CyNum << `fftgen::log2($nunits)`) + {4'b0,ButtNum}) & `($npoints/2-1)`) << 1;
+     //; } else {
+         ii = (((CyNum << `fftgen::log2($nunits)`) + {4'b0,ButtNum}) & `($npoints/2-1)`) << 1;
+     //; }
          //$display("GENOPS2 (t=%06d)           ii= %d", $time, ii);
 
          //////////////////////////////////////////////////////////////////////////////////////
          // Step 1, the rotate
+         //; # RotateLeft() uses one less bit than we do for StageNo :(
+         //; my $swidth_rleft  = fftgen::log2($nstages);
          i = (StageNo <= `$nstages-$ntoggles`) ?
-             RotateLeft(ii, StageNo) :             // Rotate i left by StageNo bits
+             RotateLeft(ii, StageNo[`$swidth_rleft-1`:0]) :   // Rotate i left by StageNo bits
              RotateSubword(ii, StageNo);           // Rotate bottom t bits of i and move them to top
             
          $display("GENOPS2 (t=%06d) ii,i: (%1d,%1d) => (%1d,%1d)", $time, ii, ii+1, i, i+2**StageNo);
