@@ -400,11 +400,9 @@ module `mname`
       //; my $groupsize = $nunits*4;
       //; my $ntoggles  = fftgen::log2($groupsize);
 
-      // shifted_cynum = cynum pre-conditioned for this alg = CyNum << log2(n_butterfly_units)
-      input [`$imax`:0] shifted_cynum;
-
-      input [`fftgen::log2($nunits) `:0] ButtNum; // Yes there's an extra bit DON'T CHANGE IT i guess
-      input [`fftgen::log2($nstages)`:0] StageNo; // Yes there's an extra bit DON'T CHANGE IT i guess
+      input [`fftgen::log2($ncalcs_per_unit)`:0] CyNum;   // Yes there's an extra bit DON'T CHANGE IT mos def
+      input [`fftgen::log2($nunits)         `:0] ButtNum; // Yes there's an extra bit DON'T CHANGE IT i guess
+      input [`fftgen::log2($nstages)        `:0] StageNo; // Yes there's an extra bit DON'T CHANGE IT i guess
        
       logic [`$imax`:0] ii, i, P, i_reordered;
       logic [`$imax`:0] op1;
@@ -417,11 +415,7 @@ module `mname`
 
          //////////////////////////////////////////////////////////////////////////////////////
          // Step 0, convert cynum/buttnum into an index.  RIGHT!??
-         //;
-         // Call does the shift now (is this a good idea?)
-         //ii  = (((CyNum << `fftgen::log2($nunits)`) + ButtNum) & `($npoints/2-1)`) << 1; // OLD
-           ii  = ((    shifted_cynum                  + ButtNum) & `($npoints/2-1)`) << 1; // NEW
-
+         ii  = (((CyNum << `fftgen::log2($nunits)`) + {4'b0,ButtNum}) & `($npoints/2-1)`) << 1;
          //$display("GENOPS2 (t=%06d)           ii= %d", $time, ii);
 
          //////////////////////////////////////////////////////////////////////////////////////
@@ -717,15 +711,7 @@ module `mname`
 
          //;   my $genops = ($WHICH_SCHED eq "round7") ? "GenOps2" : "GenOps";
          //;   for (my $i = 0; $i < $nunits; $i++) {
-         //;     # {BFLY0_op1_ix_o,BFLY0_op2_ix_o} <= GenOps2(cycle_num, 0, stageno);
-         //;
-         //;     # Pre-shift cycle_num for genops2 algorithm
-         //;     # E.g. if npoints=8 and nunits=2, use cynum[3:1] (shift by log(nunits)
-         //;     my $c0 = fftgen::log2($nunits);
-         //;     my $c1 = $c0 + (fftgen::log2($npoints)-1);
-                 {BFLY`${i}`_op1_ix_o,BFLY`${i}`_op2_ix_o} <=
-                   //`$genops`(cycle_num,              `$i`, stageno); //OLD
-                     `$genops`(cycle_num[`$c1`:`$c0`], `$i`, stageno); //NEW
+         {BFLY`${i}`_op1_ix_o,BFLY`${i}`_op2_ix_o} <= `$genops`(cycle_num, `$i`, stageno);
          //;   }
 
 //;#         //; }
