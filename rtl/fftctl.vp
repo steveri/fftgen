@@ -146,13 +146,19 @@
 //;
 //; my @butterfly_unit_indices = build_butterfly_unit_indices();
 //;
-//; my @atype_output = build_access_type_array();
-//; # E.g. ("blank", "",                  "// Per-butterfly access type\n",
-//; #       "[2:0]", "BFLY0_access_type", "",
-//; #       "[2:0]", "BFLY1_access_type", "",
-//; #       "[2:0]", "BFLY2_access_type", "",
-//; #       "[2:0]", "BFLY3_access_type", "",
-//; #       "[2:0]", "BFLY0_access_type", "")
+
+
+//; # never used?
+//; # //; my @atype_output = build_access_type_array();
+//; # //; # E.g. ("blank", "",                  "// Per-butterfly access type\n",
+//; # //; #       "[2:0]", "BFLY0_access_type", "",
+//; # //; #       "[2:0]", "BFLY1_access_type", "",
+//; # //; #       "[2:0]", "BFLY2_access_type", "",
+//; # //; #       "[2:0]", "BFLY3_access_type", "",
+//; # //; #       "[2:0]", "BFLY0_access_type", "")
+
+
+
 //;
 //; # my $cnbits = sprintf("[%d:0]", fftgen::log2($ncalcs_per_unit)-1);  # Weird?  Contrived?
 //; # May need to count a cycle or two beyond minimum!  (Why?)
@@ -211,9 +217,15 @@ module `mname`
    // No lookup table because ($USE_LOOKUP_TABLE=`$USE_LOOKUP_TABLE`).
    //; }
 
-   // Will iterate on precomputed 'access_type' registers to control
-   // bypassing.  *****Only used for 1port SRAM when nunits==1.*****
-   //;    gen_access_type_decl();
+
+
+//; # never used?
+//; #    // Will iterate on precomputed 'access_type' registers to control
+//; #    // bypassing.  *****Only used for 1port SRAM when nunits==1.*****
+//; #    //;    gen_access_type_decl();
+
+
+
 
    // For nunits>1, use precomputed bit vectors to control bypass buffers.
    // Each register has one bit per SRAM (i.e. four bits per butterfly unit),
@@ -747,9 +759,12 @@ module `mname`
          // And now for access type!
          // (Needed only for TRUE_1PORT.  Otherwise will be eliminated as unused...right?)
          // TODO: Make this conditional on SRAM_TYPE==TRUE_1PORT
-         //; for (my $i = 0; $i < $nunits; $i++) {   
-         BFLY`${i}`_access_type_o <= BFLY`${i}`_access_type[cycle_num[`$chop1`:0]];
-         //; }
+
+
+//; # never used?
+//; #          //; for (my $i = 0; $i < $nunits; $i++) {   
+//; #          BFLY`${i}`_access_type_o <= BFLY`${i}`_access_type[cycle_num[`$chop1`:0]];
+//; #          //; }
 
          // New bypass controls.
          suppress_wz_o <= precomputed_suppress_wz[cycle_num[`$chop1`:0]];
@@ -837,14 +852,20 @@ endmodule
 //;             printf("$indent.BFLY${i}_op2_ix_o(BFLY${i}_op2_ix),\n");    # .BFLY0_op2_ix_o(BFLY0_op2_ix),
 //;             print "\n";
 //;     }
-//;     print "\n";
-//;     print $indent."/////////////////////////////////////////////////////////////////////\n";
-//;     print $indent.'// Access type: 0="SRAM"'."\n";
-//;     print $indent.'// 1="op1 from buf", 2="op2 from buf", 3="op1 to buf", 4="op2 to buf"'."\n";
-//;     print "\n";
-//;     for (my $i=0; $i<$nunits; $i++) {
-//;         printf("$indent.BFLY${i}_access_type_o(BFLY${i}_access_type),\n"); # .BFLY0_access_type_o(BFLY0_access_type),
-//;     }
+
+
+//; # never used?
+//; # //;     print "\n";
+//; # //;     print $indent."/////////////////////////////////////////////////////////////////////\n";
+//; # //;     print $indent.'// Access type: 0="SRAM"'."\n";
+//; # //;     print $indent.'// 1="op1 from buf", 2="op2 from buf", 3="op1 to buf", 4="op2 to buf"'."\n";
+//; # //;     print "\n";
+//; # //;     for (my $i=0; $i<$nunits; $i++) {
+//; # //;         printf("$indent.BFLY${i}_access_type_o(BFLY${i}_access_type),\n"); # .BFLY0_access_type_o(BFLY0_access_type),
+//; # //;     }
+
+
+
 //;     print "\n";
 //;     print "\n";
 //; 
@@ -900,8 +921,13 @@ endmodule
 //;    #   output logic [2:0] BFLY0_op2_ix_o, 
 //;    pw($indent, $io_list, "output", @butterfly_unit_indices, "not_last");
 //; 
-//;    # Bypass control signals
-//;    pw($indent, $io_list, "output", @atype_output, "not_last");
+
+
+//; # //; never used???
+//; # //;    # Bypass control signals
+//; # //;    pw($indent, $io_list, "output", @atype_output, "not_last");
+
+
 //; 
 //;    print $indent."// Remaining output signals\n";
 //;    #   output logic [2:0] fftctl_cycle_num_o, // 0, 1, 2, ...
@@ -985,20 +1011,26 @@ endmodule
 //;     }
 //;   }
 //;    
-//; sub gen_access_type_decl {
-//;     #################################################################
-//;     # Declare the memory that will hold precomputed access_type values.  E.g.
-//;     #     logic [2:0] BFLY0_access_type [0:7];
-//;     #     logic [2:0] BFLY1_access_type [0:7];
-//; 
-//;     my $indent   = "   ";
-//;     print $indent."// Three-bit registers hold one of five access types:\n";
-//;     print $indent.'// ("SRAM", "op1 from buf", "op2 from buf", "op1 to buf", "op2 to buf")'."\n";
-//;     print "\n";
-//;     for (my $i=0; $i<$nunits; $i++) {
-//;         printf($indent."logic [2:0] BFLY%d_access_type [0:%d];\n", $i, $ncalcs_per_unit-1);
-//;     }
-//;   }
+
+
+//; # never used?
+//; # //; sub gen_access_type_decl {
+//; # //;     #################################################################
+//; # //;     # Declare the memory that will hold precomputed access_type values.  E.g.
+//; # //;     #     logic [2:0] BFLY0_access_type [0:7];
+//; # //;     #     logic [2:0] BFLY1_access_type [0:7];
+//; # //; 
+//; # //;     my $indent   = "   ";
+//; # //;     print $indent."// Three-bit registers hold one of five access types:\n";
+//; # //;     print $indent.'// ("SRAM", "op1 from buf", "op2 from buf", "op1 to buf", "op2 to buf")'."\n";
+//; # //;     print "\n";
+//; # //;     for (my $i=0; $i<$nunits; $i++) {
+//; # //;         printf($indent."logic [2:0] BFLY%d_access_type [0:%d];\n", $i, $ncalcs_per_unit-1);
+//; # //;     }
+//; # //;   }
+
+
+
 //;    
 //; sub gen_op1_mem_values {
 //;     my $indent = shift;
@@ -1165,23 +1197,30 @@ endmodule
 //;     return @oplist;
 //; }
 //; 
-//; sub build_access_type_array {
-//;     # E.g.   ("blank", "", "// Per-butterfly access type\n",
-//;     #         "[2:0]", "BFLY0_access_type", "",
-//;     #         "[2:0]", "BFLY1_access_type", "",
-//;     #         "[2:0]", "BFLY2_access_type", "",
-//;     #         "[2:0]", "BFLY3_access_type", "",
-//;     #         "[2:0]", "BFLY0_access_type", "")
-//; 
-//;     my $nbits = fftgen::log2($npoints);
-//;     my $bitrange = "[2:0]";
-//;     my @oplist = ("blank", "", "// Per-butterfly access type\n");
-//;     for (my $i=0; $i<$nunits; $i++) {
-//;         push(@oplist, ($bitrange, "BFLY${i}_access_type", ""));
-//; #         if ($nunits > 1) { push(@oplist, ("blank", "", "\n")); }
-//;     }
-//;     return @oplist;
-//; }
+
+
+//; # huh looks like this is never used!!??
+//; # //; sub build_access_type_array {
+//; # //;     # E.g.   ("blank", "", "// Per-butterfly access type\n",
+//; # //;     #         "[2:0]", "BFLY0_access_type", "",
+//; # //;     #         "[2:0]", "BFLY1_access_type", "",
+//; # //;     #         "[2:0]", "BFLY2_access_type", "",
+//; # //;     #         "[2:0]", "BFLY3_access_type", "",
+//; # //;     #         "[2:0]", "BFLY0_access_type", "")
+//; # //; 
+//; # //;     my $nbits = fftgen::log2($npoints);
+//; # //;     my $bitrange = "[2:0]";
+//; # //;     my @oplist = ("blank", "", "// Per-butterfly access type\n");
+//; # //;     for (my $i=0; $i<$nunits; $i++) {
+//; # //;         push(@oplist, ($bitrange, "BFLY${i}_access_type", ""));
+//; # //; #         if ($nunits > 1) { push(@oplist, ("blank", "", "\n")); }
+//; # //;     }
+//; # //;     return @oplist;
+//; # //; }
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 // Copyright Stephen Richardson and Stanford University.  All rights reserved.
 //              Exclusively Licensed by Chip Genesis Inc.
