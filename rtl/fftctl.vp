@@ -216,7 +216,9 @@ module `mname`
    //; my $bufbits = ($nunits == 4) ? "[0: 1]" : "     ";
    logic [0:`$lastbank`] precomputed_suppress_wz [0:`$nops`];      // {0,1}
    logic [0:`$lastbank`] precomputed_bypass_read [0:`$nops`];      // {0,1}
+   //; if ($nunits > 1) {
    logic `$bufbits` precomputed_bufnum[0:`$lastbank`][0:`$nops`];      // {0,1,2,3}
+   //; }
 
    //; my $n_cycle_num_bits = fftgen::log2($ncalcs_per_unit);
    // Need to count through array(s) from 0 to `$ncalcs_per_unit-1`
@@ -257,70 +259,6 @@ module `mname`
    logic `$bitrange` BFLY`$b`_op1_ix_new;
    logic `$bitrange` BFLY`$b`_op2_ix_new;
    //; }}
-
-
-//;#OLD   //////////////////////////////////////////////////////////////////////////////////////
-//;#OLD   // FUNCTION: OP GENERATOR "GenOps" generates op1, op2
-//;#OLD   // Given cynum, stageno, buttno, generate the appropriate ops for each butterfly
-//;#OLD   //
-//;#OLD   // deconstruct i = (cynum << log2(nbutts)) + butt_num
-//;#OLD   // e.g. if cynum = 7 and nbutts=4 then i is one of {28,29,30,31}
-//;#OLD   //
-//;#OLD   // op1,op2 = f(i,stageno,npoints)
-//;#OLD   //
-//;#OLD   //; if ($WHICH_SCHED ne 'round7') {  # Only need crazy eye for the old regime.
-//;#OLD   //;  my $bitwidth = fftgen::log2($npoints); # Need to hold values [0..($npoints-2)]
-//;#OLD   //;
-//;#OLD   function [`2*$bitwidth-1`:0] GenOps;
-//;#OLD
-//;#OLD      //; # For each stage, i counts from 0 to npoints...or is it npoints/2?
-//;#OLD      //; # FIXME definitely try golden test with imax=f(npoints/2) instead of npoints below
-//;#OLD      //; my $imax = (fftgen::log2($npoints)-1);  
-//;#OLD
-//;#OLD
-//;#OLD      input [`fftgen::log2($ncalcs_per_unit)`:0] CyNum;   // Yes there's an extra bit DON'T CHANGE IT
-//;#OLD      input [`fftgen::log2($nunits)         `:0] ButtNum;
-//;#OLD      input [`fftgen::log2($npoints)-1      `:0] StageNo; // E.g. 0..9 for npoints=1024
-//;#OLD       
-//;#OLD      logic [`8                      `:0] s2; // Can count up to 256 stages, should be plenty!
-//;#OLD
-//;#OLD      logic [`$imax`:0] ii;   // Counts from 0 to npoints/2 (so there's an extra bit)
-//;#OLD      logic [`$imax`:0] i;    // i = ii or crazy(ii) depending on SRAM nports
-//;#OLD      logic [`$imax`:0] j;    // i & mask
-//;#OLD      logic [`$imax`:0] k;    // i >> shift_amt
-//;#OLD
-//;#OLD      logic [`$imax`:0] op1;
-//;#OLD      logic [`$imax`:0] op2;
-//;#OLD
-//;#OLD      // op1 = BFLY[0123]_i & (511 >> stageno)) >> (9 - stageno);
-//;#OLD      begin
-//;#OLD         //i  = ((CyNum << `($nunits-1)`) + ButtNum);
-//;#OLD         //i  = ((CyNum << `($nunits-1)`) + ButtNum) & `($npoints/2-1)`; // Yes we need the mask.
-//;#OLD
-//;#OLD          //;# if ($n_sram_ports == 1) {
-//;#OLD          //; if ($USE_CRAZY_EYE == 1) {
-//;#OLD          // If we're gonna be crazy now's the time.
-//;#OLD          ii  = ((CyNum << `fftgen::log2($nunits)`) + ButtNum) & `($npoints/2-1)`; // Yes we need the mask.
-//;#OLD          i = CrazyEye(ii, (1 << StageNo));
-//;#OLD
-//;#OLD         $display("EYE2 %06d Changed normal i %1d to crazy i %1d", $time, ii, i);
-//;#OLD
-//;#OLD          //; } else {
-//;#OLD         i  = ((CyNum << `fftgen::log2($nunits)`) + ButtNum) & `($npoints/2-1)`; // Yes we need the mask.
-//;#OLD//;#           i = ii;
-//;#OLD          //; }
-//;#OLD
-//;#OLD         s2 = (`(fftgen::log2($npoints)-1)` - StageNo);  // 9,8,7,6,5,4,3,2,1
-//;#OLD         j = i & ( (1<<s2) - 1);                         // i & (511,255,127...2,1,0)
-//;#OLD         k = i >> s2;                                    // 
-//;#OLD         op1 = (j << (stageno+1)) + k;
-//;#OLD         op2 = op1 + (1 << StageNo);
-//;#OLD         $display("CrazyOp1 cy=%1d nbutts=`$nunits` log2=%1d, i=%d s=%d s2=%1d j=%d k=%d op1=%d",
-//;#OLD                  CyNum, `fftgen::log2(1)`, i, StageNo, s2, j, k, op1);
-//;#OLD         GenOps = {op1,op2};
-//;#OLD      end
-//;#OLD   endfunction
-//;#OLD   //; }
 
    //////////////////////////////////////////////////////////////////////////////////////
    // FUNCTION: CRAZY-EYE
@@ -396,7 +334,7 @@ module `mname`
       logic [`$imax`:0] op1;
       logic [`$imax`:0] op2;
 
-      integer shift_amt;
+
    //; #
    //; # May need filler bits for width match
    //; my $cynum_width = fftgen::log2($ncalcs_per_unit) + 1;
@@ -544,11 +482,9 @@ module `mname`
       input [`$iwidth-1`:0] i;        // i counts 0..(npoints-1) per stage
       input [`$swidth-1`:0] StageNo;  // StageNo is one of {0..(nstages-1)}
 
-      logic [`2*$iwidth-1`:0] shifted_double_i;
-
+      logic [2:0] _unused_ok`$iwidth`; // Suppress verilator width-mismatch warnings
       begin
-         shifted_double_i = {i,i} << StageNo;
-         RotateLeft = shifted_double_i[`2*$iwidth-1`:`$iwidth`];
+         {_unused_ok`$iwidth`,RotateLeft} = ({i,i} << StageNo) >> `$iwidth`;
       end
    endfunction
 
