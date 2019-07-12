@@ -542,11 +542,11 @@ module `mname`
    // INIT BLOCKS
 
    initial begin
-      cycle_num   <= `$n_cycle_num_bits  +1`'b0;
-      STARTED     <= `                    1`'b0;
-      LAST        <= `                    1`'b1;
-      stageno     <= `$n_stageno_bits    +1`'b0;
-      out2_offset <= `$n_out2_offset_bits+1`'b1;
+      cycle_num   = `$n_cycle_num_bits  +1`'b0;
+      STARTED     = `                    1`'b0;
+      LAST        = `                    1`'b1;
+      stageno     = `$n_stageno_bits    +1`'b0;
+      out2_offset = `$n_out2_offset_bits+1`'b1;
       $display("GENOPS2 -----------------------------------------------------");
       $display("GENOPS2 (t=%06d) STAGE 0", $time);
    end
