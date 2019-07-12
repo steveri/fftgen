@@ -591,19 +591,6 @@ module `mname`
       //;    gen_precomputed_bypass_controls("   ");
    end
 
-   //////////////////////////////////////////////////////////////////////////////////////
-   // Initialize loop variables.
-/*
-   always @(posedge start_i) if (~rst_n_i) begin
-   if (~STARTED) begin
-      cycle_num   <= `$n_cycle_num_bits  +1`'b0;
-      STARTED     <= `                    1`'b1;
-      LAST        <= `                    1`'b0;
-      out2_offset <= `$n_out2_offset_bits+1`'b1;
-      suppress_wz_o <= `$nbanks-1        +1`'b0;
-   end
-   end
-*/
    assign busy_o = ~LAST;
 
    //////////////////////////////////////////////////////////////////////////////////////
@@ -627,26 +614,25 @@ module `mname`
 
    always @(posedge fftclk_o) begin
 
+      if (rst_n_i) begin
 
-   if (rst_n_i) begin
-      cycle_num   <= `$n_cycle_num_bits  +1`'b0;
-      STARTED     <= `                    1`'b1;
-      LAST        <= `                    1`'b0;
-      out2_offset <= `$n_out2_offset_bits+1`'b1;
-      suppress_wz_o <= `$nbanks-1        +1`'b0;
-   end else
+         //////////////////////////////////////////
+         // Initialize loop variables.
+         //
+         cycle_num   <= `$n_cycle_num_bits  +1`'b0;
+         STARTED     <= `                    1`'b1;
+         LAST        <= `                    1`'b0;
+         out2_offset <= `$n_out2_offset_bits+1`'b1;
+         suppress_wz_o <= `$nbanks-1        +1`'b0;
 
-
-
-
-
-      if (STARTED & ~rst_n_i) begin
+      end else if (STARTED & ~rst_n_i) begin
 
          // Debug info
          $display("fftctl %1d: cycle_num = %1d", $time, cycle_num); 
          $display("fftctl %1d: fftctl_cycle_num_o = %1d", $time, fftctl_cycle_num_o); 
          $display("fftctl %1d: out2_offset = %1d", $time, out2_offset); 
 
+//;# Maybe this would be useful for debugging someday?
 //;#         //; if ($USE_LOOKUP_TABLE == 1) {
 //;#
 //;#         // Retrieve precomputed op1 operands for each butterfly unit BFLY<i>
