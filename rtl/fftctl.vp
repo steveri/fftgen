@@ -482,7 +482,7 @@ module `mname`
       input [`$iwidth-1`:0] i;        // i counts 0..(npoints-1) per stage
       input [`$swidth-1`:0] StageNo;  // StageNo is one of {0..(nstages-1)}
 
-      logic [2:0] _unused_ok`$iwidth`; // Suppress verilator width-mismatch warnings
+      logic [2:0] _unused_ok`$iwidth`; // Suppress verilator width-mismatch warns
       begin
          {_unused_ok`$iwidth`,RotateLeft} = ({i,i} << StageNo) >> `$iwidth`;
       end
@@ -516,28 +516,26 @@ module `mname`
       input [`$swidth-1`:0] StageNo;  // StageNo is one of {0..(nstages-1)}
       
       logic [`$ntoggles-1`:0] low_T;
-      logic [`2*$ntoggles-1`:0] shifted_double_t;
+      logic [`$ntoggles-1`:0] rotated_double_t;
+      logic [`$ntoggles-1`:0] unused`$ntoggles`; // Suppress verilator width-mismatch warns
       
       begin
-
          // Bottom T bits get rotated left s bits, e.g. if iwidth is 8 and ntoggles is 2,
          // low_T bits are [1:0] and new i is (rotated ii[1:0]) concat with ii[2:2]
          low_T = ii[`($ntoggles-1)`:0];
-         shifted_double_t = {low_T,low_T} << (StageNo - `($nstages-$ntoggles)`);
+         {unused`$ntoggles`,rotated_double_t} = ({low_T,low_T} << (StageNo - `($nstages-$ntoggles)`)) >> `$ntoggles`;
 
          //; if ($ntoggles == $iwidth) {
          // No need to reassemble word because ntoggles `$ntoggles` == iwidth `$iwidth`
-         RotateSubword = shifted_double_t[`2*$ntoggles-1`:`$ntoggles`];
+         RotateSubword = rotated_double_t;
          //; } else {
          // Assemble the return value.
          // E.g. if ntoggles = 30 and iwidth=100, would have rs={sdt[59:30],i[69:0]}
-         RotateSubword = {shifted_double_t[`2*$ntoggles-1`:`$ntoggles`], ii[`($iwidth-1)`:`($ntoggles)`]};
+         RotateSubword = {rotated_double_t, ii[`($iwidth-1)`:`($ntoggles)`]};
          //; }
       end
    endfunction
-
    //; }  # Perl windup and close-scope for verilog function RotateSubword
-
 
 
    //////////////////////////////////////////////////////////////////////////////////////
