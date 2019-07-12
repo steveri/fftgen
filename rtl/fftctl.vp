@@ -644,6 +644,7 @@ module `mname`
       //; #  precomputed_suppress_wz[0] = 16`h01; # Write to  buffer[bufnum[0]] instead of SRAM000
       //; #  precomputed_bypass_read[0] = 16`h02; # Read from buffer[bufnum[1]] instead of SRAM001
       //; #  
+      //; #  // (if nunits > 1)
       //; #  precomputed_bufnum[7][0] = 2'h0;
       //; #  precomputed_bufnum[6][0] = 2'h0;
       //; #  precomputed_bufnum[5][0] = 2'h0;
