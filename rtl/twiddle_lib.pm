@@ -26,7 +26,7 @@ sub setglobals {
 
   # my $cnbits = sprintf("[%d:0]", log2($ncalcs_per_unit)-1);  # Weird?  Contrived?
   # May need to count a cycle or two beyond minimum!  (Why?)
-  my $cnbits = sprintf("[%d:0]", log2($ncalcs_per_unit));  # Weird?  Contrived?
+  my $cnbits = sprintf("[%d:0]", log2($ncalcs_per_unit)-1);  # Weird?  Contrived?
 
   # FIXME FIXME cycle_num below different than cycle_num signals in fftram, fftctl !!! :(
   @inputs = (
