@@ -103,9 +103,14 @@ $shortrealtobits(-7.07106781e-01) = 32'hbf35_04f3
       //;    twiddle_lib::fft_gen_twiddles2("      ", $npoints, $nunits, $data_width);
    end
 
+   // assign BFLY'$i'_twiddle_cos_o = BFLY'$i'_twiddle_mem_cos[cycle_num_i];
+   // Lint WIDTH twiddle_unq1.v:159 Bit extraction of array[11:0] requires 4 bit index, not 5 bits.
+   // FIXME this is probably the wrong way to fix the fact that cycle_num has too many bits...
+
+   //; my $top_bit = fftgen::log2($ncalcs_per_unit) - 1; # See twiddle_lib.pm
    //; for (my $i=0; $i<$nunits; $i++) {
-   assign BFLY`$i`_twiddle_cos_o = BFLY`$i`_twiddle_mem_cos[cycle_num_i];
-   assign BFLY`$i`_twiddle_sin_o = BFLY`$i`_twiddle_mem_sin[cycle_num_i];
+   assign BFLY`$i`_twiddle_cos_o = BFLY`$i`_twiddle_mem_cos[ cycle_num_i[`$top_bit`:0] ];
+   assign BFLY`$i`_twiddle_sin_o = BFLY`$i`_twiddle_mem_sin[ cycle_num_i[`$top_bit`:0] ];
 
    //; }
 endmodule
