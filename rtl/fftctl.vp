@@ -593,15 +593,17 @@ module `mname`
 
    //////////////////////////////////////////////////////////////////////////////////////
    // Initialize loop variables.
-
+/*
    always @(posedge start_i) if (~rst_n_i) begin
+   if (~STARTED) begin
       cycle_num   <= `$n_cycle_num_bits  +1`'b0;
       STARTED     <= `                    1`'b1;
       LAST        <= `                    1`'b0;
       out2_offset <= `$n_out2_offset_bits+1`'b1;
       suppress_wz_o <= `$nbanks-1        +1`'b0;
    end
-
+   end
+*/
    assign busy_o = ~LAST;
 
    //////////////////////////////////////////////////////////////////////////////////////
@@ -624,6 +626,20 @@ module `mname`
    //; }
 
    always @(posedge fftclk_o) begin
+
+
+   if (rst_n_i) begin
+      cycle_num   <= `$n_cycle_num_bits  +1`'b0;
+      STARTED     <= `                    1`'b1;
+      LAST        <= `                    1`'b0;
+      out2_offset <= `$n_out2_offset_bits+1`'b1;
+      suppress_wz_o <= `$nbanks-1        +1`'b0;
+   end else
+
+
+
+
+
       if (STARTED & ~rst_n_i) begin
 
          // Debug info
