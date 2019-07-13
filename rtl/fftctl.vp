@@ -141,7 +141,6 @@
 //; my @inputs = (
 //;     "", "clk", "  // Clock",
 //;     "", "rst_n", "// Reset signal per power-up",
-//;     "", "start", "// Start signal per FFT",
 //; );
 //;
 //; my @butterfly_unit_indices = build_butterfly_unit_indices();
@@ -801,7 +800,6 @@ endmodule
 //;    # Print inputs.  If "$io_list" true, add "input" and comma, e.g.:
 //;    #   input logic  clk_i,   // Clock
 //;    #   input logic  rst_n_i, // Reset signal per power-up
-//;    #   input logic  start_i, // Start signal per FFT
 //;    pw($indent, $io_list, "input", @inputs, "not_last");
 //; 
 //;    # Butterfly unit operands, e.g.
@@ -830,7 +828,6 @@ endmodule
 //;     #  If "$io_list" true, add "input" and comma (if not "last"), e.g.:
 //;     #   input logic  clk_i,   // Clock
 //;     #   input logic  rst_n_i, // Reset signal per power-up
-//;     #   input logic  start_i, // Start signal per FFT
 //;
 //;     my $last = pop @_; # "last" or anything else (e.g. "notlast")
 //; 

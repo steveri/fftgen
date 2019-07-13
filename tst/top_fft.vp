@@ -146,6 +146,9 @@ module `mname`( input logic clk, output wire done );
 
    //; $fftctl->printwires("   ", "wire_list");
 
+   // FIXME why am I the only one here? Everyone else comes from fftctl->printwires
+   logic  start;
+
    // FIXME FIXME cycle_num below different than cycle_num signals in fftram, fftctl !!! :(
    //; twiddle_lib::printwires("   ", "wire_list");
 
