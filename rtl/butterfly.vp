@@ -107,6 +107,7 @@ module `mname`
    logic [`$op_width/2-1`:0] t2a;
    logic [`$op_width/2-1`:0] t2b;
 
+/* Wass iss?
    logic [7:0] status_t1;
    logic [7:0] status_t1a;
    logic [7:0] status_t1b;
@@ -119,6 +120,7 @@ module `mname`
    logic [7:0] status_o1i;
    logic [7:0] status_o2r;
    logic [7:0] status_o2i;
+*/
 
    //; my $add_op = "1'b0"; my $sub_op = "1'b1";
 
