@@ -156,8 +156,8 @@
 //; ########################################################################
 //; # Controls for bypass buffer.  E.g.:
 //; #    output logic [nbanks:0] suppress_wz_o; // {0,1}
-//; #    output logic [nbanks:0] bypass_read_o; // {0,1}
-//; #    output logic [0:1] bufnum_o[0:nbanks]; // {0,1,2,3}
+//; #    XXX output logic [nbanks:0] bypass_read_o; // {0,1}     XXX unused?
+//; #    XXX output logic [0:1] bufnum_o[0:nbanks]; // {0,1,2,3} XXX unused?
 //;
 //; # I think these are only used when nunits==1
 //; # FIXME either make it conditional on nunits==1 or use for all cases!
@@ -169,8 +169,9 @@
 //;     , "blank", "", "\n"
 //;     , "blank", "", "// Bypass controls\n"
 //;     , "[$lastbank:0]", "suppress_wz", " // one bit per bank, set 100 ps after posedge"
-//;     , "[$lastbank:0]", "bypass_read", " // one bit per bank, set 100 ps after posedge"
-//;     , "$bufbits", "bufnum[0:$lastbank]", "          // which buffer do we use for bypass (per bank)?"
+//;   # unused?
+//;   # , "[$lastbank:0]", "bypass_read", " // one bit per bank, set 100 ps after posedge"
+//;   # , "$bufbits", "bufnum[0:$lastbank]", "          // which buffer do we use for bypass (per bank)?"
 //; );
 //;
 //; ####################################################################
@@ -668,17 +669,19 @@ module `mname`
          //; #
          // New bypass controls.
          suppress_wz_o <= precomputed_suppress_wz[cycle_num[`$chop1`:0]];
-         bypass_read_o <= precomputed_bypass_read[cycle_num[`$chop1`:0]];
 
-         //; my $nbanks = $nunits * 4;
-         //; for (my $i=0; $i<$nbanks; $i++) {
-         //;     my $ii = sprintf("%2d", $i);
-         //;     if ($nunits == 1) {
-         bufnum_o[`$ii`] <= 1'b0;
-         //;     } else {
-         bufnum_o[`$ii`] <= precomputed_bufnum[`$ii`][cycle_num[`$chop1`:0]];
-         //;     }
-         //; }
+//;# unused?
+//;#          bypass_read_o <= precomputed_bypass_read[cycle_num[`$chop1`:0]];
+//;# 
+//;#          //; my $nbanks = $nunits * 4;
+//;#          //; for (my $i=0; $i<$nbanks; $i++) {
+//;#          //;     my $ii = sprintf("%2d", $i);
+//;#          //;     if ($nunits == 1) {
+//;#          bufnum_o[`$ii`] <= 1'b0;
+//;#          //;     } else {
+//;#          bufnum_o[`$ii`] <= precomputed_bufnum[`$ii`][cycle_num[`$chop1`:0]];
+//;#          //;     }
+//;#          //; }
 
          // Debugging info
          //;    for (my $i = 0; $i < $nunits; $i++) {   
