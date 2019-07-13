@@ -403,7 +403,7 @@ module `mname`
           (`$sname`_active == 1) &&
           (`$sname`_ix == bypassed_rnum[`$s`])
       ) begin
-         bypass_valid[`$s`] = 1'b0;
+         bypass_valid[`$s`] <= 1'b0;
          $display("fftram %6d Bypassed SRAM `$s`, read  (bsr'%08X,bsr'%08X) from bypassed_data[`$s`] BOTF", $time,
                    bypassed_data[`$s`][`$real_bits`], // Real part
                    bypassed_data[`$s`][`$imag_bits`]); // Imaginary part

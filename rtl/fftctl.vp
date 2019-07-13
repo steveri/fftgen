@@ -156,8 +156,10 @@
 //; ########################################################################
 //; # Controls for bypass buffer.  E.g.:
 //; #    output logic [nbanks:0] suppress_wz_o; // {0,1}
+//; # XXX unused
 //; #    XXX output logic [nbanks:0] bypass_read_o; // {0,1}     XXX unused?
 //; #    XXX output logic [0:1] bufnum_o[0:nbanks]; // {0,1,2,3} XXX unused?
+//; # XXX unused
 //;
 //; # I think these are only used when nunits==1
 //; # FIXME either make it conditional on nunits==1 or use for all cases!
