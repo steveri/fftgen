@@ -1,5 +1,7 @@
 #!/bin/bash
 
+small_vcs_only=1
+
 # DBG=9
 # DBG=1
 DBG=0
@@ -76,6 +78,10 @@ cd $tmpdir || exit
       # For debug, limit to cmall tests only, npoints = 8, 16, or 32
       test $DBG -gt 1 && echo "DBG npoints limited to l.e. 32"
       test $DBG -gt 1 && npoints=$((2**(RANDOM%4+3)))
+
+      # Small vcs only
+      test $small_vcs_only -gt 1 && sim=vcs
+      test $small_vcs_only -gt 1 && npoints=$((2**(RANDOM%4+3)))
 
       # nbutts = (1, 2, 4)
       nbutts=$((2**(RANDOM%3)))
