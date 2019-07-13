@@ -1,6 +1,7 @@
 #!/bin/bash
 
-small_vcs_only=1
+# small_vcs_only=1
+small_only=0
 
 # DBG=9
 # DBG=1
@@ -79,9 +80,11 @@ cd $tmpdir || exit
       test $DBG -gt 1 && echo "DBG npoints limited to l.e. 32"
       test $DBG -gt 1 && npoints=$((2**(RANDOM%4+3)))
 
-      # Small vcs only
-      test $small_vcs_only -gt 1 && sim=vcs
-      test $small_vcs_only -gt 1 && npoints=$((2**(RANDOM%4+3)))
+      # vcs only
+      # test $small_vcs_only -gt 0 && sim=vcs
+
+      # Small tests only
+      test $small_only -gt 0 && npoints=$((2**(RANDOM%4+3)))
 
       # nbutts = (1, 2, 4)
       nbutts=$((2**(RANDOM%3)))

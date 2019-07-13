@@ -141,6 +141,7 @@
 //; my @inputs = (
 //;     "", "clk", "  // Clock",
 //;     "", "rst_n", "// Reset signal per power-up",
+//;     "", "start", "// Start signal per FFT",
 //; );
 //;
 //; my @butterfly_unit_indices = build_butterfly_unit_indices();
@@ -708,7 +709,7 @@ module `mname`
    end
 
    //;# TODO: Clean up stupid "LAST" signal.
-   always @(posedge fftclk_o) begin
+   always @(posedge fftclk_o) if (~rst_n_i) begin
      // LAST signal tells us when we're done.
      //; my $last_cycle = $ncalcs_per_unit + 1;             # Need one extra cycle to complete (why?)
      //;
