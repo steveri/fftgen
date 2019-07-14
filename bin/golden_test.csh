@@ -104,6 +104,10 @@ if ("$1" == "-sim") then
   shift; shift;
 endif
 
+# Convenient abbrev ver == verilator
+if ("$SIMULATOR" == "ver") set SIMULATOR=verilator
+
+
 if ("$SIMULATOR" == "verilator") then
   set simlog = "fft.log"
 

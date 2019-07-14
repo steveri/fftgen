@@ -41,5 +41,36 @@ HOW-TO regress
 TODO
 - should probably move this whole directory to fftgen/tst/
 
+NOTES
+To find lint warnings try something like
+alias clip="sed 's/ -   ..........$//'"
+alias no_warn="sed 's/[^ ]* warnings,//'"
+alias sortlint="sort -n -k 2 -k 1 -k 3"
+clip $log | no_warn | sortlint | uniq | head
+clip $log | no_warn | sortlint | uniq | grep 1port | h40
+
+sed 's/..........$//' $log | sed 's/. warn/x warn/' | sort -n -k 2 -k 1 -k 3 | uniq | grep 1port | h40
+
+
+log=log2
+alias clip="sed 's/ -   ..........$//'"
+alias no_warn="sed 's/[^ ]* warnings,//'"
+alias sortlint="sort -n -k 2 -k 1 -k 3"
+clip $log | no_warn | sortlint | uniq | grep ver | grep 2\ 2port | less
+    ver    8  2 2port FAIL -        0 lint problems
+    ver   16  2 2port PASS -      146 lint problems
+    ver   32  2 2port PASS -      336 lint problems
+    ver   32  2 2port PASS -      337 lint problems
+    ver   64  2 2port PASS -      785 lint problems
+    ver  128  2 2port PASS -     1809 lint problems
+    ver  256  2 2port PASS -     4113 lint problems
+    ver 1024  2 2port PASS -    20497 lint problems
+    ver 2048  2 2port PASS -    45073 lint problems
+    ver 4096  2 2port PASS -    98321 lint problems
+    ver 8192  2 2port PASS -   213009 lint problems
+
+
+
+
 
 </pre>
