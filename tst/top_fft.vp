@@ -456,11 +456,12 @@ module `mname`( input logic clk, output wire done );
    //
    logic [31:0] cycle_counter;
 
-   always @ (posedge clk or negedge rst_n) begin
+   always @ (posedge clk) begin
      if (rst_n) cycle_counter <= 32'b0;
      else       cycle_counter <= cycle_counter + 32'b1;
    end
-   
+
+
 //; # FIXME not sure this (divisor thingy) is correct or useful...
 //; my $divisor = ($SIMULATOR eq "vcs") ? "1000" : "1";
    always @ (posedge clk) begin
