@@ -264,7 +264,7 @@ module `mname`
    //; # if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    //; if (1 == 1) {
    // Initialize BOTF (bypass on the fly) signals (cycle_num)
-   initial cycle_num <= `$nbits_cycle_num`'b0;
+   initial cycle_num = `$nbits_cycle_num`'b0;
    //; } else {
    // Placeholder for initialization of optional BOTF signals, unused in this configuration (cycle_num).
    //; }
