@@ -983,7 +983,7 @@ endmodule
 //;             print "\n";
 //;             my $nbanks = 4*$nunits;
 //;             for (my $b=0; $b<$nbanks; $b++) {
-//;                 printf("$indent    precomputed_bufnum[%2d][%2d] = 2'h%d;\n", $b, $cynum, $bufnums[$b]);
+//;                 printf("$indent    precomputed_bufnum[%2d][%2d] = 1'h%d;\n", $b, $cynum, $bufnums[$b]);
 //;             }
 //;             print "\n";
 //;         }
