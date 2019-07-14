@@ -247,6 +247,7 @@ module `mname`
    // out2_offset is used to calculate op2 from op1.\n");
    logic [`$n_out2_offset_bits`:0] out2_offset;
 
+   // OOPS FIXME pretty sure stageno width should actually be log2(log2(npoints)) also see genops2 below
    //; my $n_stageno_bits = fftgen::log2($npoints)-1;
    // Looks like we're (finally!) going to need a stage number.
    logic [`$n_stageno_bits`:0] stageno;
@@ -644,38 +645,19 @@ module `mname`
          $display("fftctl %1d: cycle_num = %1d", $time, cycle_num); 
          $display("fftctl %1d: fftctl_cycle_num_o = %1d", $time, fftctl_cycle_num_o); 
          $display("fftctl %1d: out2_offset = %1d", $time, out2_offset); 
+         //;#
+         //;# For more maybe-useful debugging code see below "maybe-useful debugging code"
 
-//;# Maybe this would be useful for debugging someday?
-//;#         //; if ($USE_LOOKUP_TABLE == 1) {
-//;#
-//;#         // Retrieve precomputed op1 operands for each butterfly unit BFLY<i>
-//;#         //;   for (my $i = 0; $i < $nunits; $i++) {   
-//;#         BFLY`${i}`_op1_ix_o <= BFLY`${i}`_op1_ix_mem[cycle_num];
-//;#         //;   }
-//;#
-//;#         // Use precomputed op1 to calculate op2
-//;#         //;# BFLY0_op2_ix_o = BFLY0_op1_ix_o + out2_offset;
-//;#         //;# BFLY1_op2_ix_o = BFLY1_op1_ix_o + out2_offset;
-//;#         //;# ...
-//;#         //;   for (my $i = 0; $i < $nunits; $i++) {
-//;#         BFLY`${i}`_op2_ix_o <= BFLY`${i}`_op1_ix_mem[cycle_num] + out2_offset;
-//;#         //;   }
-//;#
-//;#         //;   if ($DEBUG_CRAZY_EYE == 1) {
-//;#         //;     for (my $i = 0; $i < $nunits; $i++) {
-//;#         {BFLY`${i}`_op1_ix_new,BFLY`${i}`_op2_ix_new} <= `$genops`(cycle_num, `$i`, stageno);
-//;#         //;     }
-//;#         //;   }
-//;#
-//;#         //; } else {  # (! $USE_LOOKUP_TABLE)
+         //; my $go2width = fftgen::log2(fftgen::log2($npoints));
+         // Ugh width-match problems
+         // stageno is `fftgen::log2($npoints)` bits wide (6) but GenOps2 only wants `$go2width+1` bits (4)
 
+         //;   # NOTE pretty sure "genops" no longer exists (!)
          //;   my $genops = ($WHICH_SCHED eq "round7") ? "GenOps2" : "GenOps";
          //;   for (my $i = 0; $i < $nunits; $i++) {
-         {BFLY`${i}`_op1_ix_o,BFLY`${i}`_op2_ix_o} <= `$genops`(cycle_num, `$i`, stageno);
+         {BFLY`${i}`_op1_ix_o,BFLY`${i}`_op2_ix_o} <= `$genops`(cycle_num, `$i`, stageno[`$go2width`:0]);
          //;   }
-
-//;#         //; }
-
+         //;#
          //;# $display("EYE NORMAL0 (t=%06d) op1=%d op2=%d", $time, BFLY0_op1_ix_o, BFLY0_op2_ix_o);
          //;# $display("EYE CRAZED0 (t=%06d) op1=%d op2=%d", $time, BFLY0_op1_ix_new, BFLY0_op2_ix_new);
 
@@ -697,7 +679,7 @@ module `mname`
 //;#          bufnum_o[`$ii`] <= precomputed_bufnum[`$ii`][cycle_num[`$chop1`:0]];
 //;#          //;     }
 //;#          //; }
-
+//;#
          // Debugging info
          //;    for (my $i = 0; $i < $nunits; $i++) {   
          $display("fftctl %1d: in(%2d,%2d), out(%2d, %2d)",$time, BFLY`$i`_op1_ix_o, BFLY`$i`_op2_ix_o, BFLY`$i`_op1_ix_o, BFLY`$i`_op2_ix_o);
@@ -1074,6 +1056,38 @@ endmodule
 //;     return @oplist;
 //; }
 //; 
+//;#
+//;#
+//;#
+//;#
+//;# Maybe this would be useful for debugging someday?
+//;# See "maybe-useful debugging code" above
+//;#         //; if ($USE_LOOKUP_TABLE == 1) {
+//;#
+//;#         // Retrieve precomputed op1 operands for each butterfly unit BFLY<i>
+//;#         //;   for (my $i = 0; $i < $nunits; $i++) {   
+//;#         BFLY`${i}`_op1_ix_o <= BFLY`${i}`_op1_ix_mem[cycle_num];
+//;#         //;   }
+//;#
+//;#         // Use precomputed op1 to calculate op2
+//;#         //;# BFLY0_op2_ix_o = BFLY0_op1_ix_o + out2_offset;
+//;#         //;# BFLY1_op2_ix_o = BFLY1_op1_ix_o + out2_offset;
+//;#         //;# ...
+//;#         //;   for (my $i = 0; $i < $nunits; $i++) {
+//;#         BFLY`${i}`_op2_ix_o <= BFLY`${i}`_op1_ix_mem[cycle_num] + out2_offset;
+//;#         //;   }
+//;#
+//;#         //;   if ($DEBUG_CRAZY_EYE == 1) {
+//;#         //;     for (my $i = 0; $i < $nunits; $i++) {
+//;#         {BFLY`${i}`_op1_ix_new,BFLY`${i}`_op2_ix_new} <= `$genops`(cycle_num, `$i`, stageno);
+//;#         //;     }
+//;#         //;   }
+//;#
+//;#         //; } else {  # (! $USE_LOOKUP_TABLE)
+//;#         //; }
+//;#
+//;#
+//;#
 //////////////////////////////////////////////////////////////////////////////
 // Copyright Stephen Richardson and Stanford University.  All rights reserved.
 //              Exclusively Licensed by Chip Genesis Inc.
