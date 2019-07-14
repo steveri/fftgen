@@ -155,7 +155,9 @@ module `mname`
    // Need to count from 0 to [log2(npoints) x (npoints/2) / (nbutts)]
    // plus at least one beyond that.
    logic [`$nbits_cycle_num-1`:0] cycle_num;
+//; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
    logic bypass_time;              // Bypass_time==1 when cycle_time says it is time to bypass.
+//; }
    //; } else {
    // Placeholder for optional BOTF signals, unused in this configuration (cycle_num).
    //; }
