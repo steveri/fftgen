@@ -150,7 +150,7 @@ module `mname`
    //always @(ez_i or wz_i) //does not work for verilator
    always @(negedge wz_i) // will it...? it did!!!
       if (~ez_i & ~wz_i) begin                               // WRITE TRUE_2PORT
-         mem[addr_i] = wr_data_i;
+         mem[addr_i] <= wr_data_i;
          $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
          $display("%m %1d: Wrote   wr_data_i mem[%1d] <= %16x", $time, addr_i, wr_data_i);
          $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)", $time, addr_i, `ri("wr_data_i")`);
