@@ -216,7 +216,11 @@ module `mname`
    //; my $nops = $ncalcs_per_unit - 1;
    //; my $bufbits = ($nunits == 4) ? "[0: 1]" : "     ";
    logic [0:`$lastbank`] precomputed_suppress_wz [0:`$nops`];      // {0,1}
-   logic [0:`$lastbank`] precomputed_bypass_read [0:`$nops`];      // {0,1}
+
+   // unused?
+   // logic [0:`$lastbank`] precomputed_bypass_read [0:`$nops`];      // {0,1}
+   // unused?
+
    //; if ($nunits > 1) {
    logic `$bufbits` precomputed_bufnum[0:`$lastbank`][0:`$nops`];      // {0,1,2,3}
    //; }
@@ -971,7 +975,10 @@ endmodule
 //; 
 //;         my $nbanks = 4*$nunits;
 //;         printf("$indent    precomputed_suppress_wz[%2d] = %d'h%X;\n", $cynum, $nbanks, $write_op);
-//;         printf("$indent    precomputed_bypass_read[%2d] = %d'h%X;\n", $cynum, $nbanks, $read_op);
+//;# unused?
+//;#         printf("$indent    precomputed_bypass_read[%2d] = %d'h%X;\n", $cynum, $nbanks, $read_op);
+//;# unused?
+
 //;         if ($nunits>1) {
 //;             print "\n";
 //;             my $nbanks = 4*$nunits;
