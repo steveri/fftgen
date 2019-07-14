@@ -155,27 +155,27 @@
 //; );
 //;
 //; ########################################################################
-//; # Controls for bypass buffer.  E.g.:
+//; # Controls for bypass buffer (1port sram only).  E.g.:
 //; #    output logic [nbanks:0] suppress_wz_o; // {0,1}
 //; # XXX unused
 //; #    XXX output logic [nbanks:0] bypass_read_o; // {0,1}     XXX unused?
 //; #    XXX output logic [0:1] bufnum_o[0:nbanks]; // {0,1,2,3} XXX unused?
 //; # XXX unused
 //;
-//; # I think these are only used when nunits==1
-//; # FIXME either make it conditional on nunits==1 or use for all cases!
-//; my $nbanks   = 4*$nunits;
-//; my $lastbank = $nbanks-1;
-//; # if 4 units, use 4 buffers, otherwise only need two (or one).
-//; my $bufbits  = ($nunits == 4) ? "[1:0]" : "     ";
-//; @outputs = (@outputs
+//; if ($n_sram_ports == 1) {
+//;   my $nbanks   = 4*$nunits;
+//;   my $lastbank = $nbanks-1;
+//;   @outputs = (@outputs
 //;     , "blank", "", "\n"
 //;     , "blank", "", "// Bypass controls\n"
 //;     , "[$lastbank:0]", "suppress_wz", " // one bit per bank, set 100 ps after posedge"
+//;   );
 //;   # unused?
+//;   # if 4 units, use 4 buffers, otherwise only need two (or one).
+//;   # my $bufbits  = ($nunits == 4) ? "[1:0]" : "     ";
 //;   # , "[$lastbank:0]", "bypass_read", " // one bit per bank, set 100 ps after posedge"
 //;   # , "$bufbits", "bufnum[0:$lastbank]", "          // which buffer do we use for bypass (per bank)?"
-//; );
+//; }
 //;
 //; ####################################################################
 //; # Generate submodules.
@@ -211,19 +211,18 @@ module `mname`
    // for SRAM001 and SRAM000 should go to bypass buffers instead.  "Bufnum"
    // tells which of up to four bypass buffers hold this data, thus "bufnum"
    // needs two bits per SRAM access.
+   // NOTE suppress_wz only needed for bypass buffers, when nports==1 ... right???
 
-   //;# my $nops = ($nunits * $ncalcs_per_unit) - 1;
-   //; my $nops = $ncalcs_per_unit - 1;
-   //; my $bufbits = ($nunits == 4) ? "[0: 1]" : "     ";
+//; if ($n_sram_ports == 1) {
+   //; # my $nops = ($nunits * $ncalcs_per_unit) - 1;
+   //;   my $nbanks   = 4*$nunits;
+   //;   my $lastbank = $nbanks-1;
+   //;   my $nops = $ncalcs_per_unit - 1;
+   //;   # if 4 units, use 4 buffers, otherwise only need two (or one).
+   //;   my $bufbits = ($nunits == 4) ? "[0: 1]" : "     ";
    logic [`$lastbank`:0] precomputed_suppress_wz [0:`$nops`];      // {0,1}
-
-   // unused?
-   // logic [`$lastbank`:0] precomputed_bypass_read [0:`$nops`];      // {0,1}
-   // unused?
-
-   //; if ($nunits > 1) {
    logic `$bufbits` precomputed_bufnum[0:`$lastbank`][0:`$nops`];      // {0,1,2,3}
-   //; }
+//; }
 
    //; my $n_cycle_num_bits = fftgen::log2($ncalcs_per_unit);
    // Need to count through array(s) from 0 to `$ncalcs_per_unit-1`
@@ -587,22 +586,25 @@ module `mname`
       //; else {
       // No lookup table because ($USE_LOOKUP_TABLE=`$USE_LOOKUP_TABLE`).
       //; }
-
-      //; # E.g. for each cycle [0] through [n]:
-      //; #  precomputed_suppress_wz[0] = 16`h01; # Write to  buffer[bufnum[0]] instead of SRAM000
-      //; #  precomputed_bypass_read[0] = 16`h02; # Read from buffer[bufnum[1]] instead of SRAM001
-      //; #  
-      //; #  // (if nunits > 1)
-      //; #  precomputed_bufnum[7][0] = 2'h0;
-      //; #  precomputed_bufnum[6][0] = 2'h0;
-      //; #  precomputed_bufnum[5][0] = 2'h0;
-      //; #  precomputed_bufnum[4][0] = 2'h0;
-      //; #  precomputed_bufnum[3][0] = 2'h0;
-      //; #  precomputed_bufnum[2][0] = 2'h0;
-      //; #  precomputed_bufnum[1][0] = 2'h3;
-      //; #  precomputed_bufnum[0][0] = 2'h2;
+      //; if ($n_sram_ports == 1) {
+      //;   # E.g. for each cycle [0] through [n]:
+      //;   #  precomputed_suppress_wz[0] = 16`h01; # Write to  buffer[bufnum[0]] instead of SRAM000
+      //;   #  precomputed_bypass_read[0] = 16`h02; # Read from buffer[bufnum[1]] instead of SRAM001
+      //;   #  
+      //;   #  // (if nunits > 1)
+      //;   #  precomputed_bufnum[7][0] = 2'h0;
+      //;   #  precomputed_bufnum[6][0] = 2'h0;
+      //;   #  precomputed_bufnum[5][0] = 2'h0;
+      //;   #  precomputed_bufnum[4][0] = 2'h0;
+      //;   #  precomputed_bufnum[3][0] = 2'h0;
+      //;   #  precomputed_bufnum[2][0] = 2'h0;
+      //;   #  precomputed_bufnum[1][0] = 2'h3;
+      //;   #  precomputed_bufnum[0][0] = 2'h2;
       //;              
       //;    gen_precomputed_bypass_controls("   ");
+      //; }
+
+
    end
 
    assign busy_o = ~LAST;
@@ -637,7 +639,10 @@ module `mname`
          STARTED     <= `                    1`'b1;
          LAST        <= `                    1`'b0;
          out2_offset <= `$n_out2_offset_bits+1`'b1;
+      //; if ($n_sram_ports == 1) {
+      //;   my $nbanks   = 4*$nunits;
          suppress_wz_o <= `$nbanks-1        +1`'b0;
+      //; }
 
       end else if (STARTED & ~rst_n_i) begin
 
@@ -661,11 +666,13 @@ module `mname`
          //;# $display("EYE NORMAL0 (t=%06d) op1=%d op2=%d", $time, BFLY0_op1_ix_o, BFLY0_op2_ix_o);
          //;# $display("EYE CRAZED0 (t=%06d) op1=%d op2=%d", $time, BFLY0_op1_ix_new, BFLY0_op2_ix_new);
 
+//; if ($n_sram_ports == 1) {
          //; # Lint WIDTH 425: Bit extraction of array[11:0] requires 4 bit index, not 5 bits.
          //; my $chop1 = $n_cycle_num_bits - 1;
          //; #
          // New bypass controls.
          suppress_wz_o <= precomputed_suppress_wz[cycle_num[`$chop1`:0]];
+//; }
 
 //;# unused?
 //;#          bypass_read_o <= precomputed_bypass_read[cycle_num[`$chop1`:0]];
@@ -680,6 +687,7 @@ module `mname`
 //;#          //;     }
 //;#          //; }
 //;#
+//;# unused?
          // Debugging info
          //;    for (my $i = 0; $i < $nunits; $i++) {   
          $display("fftctl %1d: in(%2d,%2d), out(%2d, %2d)",$time, BFLY`$i`_op1_ix_o, BFLY`$i`_op2_ix_o, BFLY`$i`_op1_ix_o, BFLY`$i`_op2_ix_o);

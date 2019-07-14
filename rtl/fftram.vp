@@ -112,16 +112,18 @@ module `mname`
      //;                       "     ,input logic [$obits] BFLY%d_out1_data_i  ",
      //;                       "     ,input logic [$obits] BFLY%d_out2_data_i\n");
 
+//; if ($n_sram_ports == 1) {
      // Only used for TRUE_1PORT.  Otherwise, gets eliminated automatically, right?
      // ...or...? Shold they be ifdef'ed?
      // Bypass controls
      //; my $lastbank = 4*$nunits - 1;
      //; my $bufbits = ($nunits==4)?"[1:0]":"     ";
      ,input logic [`$lastbank`:0] suppress_wz_i  // one bit per bank, set 100 ps after posedge
-     //; if ($BYPASS_MECHANISM eq 'old') {
-     ,input logic [`$lastbank`:0] bypass_read_i  // one bit per bank, set 100 ps after posedge
-     ,input logic `$bufbits` bufnum_i[0:`$lastbank`]  // which buffer do we use for bypass?
-     //; }
+//; }
+//;#      //; if ($BYPASS_MECHANISM eq 'old') {
+//;#      ,input logic [`$lastbank`:0] bypass_read_i  // one bit per bank, set 100 ps after posedge
+//;#      ,input logic `$bufbits` bufnum_i[0:`$lastbank`]  // which buffer do we use for bypass?
+//;#      //; }
 
      ,input logic fft_started
   );
@@ -414,36 +416,40 @@ module `mname`
    // Placeholder for optional BOTF signals, unused in this configuration.
    //; }
 
-   //; if ($BYPASS_MECHANISM eq 'old') {
-   //////////////////////////////////////////////////////////////////////////////////
-   // If suppress_wz was set (at posedge clk above), we suppress write to the
-   // indicated SRAM.  Contents originally destined for SRAM now go to bypass_buffer.
 
-   // If I were more paranoid, maybe each case would get its own "@ (negedge clk)"?
-   always @ (posedge clk_i) begin
-      //;#
-      //;#  if (suppress_wz[ 0]) bypass_buffer[bufnum_i[ 0]] <= SRAM000_wr_data;
-      //;#  if (suppress_wz[ 1]) bypass_buffer[bufnum_i[ 1]] <= SRAM001_wr_data;
-      //;#  ...
-      //;#  if (suppress_wz[15]) bypass_buffer[bufnum_i[15]] <= SRAM015_wr_data;
-
-      // TODO again, replace ugly repetitive $display w/a task.
-      // if nunits == 1 this (suppress_wz) is one-hot (or zero)
-      //; for (my $i = 0; $i < $nbanks; $i++) {
-      //;     my $nn  = sprintf("%2d", $i);
-      //;     my $nnn = sprintf("%03d", $i);
-      //;     my $bufnum = ($nunits==1) ? "" : "[bufnum_i[$nn]]";
-      //;     my $bufnum2 = ($nunits==1) ? "0" : "bufnum_i[$nn]";
-      if (suppress_wz_i[`$nn`]) begin
-         bypass_buffer`$bufnum` <= SRAM`$nnn`_wr_data;
-         $display("fftram %6d Bypassed SRAM `$i`, wrote (bsr'%08X,bsr'%08X) to bypass_buffer[%1d]",
-               $time, `ri("SRAM${nnn}_wr_data")`, `$bufnum2`);
-      end
-      //; }
-    end
-   //; } else {
+//;# unused/old?
+//;#    //; if ($BYPASS_MECHANISM eq 'old') {
+//;#    //////////////////////////////////////////////////////////////////////////////////
+//;#    // If suppress_wz was set (at posedge clk above), we suppress write to the
+//;#    // indicated SRAM.  Contents originally destined for SRAM now go to bypass_buffer.
+//;# 
+//;#    // If I were more paranoid, maybe each case would get its own "@ (negedge clk)"?
+//;#    always @ (posedge clk_i) begin
+//;#       //;#
+//;#       //;#  if (suppress_wz[ 0]) bypass_buffer[bufnum_i[ 0]] <= SRAM000_wr_data;
+//;#       //;#  if (suppress_wz[ 1]) bypass_buffer[bufnum_i[ 1]] <= SRAM001_wr_data;
+//;#       //;#  ...
+//;#       //;#  if (suppress_wz[15]) bypass_buffer[bufnum_i[15]] <= SRAM015_wr_data;
+//;# 
+//;#       // TODO again, replace ugly repetitive $display w/a task.
+//;#       // if nunits == 1 this (suppress_wz) is one-hot (or zero)
+//;#       //; for (my $i = 0; $i < $nbanks; $i++) {
+//;#       //;     my $nn  = sprintf("%2d", $i);
+//;#       //;     my $nnn = sprintf("%03d", $i);
+//;#       //;     my $bufnum = ($nunits==1) ? "" : "[bufnum_i[$nn]]";
+//;#       //;     my $bufnum2 = ($nunits==1) ? "0" : "bufnum_i[$nn]";
+//;#       if (suppress_wz_i[`$nn`]) begin
+//;#          bypass_buffer`$bufnum` <= SRAM`$nnn`_wr_data;
+//;#          $display("fftram %6d Bypassed SRAM `$i`, wrote (bsr'%08X,bsr'%08X) to bypass_buffer[%1d]",
+//;#                $time, `ri("SRAM${nnn}_wr_data")`, `$bufnum2`);
+//;#       end
+//;#       //; }
+//;#     end
+//;#    //; } else {
+//;#    // LOOK MA NO BYPASS BUFFER mano mano
+//;#    //; }
+//;# unused/old?
    // LOOK MA NO BYPASS BUFFER mano mano
-   //; }
 
    //////////////////////////////////////////////////////////////////////////////
    // wz signals.  If Anyone wants to access a given bank n (op1_bnum==1),

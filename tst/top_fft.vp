@@ -313,12 +313,17 @@ module `mname`( input logic clk, output wire done );
      //;                       "     ,.BFLY%d_out1_data_i", "(BFLY%d_out1_data) ",
      //;                       "     ,.BFLY%d_out2_data_i", "(BFLY%d_out2_data)\n");
 
-     // Bypass controls
+     //; my $n_sram_ports = ($SRAM_TYPE eq "TRUE_1PORT") ? 1 : 2;
+     //; if ($n_sram_ports == 1) {
+     // Bypass controls (only if SRAM nports == 1)
      ,.suppress_wz_i(suppress_wz)  // one bit per bank, set 100 ps after posedge
-     //; if ($BYPASS_MECHANISM eq 'old') {
-     ,.bypass_read_i(bypass_read)  // one bit per bank, set 100 ps after posedge
-     ,.bufnum_i(bufnum)            // which buffer do we use for bypass?
      //; }
+
+//;#      //; if ($BYPASS_MECHANISM eq 'old') {
+//;#      ,.bypass_read_i(bypass_read)  // one bit per bank, set 100 ps after posedge
+//;#      ,.bufnum_i(bufnum)            // which buffer do we use for bypass?
+//;#      //; }
+
 
      ,.fft_started(busy | start)
      );
