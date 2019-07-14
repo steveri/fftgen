@@ -495,7 +495,7 @@ module `mname`
       input [`$iwidth-1`:0] i;        // i counts 0..(npoints-1) per stage
       input [`$swidth-1`:0] StageNo;  // StageNo is one of {0..(nstages-1)}
 
-      logic [2:0] _unused_ok`$iwidth`; // Suppress verilator width-mismatch warns
+      logic [`$iwidth-1`:0] _unused_ok`$iwidth`; // Suppress verilator width-mismatch warns
       begin
          {_unused_ok`$iwidth`,RotateLeft} = ({i,i} << StageNo) >> `$iwidth`;
       end
