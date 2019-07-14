@@ -360,14 +360,22 @@ module `mname`
          //////////////////////////////////////////////////////////////////////////////////////
          // Step 0, convert cynum/buttnum into an index.  RIGHT!??
      //;
+     //; # not-FIXME assert $bnfill > 0 or maybe yeah, this will take care of itself.
+     //; my $bnwidth = fftgen::log2($nunits) + 1;
+     //; my $cnwidth = fftgen::log2($ncalcs_per_unit) + 1;
+     //; my $bnfill  = $cnwidth - $bnwidth;
+     //; 
      //; # May need filler bits for width match (see above)
      //; # FIXME what happens if $ii_filler is negative? Can that happen?
      //; if ($ii_filler > 0) {
-         {_unused_ok_ii,ii}  = (((CyNum << `fftgen::log2($nunits)`) + {4'b0,ButtNum}) & `($npoints/2-1)`) << 1;
-     //; } else {
-         ii = (((CyNum << `fftgen::log2($nunits)`) + {4'b0,ButtNum}) & `($npoints/2-1)`) << 1;
-     //; }
+         // ButtNum is `$bnwidth` bits (2) but needs `$cnwidth` bits (8) for width match to cynum
+         {_unused_ok_ii,ii}  = (((CyNum << `fftgen::log2($nunits)`) + {`$bnfill`'b0,ButtNum}) & `($npoints/2-1)`) << 1;
          //$display("GENOPS2 (t=%06d)           ii= %d", $time, ii);
+     //; } else {
+         // ButtNum is `$bnwidth` bits (2) but needs `$cnwidth` bits (8) for width match to cynum
+         ii = (((CyNum << `fftgen::log2($nunits)`) + {`$bnfill`'b0,ButtNum}) & `($npoints/2-1)`) << 1;
+         //$display("GENOPS2 (t=%06d)           ii= %d", $time, ii);
+     //; }
 
          //////////////////////////////////////////////////////////////////////////////////////
          // Step 1, the rotate
