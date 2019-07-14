@@ -141,7 +141,7 @@
 //; my @inputs = (
 //;     "", "clk", "  // Clock",
 //;     "", "rst_n", "// Reset signal per power-up",
-//;     "", "start", "// Start signal per FFT",
+//;#     "", "start", "// Start signal per FFT",
 //; );
 //;
 //; my @butterfly_unit_indices = build_butterfly_unit_indices();

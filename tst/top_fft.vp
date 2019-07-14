@@ -180,6 +180,8 @@ module `mname`( input logic clk, output wire done );
    //;     "   logic [$rbits] BFLY%d_op1_rnum;   ",
    //;     "   logic [$rbits] BFLY%d_op2_rnum;\n");
 
+   logic start;
+
    // END WIRE DECLARATIONS
 
    // Because fftctl calls it one thing and twiddle calls it something else.
