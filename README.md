@@ -5,8 +5,8 @@ fftgen - FFT Generator
 |------------------------------|
 | [![linux build status][1]][2]|
 
-[1]: https://travis-ci.org/steveri/fftgen.svg?branch=master
-[2]: https://travis-ci.org/steveri/fftgen
+[1]: https://travis-ci.com/steveri/fftgen.svg?branch=master
+[2]: https://travis-ci.com/steveri/fftgen
 
 
 
