@@ -58,15 +58,25 @@ module srmul(
   wire ofw; assign ofw = (ze_norm[8] == 1'b1);
 
   ////////////////////////////////////////////////////////////////
+/*
   assign z = (a==`zero) ? `zero : (
                (b==`zero) ? `zero : (
                 (ufw)      ? `zero : (
                   (ofw)      ? `NaN :  (
                                  {zs, ze, zm} 
               ))));
+*/
 
-`define DBG1
-`define DBG9
+  assign z = (a==`zero) ? `zero : (
+               (b==`zero) ? `zero : (
+                  (ofw)      ? `NaN :  (
+                                 {zs, ze, zm} 
+              )));
+
+
+
+// `define DBG1
+// `define DBG9
 
 `ifdef DBG1
   // DEBUGGING

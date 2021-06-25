@@ -72,10 +72,13 @@ assign zraw =
 
 // oh how i hate to do this
 // turn -0 (0x80000000) into true zero (0x00000000)
-wire [31:0] z;
 assign z = (zraw == 32'h80000000) ? 32'h0 : zraw;
 
+// FIXME Technically I think these are supposed to be OUTSIDE the module def
+//`define DBG1
+//`define DBG9
 
+`ifdef DBG1
 always @ (*) begin
   $display("%m");
   if (op == `ADD) begin
@@ -92,6 +95,7 @@ always @ (*) begin
 `endif
   $display("%m");
 end
+`endif
 
 endmodule;
 
