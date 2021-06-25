@@ -9,7 +9,19 @@ fftgen - FFT Generator
 [2]: https://travis-ci.com/steveri/fftgen
 
 
-This is an FFT generator and testbench.
+This is an FFT generator and testbench. The generator can build an 8-point FFT, a 1024-point FFT, or any power-of-two in between. It also provides a choice of 1, 2, or 4 butterfly units.
+
+This FFT uses a conflict-free schedule, meaning that it runs to completion without ever having to pause for memory-conflict resolution. Not counting setup and takedown simulation time, the FFT will therefore complete its operation in minimal time; e.g. if local memory access takes one cycle to complete, and you use the generator to build a 1024-point FFT with only a single butterfly unit, it will complete in
+(n/2)log2(n)= 5120 cycles. A unit build with two butterflies working in parallel will complete in half that time, and so on.
+
+The conflict-free schedule works on a variety of SRAM configurations, including single-ported SRAM. The single-ported version of this FFT should thus be the least-area memory configuration for a resource-constrained FFT.
+
+Also see
+
+* Richardson et al., "Building Conflict-Free FFT Schedules," April 2015, doi: 10.1109/TCSI.2015.2402935. https://ieeexplore.ieee.org/document/7070875
+
+* Richardson et al., "An area-efficient minimum-time FFT schedule using single-ported memory," 2013, doi: 10.1109/VLSI-SoC.2013.6673242. https://ieeexplore.ieee.org/document/6673242
+
 
 # Quick How-To
 
@@ -32,9 +44,10 @@ This is an FFT generator and testbench.
 ```
 
 
+4. You'll need csh and perl (sorry!). If you don't already have them, see internet for instructions on how to install.
 
 
-3a. Build and test a single FFT design against a golden model, e.g. to build a 32-point in-place FFT using two butterfly units and one bank of single-port DRAM:
+5. Build and test a single FFT design against a golden model, e.g. to build a 32-point in-place FFT using two butterfly units and one bank of single-port DRAM:
 ```
   cd build/
   ../bin/golden_test.csh 32 2 1port -sim verilator
