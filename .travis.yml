@@ -32,7 +32,7 @@ script:
 
   ### FFT REGRESSIONS
   - cd ${TRAVIS_BUILD_DIR}
-  - test -e rtl/lib && unlink rtl/lib
+  - test -e rtl/lib && unlink rtl/libfoo
   - git clone https://github.com/steveri/fpu rtl/lib
   - mkdir regression; cd regression
   # - ls -l ../bin
