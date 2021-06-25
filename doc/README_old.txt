@@ -2,26 +2,6 @@ Last update: 2/18/2013
 
 (Notes in "0notes.txt"; publish to "README.md"))
 
-This is an FFT generator and testbench.
-
-# Quick How-To
-
-1. Clone the repo
-  git clone fftgen
-  cd fftgen
-
-2. Build a scratch/build area
-  mkdir build/
-
-3a. Build and test a single FFT design against a golden model, e.g. to build a 32-point in-place FFT using two butterfly units and one bank of single-port DRAM:
-  cd build/
-  ../bin/golden_test.csh 32 2 1port
-
-3b. Exhaustive test of multiple models
-  cd build/
-  ../bin/golden_test.csh
-
-
 # Online Interactive FFT Builder
 
 An online, interactive working version of the generator was once
@@ -33,7 +13,8 @@ With a backup mirror here:
 
     http://www-vlsi.stanford.edu/genesis
 
-STATUS: As of May 2019, the backup mirror is still up but the generator is not working...
+STATUS: As of May 2019, the backup mirror is still up but the
+generator is not working...
 
 <!--
 # Source code
