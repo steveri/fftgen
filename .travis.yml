@@ -32,6 +32,8 @@ script:
 
   ### FFT REGRESSIONS
   - cd ${TRAVIS_BUILD_DIR}
+  - test -e rtl/lib && unlink rtl/lib
+  - git clone https://github.com/steveri/fpu rtl/lib
   - mkdir regression; cd regression
   # - ls -l ../bin
   - ../bin/golden_test.csh -sim verilator |& tee test_results.log | egrep 'PASS|FAIL|ERR'

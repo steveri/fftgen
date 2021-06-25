@@ -1,3 +1,7 @@
+Notes 06/2021: Yeah most of this information is old and outdated but
+imma leave it here because me lazy.
+
+
 #### add_copyright.csh
 
 <pre>
