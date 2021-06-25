@@ -9,7 +9,7 @@ fftgen - FFT Generator
 [2]: https://travis-ci.com/steveri/fftgen
 
 
-This is an FFT generator and testbench. The generator can build an 8-point FFT, a 1024-point FFT, or any power-of-two in between. It also provides a choice of 1, 2, or 4 butterfly units.
+This is an FFT generator and testbench. The generator can build an 8-point FFT, a 1024-point FFT, or any power-of-two in between. It also provides a choice of 1, 2, or 4 butterfly units. The generator is powered by [Genesis2](https://github.com/StanfordVLSI/Genesis2).
 
 This FFT uses a conflict-free schedule, meaning that it runs to completion without ever having to pause for memory-conflict resolution. Not counting setup and takedown simulation time, the FFT will therefore complete its operation in minimal time; e.g. if local memory access takes one cycle to complete, and you use the generator to build a 1024-point FFT with only a single butterfly unit, it will complete in
 (n/2)log2(n)= 5120 cycles. A unit build with two butterflies working in parallel will complete in half that time, and so on.
@@ -23,42 +23,49 @@ Also see
 * Richardson et al., "An area-efficient minimum-time FFT schedule using single-ported memory," 2013, doi: 10.1109/VLSI-SoC.2013.6673242. https://ieeexplore.ieee.org/document/6673242
 
 
-# Quick How-To
+# Building the FFT(s): A Quick How-To Guide
+
+0. You'll need csh and perl (sorry!). If you don't already have them, see internet for instructions on how to install. Oh, and you'll also need verilator if you're going to use this prepackaged test build. VCS is also supported maybe, see `bin/golden_test.csh --help`.
+
 
 1. Clone the repo
 ```
-  git clone fftgen
-  cd fftgen
+  git clone https://github.com/steveri/fftgen
+  FFTGEN=$PWD/fftgen
 ```
 
 
-2. Build a scratch/build area
+2. This script installs Genesis.pl if it's not already in your path
 ```
-  mkdir build/
-```
-
-
-3. This script installs Genesis.pl if it's not already in your path
-```
-  source ../bin/setup_genesis.sh
+  source $FFTGEN/bin/setup_genesis.sh
 ```
 
 
-4. You'll need csh and perl (sorry!). If you don't already have them, see internet for instructions on how to install.
-
-
-5. Build and test a single FFT design against a golden model, e.g. to build a 32-point in-place FFT using two butterfly units and one bank of single-port DRAM:
+3. Build a scratch/build area inside the clone
 ```
-  cd build/
-  ../bin/golden_test.csh 32 2 1port -sim verilator
+  mkdir fftgen/build; cd fftgen/build
 ```
 
 
-3b. Exhaustive test of multiple models
+4. Build and test a single FFT design against a golden model, e.g. to build a 32-point in-place FFT using two butterfly units and one bank of single-port DRAM:
 ```
-  cd build/
-  ../bin/golden_test.csh
+
+  $FFTEGEN/bin/golden_test.csh 32 2 1port -sim verilator
 ```
+
+
+5. Exhaustive test of multiple models
+```
+  $FFTEGEN/bin/golden_test.csh
+```
+
+
+6. More information
+```
+  $FFTEGEN/bin/golden_test.csh --help
+```
+
+Also look at .travis.yml to see how we run these test on travis for CI (continuous integration) purposes.
 
 
 
