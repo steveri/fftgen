@@ -144,7 +144,9 @@ module `mname`( input logic clk, output wire done );
 //; }
    // BEGIN WIRE DECLARATIONS
 
-   //; $fftctl->printwires("   ", "wire_list");
+   //; # Declare fftclk wires
+   //; # EXCEPT clk because that's already declared as an input wire.
+   //; $fftctl->printwires("   ", "wire_list", "EXCEPT", "clk");
 
    // FIXME FIXME cycle_num below different than cycle_num signals in fftram, fftctl !!! :(
    //; twiddle_lib::printwires("   ", "wire_list");

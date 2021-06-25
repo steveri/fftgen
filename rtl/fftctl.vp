@@ -790,10 +790,40 @@ endmodule
 //;    print $indent."// end fftctl->printconnections()\n";
 //; }
 //; 
+//; sub delete_exceptions {
+//; 
+//;     # For each item in "except", delete that item from "list"
+//;     my @list   = @{shift(@_)};
+//;     my @except = @{shift(@_)};
+//; 
+//;     my @rlist = (); # Processed list lives here
+//; 
+//;     # print "// list="; print join(",", @list); print "\n";
+//;     # print "// except="; print join(",", @except); print "\n";
+//;     for (my $i = 0; $i < @list; $i += 3) {
+//;         my $bits    = $list[$i+0];  # E.g. "[3:0]"
+//;         my $signame = $list[$i+1];  # E.g. "fourbit_counter"
+//;         my $comment = $list[$i+2];  # E.g. "// Counts to sixteen"
+//;         my $keep    = 1;
+//;         foreach my $E (@except) {
+//;             if ($E eq $signame) { $keep = 0 ; }
+//;         }
+//;         if ($keep) { push(@rlist, ($bits,$signame,$comment)); }
+//;     }
+//;     # print "// rlist="; print join(",", @rlist); print "\n";
+//;     return @rlist;
+//; }
+//;
 //; sub printwires {
 //;    # Okay yes this is weird but parm list has extra "HASH" when called as "function()" vs. "obj->function()"!!
 //;    my $indent = shift @_; while ($indent =~ /HASH/) { $indent = shift @_; }
 //;    my $list    = shift @_; # Either "io_list" (for me) or "wire_list" (for others)
+//;
+//;    # Remaining args are signals to exclude from the list(s).
+//;    # E.g.: $fftctl->printwires("   ", "wire_list", "EXCEPT", "clk");
+//;    my @except = @_;
+//;    my @inputs_e  = delete_exceptions( \@inputs,  \@except );
+//;    my @outputs_e = delete_exceptions( \@outputs, \@except );
 //;
 //;    my $io_list = ($list eq "io_list") ? 1 : 0;
 //;    
@@ -808,7 +838,7 @@ endmodule
 //;    # Print inputs.  If "$io_list" true, add "input" and comma, e.g.:
 //;    #   input logic  clk_i,   // Clock
 //;    #   input logic  rst_n_i, // Reset signal per power-up
-//;    pw($indent, $io_list, "input", @inputs, "not_last");
+//;    pw($indent, $io_list, "input", @inputs_e, "not_last");
 //; 
 //;    # Butterfly unit operands, e.g.
 //;    #   output logic [2:0] BFLY0_op1_ix_o, 
@@ -819,7 +849,7 @@ endmodule
 //;    #   output logic [2:0] fftctl_cycle_num_o, // 0, 1, 2, ...
 //;    #   output logic  busy_o,   // hi while busy computing fft
 //;    #   output logic  fftclk_o // local_clk = global_clk/1
-//;    pw($indent, $io_list, "output", @outputs, "last");
+//;    pw($indent, $io_list, "output", @outputs_e, "last");
 //; 
 //;    print $indent."// end fftctl->printwires()\n";
 //;    print $indent."//------------------------------------------------\n";

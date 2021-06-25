@@ -9,17 +9,63 @@ fftgen - FFT Generator
 [2]: https://travis-ci.com/steveri/fftgen
 
 
+This is an FFT generator and testbench.
 
-UNDER DEVELOPMENT
+# Quick How-To
 
-Temporarily down for maintenance.  Check Back Again Tomorrow (tm).
+1. Clone the repo
+```
+  git clone fftgen
+  cd fftgen
+```
 
 
-#### CURRENT STATUS
+2. Build a scratch/build area
+```
+  mkdir build/
+```
+
+
+3. This script installs Genesis.pl if it's not already in your path
+```
+  source ../bin/setup_genesis.sh
+```
+
+
+
+
+3a. Build and test a single FFT design against a golden model, e.g. to build a 32-point in-place FFT using two butterfly units and one bank of single-port DRAM:
+```
+  cd build/
+  ../bin/golden_test.csh 32 2 1port -sim verilator
+```
+
+
+3b. Exhaustive test of multiple models
+```
+  cd build/
+  ../bin/golden_test.csh
+```
+
+
+
+
+
+
+
+
+
+
+#### CURRENT STATUS Jun 2021
 
 - all regression tests PASS (47/47) using homebrew fpu
-- still to do: make everything work with verilator
+- I think it's all working with verilator now
 - see 0notes-fft.txt, README.txt for latest/best info
+
+
+
+
+
 
 #### NOTES
 <pre>

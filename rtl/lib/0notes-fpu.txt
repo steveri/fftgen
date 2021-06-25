@@ -1,3 +1,9 @@
+SUMMARY 2106
+- gave FPU its own repo
+- jimmied up a bunch of beeyootiful CI tests
+
+
+------------------------------------------------------------------------
 SUMMARY 1906
 
 Summary of what happened:
@@ -11,7 +17,7 @@ Summary of what happened:
 STATUS 1905
 - seems stable for now, works on 47 fft regressions
 - could use a severe cleaning up
-- also needs severe testsing, i.e. maybe find IEEE/IBM vectors
+- also needs severe testing, i.e. maybe find IEEE/IBM vectors
 
 TODO
 - put it in a separate repo...StanfordVLSI I guess

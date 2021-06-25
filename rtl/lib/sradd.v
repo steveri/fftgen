@@ -88,7 +88,7 @@ assign z =
 
 // DEBUGGING
 // FIXME Technically I think these are supposed to be OUTSIDE the module def
-`define DBG1
+//`define DBG1
 //`define DBG9
 
 `ifdef DBG1
