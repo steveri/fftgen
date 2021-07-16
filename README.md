@@ -1,7 +1,7 @@
 fftgen FFT Generator
 ======
 
-[![Build Status](https://travis-ci.com/steveri/fpu.svg?branch=main)](https://travis-ci.com/steveri/fpu)
+[![Build Status](https://travis-ci.com/steveri/fftgen.svg?branch=main)](https://travis-ci.com/steveri/fftgen)
 
 
 This repo contains code for an FFT generator and testbench. The generator can build an 8-point FFT, a 1024-point FFT, or any power-of-two in between. It also provides a choice of 1, 2, or 4 butterfly units. The generator is powered by [Genesis2](https://github.com/StanfordVLSI/Genesis2).
