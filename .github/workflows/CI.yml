@@ -1,0 +1,83 @@
+name: CI
+
+########################################################################
+on:
+  # Every push
+  push:
+
+  # When requested manually
+  workflow_dispatch:
+
+  # Schedule NOTE ONLY WORKS FOR MAIN BRANCH :(
+  schedule:
+    # Every morning at 3am ( 3am local ~ 10am UTC :( )
+    # ( min hr day JAN-DEC MON-SUN )
+    - cron: '0 10 * * *'
+
+
+########################################################################
+jobs:
+
+  # This workflow contains a single job called "CI"
+  CI:
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Action, branch, and repo information.
+      - run: echo Action = ${{ github.event_name }}, branch = ${{ github.ref }}
+      # - run: echo "Branch '${{ github.ref }}' in repo '${{ github.repository }}'."
+
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Install csh
+        run: sudo apt-get install csh
+
+      - name: Install Genesis2
+        run: source bin/setup_genesis.sh
+
+      - name: Install verilator
+        run: sudo apt-get install verilator
+
+      - name: 'FFT REGRESSIONS'
+        run: |
+          # FFT REGRESSIONS
+
+          # Echo commands; exit on failure
+          set -x; set -e
+
+          # Where are we?
+          TRAVIS_BUILD_DIR=`pwd`
+
+          # Initialize Genesis2 environment
+          source bin/setup_genesis.sh
+
+          # Fetch the FPU
+          test -e rtl/lib && unlink rtl/lib
+          git clone https://github.com/steveri/fpu rtl/lib
+
+          # Prep to run the regressions
+          echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
+          echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
+          mkdir regression; cd regression
+
+          # ("nobuf" allows continuous streaming to stdout instead of buffering)
+          nobuf='stdbuf -oL -eL'
+
+          # Run the regressions
+          do_test='../bin/golden_test.csh -sim verilator'
+          $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
+
+          # Check for errors
+          egrep 'FAIL|ERR' test_results.log && exit 13 || echo okay
+
+          # Log should be about 18K lines long
+          wc -l test_results.log
+
+          ### SIMV ANALYZER
+          # I have this test for the analyzer, why not use it.
+          # FIXME not sure what this really does...?
+          cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
