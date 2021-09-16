@@ -61,7 +61,7 @@ jobs:
 
           # Prep to run the regressions
           echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
-          echo "One of the 48 passes should fail (8 points, 4 units, 1 port makes no sense)"
+          echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
           mkdir regression; cd regression
 
           # ("nobuf" allows continuous streaming to stdout instead of buffering)
