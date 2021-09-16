@@ -69,11 +69,24 @@ jobs:
           # Run the regressions
           mkdir regression; cd regression
           # - ls -l ../bin
-          ../bin/golden_test.csh -sim verilator |& tee test_results.log | egrep 'PASS|FAIL|ERR'
+          #  ../bin/golden_test.csh -sim verilator |& tee test_results.log | egrep 'PASS|FAIL|ERR'
+
+          nobuf='stdbuf -oL -eL'
+
+          ../bin/golden_test.csh -sim verilator |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
+
+
+          wc -l test_results.log
+
+
 
           # Here's a tricky thing...it passes when it fails and it fails when it passes :(
           # Also---FIXME---above command should be responsible for PASS/FAIL exit codes
           egrep 'FAIL|ERR' test_results.log && exit 13 || echo okay
+
+
+          
+
 
           ### SIMV ANALYZER
           # I have this test for the analyzer, why not use it.
