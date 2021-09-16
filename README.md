@@ -1,4 +1,4 @@
-fftgen FFT Generator
+FFT Generator
 ======
 
 [![Build Status][1]][2]
