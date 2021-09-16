@@ -59,73 +59,23 @@ jobs:
           test -e rtl/lib && unlink rtl/lib
           git clone https://github.com/steveri/fpu rtl/lib
 
-          # Run the regressions
+          # Prep to run the regressions
+          echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
+          echo "One of the 48 passes should fail: 8 points, 4 units, 1 port makes no sense"
           mkdir regression; cd regression
           nobuf='stdbuf -oL -eL'
           do_test='../bin/golden_test.csh -sim verilator'
-          # ../bin/golden_test.csh -sim verilator |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
+
+          # Run the regressions
           $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
 
-          # tee_results='stdbuf -oL -eL tee test_results.log'
-          # filter_results="stdbuf -oL -eL egrep 'PASS|FAIL|ERR'"
-          # $do_test | $tee_results | $filter_results
-
-
-          wc -l test_results.log
-
-
-
-          # Here's a tricky thing...it passes when it fails and it fails when it passes :(
-          # Also---FIXME---above command should be responsible for PASS/FAIL exit codes
+          # Check for errors
           egrep 'FAIL|ERR' test_results.log && exit 13 || echo okay
 
-
-          
-
+          # Log should be about 18K lines long
+          wc -l test_results.log
 
           ### SIMV ANALYZER
           # I have this test for the analyzer, why not use it.
+          # FIXME not sure what this really does...?
           cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
-
-
-#       - name: 'FPU tests: SUB'
-#         run: |
-#           cd test
-#           make clean
-# 
-#           echo "========================================================================"
-#           echo "make build TEST=SUB"
-#           echo "========================================================================"
-#           make build TEST=SUB
-# 
-#           echo "========================================================================"
-#           echo "make run TEST=SUB"
-#           echo "========================================================================"
-#           make run TEST=SUB |& tee ../test-results.sub
-# 
-#       - name: 'FPU tests: MUL'
-#         run: |
-#           cd test
-#           make clean
-# 
-#           echo "========================================================================"
-#           echo "make build TEST=MUL"
-#           echo "========================================================================"
-#           make build TEST=MUL
-# 
-#           echo "========================================================================"
-#           echo "make run TEST=MUL"
-#           echo "========================================================================"
-#           make run TEST=MUL |& tee ../test-results.mul
-# 
-#       - name: Test results
-#         run: |
-#           echo
-#           echo "ADD-TEST RESULTS"
-#           sed -n '/^Num/,/^Max/p' test-results.add; tail -1 test-results.add
-#           echo "================================================================================"
-#           echo "SUB-TEST RESULTS"
-#           sed -n '/^Num/,/^Max/p' test-results.sub; tail -1 test-results.sub
-#           echo "================================================================================"
-#           echo "MUL-TEST RESULTS"
-#           sed -n '/^Num/,/^Max/p' test-results.mul; tail -1 test-results.mul
