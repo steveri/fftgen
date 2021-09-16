@@ -44,17 +44,10 @@ jobs:
 
       - name: 'FFT REGRESSIONS'
         run: |
+          # FFT REGRESSIONS
 
-          # debugging
-          set -x
-          command -v sh
-          command -v csh
-          which sh
-          which csh
-
-
-          # Exit on failure
-          set -e
+          # Echo commands; exit on failure
+          set -x; set -e
 
           # Where are we?
           TRAVIS_BUILD_DIR=`pwd`
@@ -68,12 +61,15 @@ jobs:
 
           # Run the regressions
           mkdir regression; cd regression
-          # - ls -l ../bin
-          #  ../bin/golden_test.csh -sim verilator |& tee test_results.log | egrep 'PASS|FAIL|ERR'
-
           nobuf='stdbuf -oL -eL'
+          do_test='../bin/golden_test.csh -sim verilator'
+#           ../bin/golden_test.csh -sim verilator |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
+          $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
 
-          ../bin/golden_test.csh -sim verilator |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
+
+#           tee_results='stdbuf -oL -eL tee test_results.log'
+#           filter_results="stdbuf -oL -eL egrep 'PASS|FAIL|ERR'"
+#           $do_test | $tee_results | $filter_results
 
 
           wc -l test_results.log
@@ -88,7 +84,8 @@ jobs:
           
 
 
-          ### SIMV ANALYZER
+          ### SIMV ANALYZER \
+          wyzer
           # I have this test for the analyzer, why not use it.
           cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
 
