@@ -1,7 +1,8 @@
 FFT Generator
 ======
 
-Github: [![Build Status][1]][2]
+Github:
+[![Build Status][1]][2]
 [1]: https://github.com/steveri/fftgen/actions/workflows/CI.yml/badge.svg
 [2]: https://github.com/steveri/fftgen/actions/workflows/CI.yml
 
