@@ -2,13 +2,15 @@ FFT Generator
 ======
 
 Github:
+
 [![Build Status][1]][2]
+
 [1]: https://github.com/steveri/fftgen/actions/workflows/CI.yml/badge.svg
 [2]: https://github.com/steveri/fftgen/actions/workflows/CI.yml
 
-Travis: [![Build Status][1]][2]
-[1]: https://app.travis-ci.com/steveri/fftgen.svg?branch=master
-[2]: https://app.travis-ci.com/steveri/fftgen
+Travis: [![Build Status][3]][4]
+[3]: https://app.travis-ci.com/steveri/fftgen.svg?branch=master
+[4]: https://app.travis-ci.com/steveri/fftgen
 
 
 
