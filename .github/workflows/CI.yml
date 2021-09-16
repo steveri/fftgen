@@ -44,6 +44,9 @@ jobs:
 
           # debugging
           set -x
+          command -v sh
+          command -v csh
+          which sh
           which csh
 
 
