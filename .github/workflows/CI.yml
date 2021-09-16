@@ -63,13 +63,12 @@ jobs:
           mkdir regression; cd regression
           nobuf='stdbuf -oL -eL'
           do_test='../bin/golden_test.csh -sim verilator'
-#           ../bin/golden_test.csh -sim verilator |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
+          # ../bin/golden_test.csh -sim verilator |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
           $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
 
-
-#           tee_results='stdbuf -oL -eL tee test_results.log'
-#           filter_results="stdbuf -oL -eL egrep 'PASS|FAIL|ERR'"
-#           $do_test | $tee_results | $filter_results
+          # tee_results='stdbuf -oL -eL tee test_results.log'
+          # filter_results="stdbuf -oL -eL egrep 'PASS|FAIL|ERR'"
+          # $do_test | $tee_results | $filter_results
 
 
           wc -l test_results.log
@@ -84,8 +83,7 @@ jobs:
           
 
 
-          ### SIMV ANALYZER \
-          wyzer
+          ### SIMV ANALYZER
           # I have this test for the analyzer, why not use it.
           cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
 
