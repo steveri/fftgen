@@ -42,6 +42,11 @@ jobs:
       - name: 'FFT REGRESSIONS'
         run: |
 
+          # debugging
+          set -x
+          which csh
+
+
           # Exit on failure
           set -e
 
