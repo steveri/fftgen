@@ -59,6 +59,9 @@ jobs:
           # Where are we?
           TRAVIS_BUILD_DIR=`pwd`
 
+          # Initialize Genesis2 environment
+          source bin/setup_genesis.sh
+
           # Fetch the FPU
           test -e rtl/lib && unlink rtl/lib
           git clone https://github.com/steveri/fpu rtl/lib
