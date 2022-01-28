@@ -55,8 +55,15 @@ You will need csh and perl (sorry!). If you don't already have them, see interne
   $FFTGEN/bin/golden_test.csh --help
 ```
 
-Also look at .travis.yml to see how we run these test on travis for CI (continuous integration) purposes.
+Our CI scripts also provide a good guide on how to build and run fftgen using an extensive test suite. Scripts are here:
 
+* https://github.com/steveri/fftgen/tree/master/.github/workflows
+* https://github.com/steveri/fftgen/blob/master/.travis.yml
+
+And you can see the results of previous runs here:
+
+* https://github.com/steveri/fftgen/actions/workflows/CI.yml
+* https://app.travis-ci.com/github/steveri/fftgen/builds
 
 
 #### CURRENT STATUS Jun 2021
