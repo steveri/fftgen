@@ -68,7 +68,7 @@ And you can see the results of previous runs here:
 
 ## Using RTL examples
 
-If you want to not fool with genesis and just use see/use straight SystemVerilog RTL, there are example configurations in the subdirectory "examples-rtl", along with README.md instructions on how to build and use a Verilator testbench to verify its correctness.
+If you want to not fool with genesis and just use see/use straight SystemVerilog RTL, there are example configurations in the subdirectory `examples-rtl`, along with `README.md` instructions on how to build and use a Verilator testbench to verify its correctness.
 
 
 
