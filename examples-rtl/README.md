@@ -1,6 +1,6 @@
 # How To Use The Examples
 
-To simulate and test the 8-port FFT with 1 butterfly unit and 1-port SRAM in subdirectory "8.1.1port":
+To simulate and test the 8-port FFT with 1 butterfly unit and 1-port SRAM in subdirectory `8.1.1port`:
 ```
   # Set "repo" to wherever you cloned the fftgen repo;
   # e.g. $repo/bin/golden_test.pl should exist.
@@ -82,11 +82,11 @@ Note for 1024-4-2port example, you would use a similar sequence except with
 `npoints=1024`, `nunits=4`, `nports="2port`.
 
 
-<- ------------------------------------------------------------------------ ->
+<!- ------------------------------------------------------------------------ ->
 # How Genesis2 Was Used To Generate The Example RTL
 
 
-For 8-port FFT with 1 butterfly unit and 1-port SRAM
+For 8-port FFT with 1 butterfly unit and 1-port SRAM example
 ```
   # Set "repo" to wherever you cloned the fftgen repo;
   # $repo/Makefile should exist
@@ -119,5 +119,5 @@ For 8-port FFT with 1 butterfly unit and 1-port SRAM
   genesis_clean.cmd
 
 The above sequence would leave you with the SystemVerilog RTL in a subdirectory
-8.1.1port/rtl
+`8.1.1port/rtl`.
 ```
