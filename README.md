@@ -66,6 +66,12 @@ And you can see the results of previous runs here:
 * https://app.travis-ci.com/github/steveri/fftgen/builds
 
 
+## Using RTL examples
+
+If you want to not fool with genesis and just use see/use straight SystemVerilog RTL, there are example configurations in the subdirectory "examples-rtl", along with README.md instructions on how to build and use a Verilator testbench to verify its correctness.
+
+
+
 #### CURRENT STATUS Jun 2021
 
 - all regression tests PASS (47/47) using homebrew fpu
