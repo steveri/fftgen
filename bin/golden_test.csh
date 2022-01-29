@@ -262,7 +262,7 @@ foreach t ($tests:q)
   if ($?VERBOSE) then
     echo "  $cmd GENESIS_PARAMS=$dq$parms$dq" >& $tmp
   endif
-  $cmd GENESIS_PARAMS="$parms" >& $tmp || set fatal_error
+  $cmd GENESIS_PARAMS="$parms" >>& $tmp || set fatal_error
 
   # If FFT generator failed, print out a coherent error message.
   if ($?fatal_error) then
