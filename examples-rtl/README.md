@@ -97,7 +97,7 @@ For 8-port FFT with 1 butterfly unit and 1-port SRAM example
   mkdir 8.1.1port; cd 8.1.1port
 
   # Translate sram choice into genesis-speak;
-  # options inclue "TRUE_1PORT", "1PORT_DBLPUMP", "TRUE_2PORT"
+  # options include "TRUE_1PORT", "1PORT_DBLPUMP", "TRUE_2PORT"
   if [ "$nports" == "1port" ]; then sram="TRUE_1PORT";
   if [ "$nports" == "2port" ]; then sram="TRUE_2PORT";
   if [ "$nports" == "dpump" ]; then sram="1PORT_DBLPUMP";
