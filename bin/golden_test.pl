@@ -26,7 +26,8 @@ if (@ARGV != 4) {
     die $errmsg;
 }
 my ($LOGFILE, $npoints,$nunits,$sram_type) = ($ARGV[0], $ARGV[1], $ARGV[2], $ARGV[3]);
-print "Comparing $LOGFILE against GM w/ npoints=$npoints, nunits=$nunits and sram_type=\"$sram_type\".\n";
+print "Comparing FFT log '$LOGFILE' vs. gold model (GM)\n";
+print "with npoints=$npoints, nunits=$nunits, sram_type='$sram_type'\n";
 
 if ($sram_type eq "test_error") {
     $sram_type = "1port";
@@ -214,7 +215,7 @@ sub print_results {
     my $nerrors = 0;
     my $nwarnings = 0;
     my ($first,$last) = ($rtype eq "Real") ? (0, $npoints) : ($npoints, 2*$npoints);
-    print "$rtype results:  GM        FFT\n";
+    print "$rtype results:      GM          FFT\n";
     for (my $i=$first; $i < $last; $i++) {
         #printf("             %6s    %9s\n", $gm_results[$i], $fft_results[$i]);
         #printf("             %6.3f    %6.3f\n", $gm_results[$i]+0, $fft_results[$i]+0);
