@@ -1,8 +1,4 @@
 #!/usr/bin/perl
-## Copyright 2013, all rights reserved.
-## See below (end of file) for extended copyright information.
-##
-#!/usr/bin/perl
 # Command is "$0"; command-line arguments can be found in array @ARGV
 use strict;
 
@@ -272,18 +268,3 @@ sub mydir {
     my ($filename, $dir, $suffix) = fileparse($fullpath);
     return abs_path("$dir/$offset");
 }
-##############################################################################
-## Copyright Stephen Richardson and Stanford University.  All rights reserved.
-##              Exclusively Licensed by Chip Genesis Inc.
-##
-## The code, the algorithm, or any part of it is not to be copied/reproduced.
-## The code, the algorithm, or results from running this code may not be used
-## for any commercial use unless legally licensed.
-##
-## For more information please contact
-##   Ofer Shacham (Stanford Univ./Chip Genesis)   shacham@alumni.stanford.edu
-##   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu
-##
-## Genesis2 is patent pending. For information regarding the patent please
-## contact the Stanford Technology Licensing Office.
-###############################################################################

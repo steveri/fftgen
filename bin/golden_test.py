@@ -188,6 +188,47 @@ def do_fft(DBG=0):
     return (ar + ai)
 
 def golden_model(npoints, nunits, DBG=0):
+    '''Can use either perl or python golden model!'''
+
+    # return golden_model_perl(npoints, nunits, DBG=0)
+    return golden_model_numpy(npoints, nunits, DBG=0)
+
+def golden_model_numpy(npoints, nunits, DBG=0):
+    from numpy import fft
+
+    '''Calculate FFT of a step-down function'''
+    # Note: 'nunits' is unused!
+
+    # Build a step-function test array of input datapoints, e.g. for npoints=8:
+    # test_array = [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+    n2 = int(npoints) >> 1  # Divide by two and still be integer
+    test_array = ([1.0] * n2) + ([0.0] * n2)
+    if DBG:
+        print("")
+        print("test_array = ", end='')
+        pprint(test_array)
+        print("")
+
+    # Calculate the fft
+    fft_results = fft.fft(test_array)
+
+    # Unpack results into separate real and imaginary arrays
+    ar=[]; ai=[]
+    for c in fft_results:
+        ar = ar + [ c.real ]
+        ai = ai + [ c.imag ]
+
+    # Optional debugging
+    if DBG:
+        print("")
+        print("     ______GOLDEN MODEL______")
+        for i in range(npoints):
+            print(f"  {i:4d} {ar[i]:9.3f} {ai[i]:9.3f}")
+        print("")
+
+    return (ar+ai)
+
+def golden_model_perl(npoints, nunits, DBG=0):
     '''Invoke the Golden Model and capture the results'''
     # E.g. gm = `golden_model 8 1`
 
@@ -229,9 +270,9 @@ def golden_model(npoints, nunits, DBG=0):
         assert len(ar) == int(ix); ar = ar + [ real ]
         assert len(ai) == int(ix); ai = ai + [ imag ]
 
-    if DBG: print('real', ar)
-    if DBG: print('imag', ai)
     if DBG:
+        print('real', ar)
+        print('imag', ai)
         print("     _________GOLDEN MODEL_______")
         for ix in range(0,len(ar)):
             print(f"    {ix:4d} {ar[ix]:>9s}    {ai[ix]:>9s}")

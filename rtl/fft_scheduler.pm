@@ -1,9 +1,10 @@
-## Copyright 2013, all rights reserved.
-## See below (end of file) for extended copyright information.
-##
 package fft_scheduler;
 use strict;
 $| = 1; # Autoflush output why not.
+
+# Turn on ALL_LDBG for extensive debug info
+my $ALL_LDBG=0;
+if ($ENV{ALL_LDBG} ne "") { $ALL_LDBG = $ENV{ALL_LDBG}; }
 
 my $rtldir = mydir(".");  # This script lives in $FFTGEN/rtl;
 push (@INC, "$rtldir/");  # swizzler lives in $FFTGEN/rtl
@@ -20,6 +21,9 @@ sub DBG_ON { $DBG = 1; }
 # Valid settings are 'round7' (new/best), 'mod_bn_combo' (old) and maybe 'takala'
 my $SCHED_ALG = 'round7';
 if ($ENV{SCHED_ALG} ne "") { $SCHED_ALG = $ENV{SCHED_ALG}; }
+
+# For comparison to python version
+if ($ALL_LDBG) { print "PERL\n"; }
 
 # To turn crazy_eye on remotely, set shell variable USE_CRAZY to 1
 print "// Scheduling algorithm='$SCHED_ALG'";
@@ -51,6 +55,12 @@ sub build_base_schedule {
     my ($S,$T) = (log2($D), log2($G)); # Number of stages S and toggle bits T
     my %datapoints = {};
 
+    # Debugging
+    if ($ALL_LDBG) {
+        printf("Will build normal  stages %d to %d\n", 0,       $S-$T);
+        printf("Will build overlap stages %d to %d\n", $S-$T+1, $S-1 );
+        print("\n")
+    }
     # Normal stages 0 through S-T
     for (my $s=0; $s <= ($S-$T); $s++) {
         if ($DBG) { print "Building normal stage $s\n"; }
@@ -88,6 +98,19 @@ sub build_base_schedule {
         }
     }
     if ($DBG) { print "\n"; }
+
+    # For comparison to python version
+    if ($ALL_LDBG) {
+        printf("build_base_schedule(%d,%d)=\n", $D, $G);
+        my @printlist = ();
+        foreach my $name (sort keys %datapoints) {
+            if ($datapoints{$name} ne "") {
+                push @printlist, "'$name': $datapoints{$name}";
+            }
+        }
+        print("{"); print(join(",\n ", @printlist)); print("}\n\n");
+    }
+
     return %datapoints;
 }
 
@@ -105,6 +128,8 @@ sub build_extended_schedule {
     my ($S,$T) = (log2($D), log2($G));
 
     my %deltapoints = {};
+
+    my $DBG = $ALL_LDBG;
 
     # Forward stages
     for (my $s=0; $s <= ($S-$T); $s++) {
@@ -430,6 +455,18 @@ sub fft_schedule_round7 {
     my %deltapoints = build_extended_schedule($D,$G,\%datapoints);
     my $schedule = \%deltapoints; # Somewhat unnecessary dontcha think.
 
+    # Debugging
+    if ($ALL_LDBG) {
+        printf("extended_schedule=\n");
+        my @printlist = ();
+        foreach my $name (sort keys %$schedule) {
+            if ($schedule->{$name} ne "") {
+                push @printlist, "'$name': $schedule->{$name}";
+            }
+        }
+        print("{"); print(join(",\n ", @printlist)); print("}\n\n");
+    }
+
     my $fftno = 0;     # cycle number I guess, but not really maybe
     my @fft_info = ();
 
@@ -593,7 +630,7 @@ sub add_bypass_info {
     my $odnod = 1; # First conflict (only) should trigger an OD NOD message.
     my $bufnum = 0;
 
-    my $LDBG = 0;
+    my $LDBG = $ALL_LDBG;
     # See if there's a bank conflict between last group in current stage and first group of next stage.
     for (my $fcur = $lastpack_curstage; $fcur < $firstcy_nxtstage; $fcur++) {
         my $found_conflict = 0;
@@ -602,6 +639,8 @@ sub add_bypass_info {
             # Look for bank1, bank2 conflicts each in turn.
             foreach my $which_op ('op1', 'op2') {
                 
+                if ($LDBG) { print "Comparing cycles $fcur and $fnxt\n"; }
+
                 # if $which_op's write bank conflicts with next cycle's read bank, must bypass
                 my $cur_op = find_conflict($fft_info, $fcur, $which_op, $fnxt);
                 if ($cur_op eq "") { next; }  # No conflicts found.
@@ -652,7 +691,7 @@ sub find_conflict {
     my $nxtb1 = @{$fft_info}[$fnxt]->{bank1};
     my $nxtb2 = @{$fft_info}[$fnxt]->{bank2};
 
-    my $LDBG=0;
+    my $LDBG=$ALL_LDBG;
     if ($LDBG) { print "  bnr(): cy$fcur.$which_op=b$curbank; cy$fnxt.op1=b$nxtb1 and cy$fnxt.op1=b$nxtb2\n"; }
 
 
@@ -1692,6 +1731,3 @@ sub gen_crazy_verilog {
     return $rval;
 }
 1;
-##############################################################################
-## Copyright Stephen Richardson and Stanford University.  All rights reserved.
-##############################################################################

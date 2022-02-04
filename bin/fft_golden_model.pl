@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-## Copyright 2013, all rights reserved.
-## See below (end of file) for extended copyright information.
-##
-#!/usr/bin/perl
 # Command is "$0"; command-line arguments can be found in array @ARGV
 use strict;
+
+# Debugging
+my $ALL_LDBG=0;
+if ($ENV{ALL_LDBG} ne "") { $ALL_LDBG = $ENV{ALL_LDBG}; }
 
 #push (@INC, "/home/steveri/fftgen/rtl/");
 my $rtldir = mydir("../rtl");  # Script lives in $FFTGEN/bin;
@@ -13,6 +13,35 @@ require fft_scheduler;
 
 #test_fft(8, 1);
 
+# Example usage, from golden_test.p[ly]:
+# fft_golden_model.py 8 1
+# ------------------------------------------------------------------------
+# // Scheduling algorithm='round7'
+# 
+# // swizzler algorithm 'round7'
+# //  0. Index ( 0, 1) => banks ( 0, 1),  twid(c,s) = ( 1.000,  0.000)
+# //  1. Index ( 2, 3) => banks ( 2, 3),  twid(c,s) = ( 1.000,  0.000)
+# //  2. Index ( 4, 5) => banks ( 0, 1),  twid(c,s) = ( 1.000,  0.000)
+# //  3. Index ( 6, 7) => banks ( 2, 3),  twid(c,s) = ( 1.000,  0.000)
+# //  4. Index ( 0, 2) => banks ( 0, 2),  twid(c,s) = ( 1.000,  0.000)
+# //  5. Index ( 4, 6) => banks ( 1, 3),  twid(c,s) = ( 1.000,  0.000)
+# //  6. Index ( 5, 7) => banks ( 0, 2),  twid(c,s) = ( 0.000, -1.000)
+# //  7. Index ( 1, 3) => banks ( 1, 3),  twid(c,s) = ( 0.000, -1.000)
+# //  8. Index ( 0, 4) => banks ( 0, 1),  twid(c,s) = ( 1.000,  0.000)
+# //  9. Index ( 2, 6) => banks ( 2, 3),  twid(c,s) = ( 0.000, -1.000)
+# // 10. Index ( 1, 5) => banks ( 0, 1),  twid(c,s) = ( 0.707, -0.707)
+# // 11. Index ( 3, 7) => banks ( 2, 3),  twid(c,s) = (-0.707, -0.707)
+#        0    4.000     0.000
+#        1    1.000    -2.414
+#        2    0.000     0.000
+#        3    1.000    -0.414
+#        4    0.000     0.000
+#        5    1.000     0.414
+#        6    0.000     0.000
+#        7    1.000     2.414
+# ------------------------------------------------------------------------
+
+my $DBG=$ALL_LDBG;
 my ($npoints,$nunits);
 if (@ARGV == 2) {
     ($npoints,$nunits) = ($ARGV[0], $ARGV[1]);
@@ -23,7 +52,7 @@ else {
     print "    $0 8 1\n";
     exit(-1);
 }
-#print "npoints=$npoints, nunits=$nunits\n";
+if ($DBG) { print "npoints=$npoints, nunits=$nunits\n"; }
 
 # fft_scheduler::DBG_ON();
 test_fft($npoints, $nunits);
@@ -43,13 +72,13 @@ sub test_fft {
     #   @ai = (0, 0, 0, 0,  0, 0, 0, 0);
 
     my @a = build_test_array($npoints);
+
+    # Unpack real and imaginary portions
     my @ar = @a[0          .. $npoints-1];
     my @ai = @a[$npoints .. 2*$npoints-1];
-
-#    printvals($npoints, @ar, @ai); print "\n";
+    # printvals($npoints, @ar, @ai); print "\n";
 
     # Now replace test array with its FFT values
-#    my @a = do_fft($npoints, @ar, @ai);
     my @a = do_fft($npoints, $nunits, @ar, @ai);
     my @ar = @a[0          .. $npoints-1];
     my @ai = @a[$npoints .. 2*$npoints-1];
@@ -82,17 +111,17 @@ sub build_test_array {
 sub do_fft {
     my $npoints = shift; # 8, 16, 32, ... 1024
     my $nunits  = shift; # 1, 2 or 4
+    my $LDBG = $ALL_LDBG;
+    # $LDBG = 1;
 
     if (@_ != 2*$npoints) { print "ERROR bad arg list for do_fft\n"; exit(-1); }
 
     my @ar = @_[0          .. $npoints-1];
     my @ai = @_[$npoints .. 2*$npoints-1];
-    
-    my $LDBG = 0;
 
     # Generate FFT info
-    #my @fft_info = fft_scheduler::fft_schedule($npoints, $nunits, "reschedule", "");
 
+    #my @fft_info = fft_scheduler::fft_schedule($npoints, $nunits, "reschedule", "");
     # For now, assuming "reschedule" is just asking for trouble...
     # in particular, trouble for npoints=8 and nunits=4
 
@@ -102,7 +131,7 @@ sub do_fft {
 #       $ENV{USE_CRAZY} ?
 #       fft_scheduler::fft_schedule($npoints, $nunits, "reschedule", "") :
 #       fft_scheduler::fft_schedule($npoints, $nunits, "", "") ;
-    
+
     # BUG/FIXME/TODO maybe later, emulate swizzle and bypass behavior
     # Maybe later, emulate swizzle and bypass behavior
     # For now, FFT in place.  Also, serialize all parallel-butt action.
@@ -203,18 +232,3 @@ sub mydir {
     my ($filename, $dir, $suffix) = fileparse($fullpath);
     return abs_path("$dir/$offset");
 }
-##############################################################################
-## Copyright Stephen Richardson and Stanford University.  All rights reserved.
-##              Exclusively Licensed by Chip Genesis Inc.
-##
-## The code, the algorithm, or any part of it is not to be copied/reproduced.
-## The code, the algorithm, or results from running this code may not be used
-## for any commercial use unless legally licensed.
-##
-## For more information please contact
-##   Ofer Shacham (Stanford Univ./Chip Genesis)   shacham@alumni.stanford.edu
-##   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu
-##
-## Genesis2 is patent pending. For information regarding the patent please
-## contact the Stanford Technology Licensing Office.
-###############################################################################
