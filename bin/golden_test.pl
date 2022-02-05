@@ -70,15 +70,20 @@ sub do_test {
 
     if ($DBG) { print('do_test %s %s %s\n', $npoints, $nunits, $sram_type); }
 
-print("bookmarkpl\n");
+    # Run the golden model and fetch the results
     my @gm_results = golden_model($npoints, $nunits);
+    if ($DBG) {
+        print 'gm_results='; print(@gm_results); print "\n"; 
+        foreach my $result (@gm_results) { print "bat $result\n"; }
+        print "\n";
+    }
 
-#    foreach my $result (@gm_results) { print "bat $result\n"; } print "\n";
-
-#    my @fft_results = do_fft(8, 1, "1port");
-    my @fft_results = do_fft();  # Use results found in "$LOGFILE".
+    my @fft_results = do_fft();  # Fetch results found in fft log <LOGFILE>
     print "\n";
-#    foreach my $result (@fft_results) { print "fat $result\n\n"; } print "\n";
+
+    if ($DBG) {
+        foreach my $result (@fft_results) { print "fat $result\n\n"; } print "\n";
+    }
 
     # If lengths don't match, maybe user got command line args wrong (???)
     # gm_results=(0,1,2,3,4,5,6,7,8); # Uncomment to check error message
@@ -96,19 +101,21 @@ print("bookmarkpl\n");
     if ($sram_type eq "test_error") {
         $sram_type = "1port";
         $fft_results[3] = "99999";   # Guarantees at least one error
+        # $gm_results[3] = "42";
     }
-
-#     if ($TEST_ERROR) { $gm_results[3] = "42"; }
 
     my $nerrors = 0;
     $nerrors += print_results("Real", $npoints, \@gm_results, \@fft_results);
     $nerrors += print_results("Imag", $npoints, \@gm_results, \@fft_results);
 
-#    print "\n";
+    if ($DBG) { print('found', $nerrors, 'errors\n'); }
+
     my $test_result = ($nerrors==0) ? "PASS" : "FAIL";
     my $plural = ($nerrors==1) ? "" : "s";
     print "$test_result: $nerrors mismatched result$plural --- $npoints $nunits $sram_type\n";
 }
+
+    print("bookmarkpl\n"); #----------------------------------------------------------------
 
 sub do_fft {
     # Use whatever results we find in "$LOGFILE"

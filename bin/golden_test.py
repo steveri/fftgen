@@ -60,7 +60,6 @@ def main():
     do_test(npoints, nunits, sram_type, DBG=0); exit()
 
 def do_test(npoints, nunits, sram_type, DBG=0):
-    print("bookmarkpy")
     '''Compare results in <LOGFILE> against result of running golden model'''
 
     # Examples:
@@ -73,11 +72,10 @@ def do_test(npoints, nunits, sram_type, DBG=0):
     gm_results = golden_model(npoints, nunits)
     if DBG: print('gm_results=', gm_results)
 
-    # Fetch results from fft log <LOGFILE>
-    fft_results = do_fft()
-    if DBG: print('fft_results=', fft_results)
-
+    fft_results = do_fft()      # Fetch results found in fft log <LOGFILE>
     print('')  # ? yeah i dunno
+
+    if DBG: print('fft_results=', fft_results)
 
     # If lengths don't match, maybe user got command line args wrong (???)
     # gm_results=range(9) # Uncomment to check error message
@@ -110,6 +108,7 @@ ERROR: Golden model produced {ngr} results and FFT produced {nfr}.
 ''')
         exit(13)
 
+print("bookmarkpy") #----------------------------------------------------------------
 
 # Same as shell `backtick` e.g. result=`echo foo | sed 's/oo/ox/'`
 #   shell: result=`echo foo | sed 's/oo/ox/'`
