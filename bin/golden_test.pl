@@ -1,16 +1,23 @@
 #!/usr/bin/perl
-# Command is "$0"; command-line arguments can be found in array @ARGV
 use strict;
 
+# Compares FFT log file from rtl simulation, against a golden model.
+# Summarizes results from each and says either PASS or FAIL.
+
+# Set one or more of these vars to "1" to test the script
 my $DBG = 0;
 my $DBG9 = 0;
-my $TEST_ERROR = 0;
-my $LOGFILE = "simv.log";
 
+# Set TEST_ERROR to insert a single faulty datapoint
+# Can also set this from command line, by ussing sram "test_error" e.g.
+# golden_test.py 8 1 fft.log 8 1 test_error
+my $TEST_ERROR = 0;
+
+# Help message
 if (@ARGV != 4) {
     my $errmsg = sprintf(
         "\n".
-        "Generates correct fft answers and compares vs. $LOGFILE\n".
+        "Generates correct fft answers and compares vs. <logfile>\n".
         "\n".
         "Usage:\n".
         "   $0 <logfile> <npoints> <n_butterfly_units> <sram_type>\n".
@@ -18,9 +25,16 @@ if (@ARGV != 4) {
         "Examples:\n".
         "    $0 fft.log  8    1 \"2port\"\n".
         "    $0 simv.log 1024 4 \"1port\"\n".
+        "\n".
+        "To test failure mechanism, use sram_type \"test_error\"\n".
+        "    $0 fft.log  8    1 \"test_error\"\n".
+        "\n".
+        "    $0 ../tst/regress/old/verlint/fft.log 8 1 \"2port\"\n".
         "\n");
     die $errmsg;
 }
+
+# Process command-line arguments
 my ($LOGFILE, $npoints,$nunits,$sram_type) = ($ARGV[0], $ARGV[1], $ARGV[2], $ARGV[3]);
 print "Comparing FFT log '$LOGFILE' vs. gold model (GM)\n";
 print "with npoints=$npoints, nunits=$nunits, sram_type='$sram_type'\n";
@@ -172,6 +186,13 @@ sub golden_model {
     ##############################################################################
     # Print results from Golden Model
 
+    if ($ENV{ALL_LDBG}) {
+        print STDERR "WARNING\n";
+        print STDERR "WARNING Env var ALL_LDBG is set (=$ENV{ALL_LDBG})".
+            ", that can screw up the golden model.\n";
+        print STDERR "WARNING\n\n";
+    }
+
 #     my $golden_model = "/home/steveri/fftgen/bin/fft_golden_model.pl";
     my $golden_model = "$FFTGEN_DIR/bin/fft_golden_model.pl";
 
@@ -198,6 +219,10 @@ sub golden_model {
             @ar = (@ar,$real);
             @ai = (@ai,$imag);
         }
+    }
+    if (($#ar+1) != $npoints) {
+        die "ERROR Golden model produced $#ar results but npoints=$npoints\n";
+        exit(-1);
     }
     return (@ar,@ai);
 }
