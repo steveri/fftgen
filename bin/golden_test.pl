@@ -115,23 +115,12 @@ sub do_test {
     print "$test_result: $nerrors mismatched result$plural --- $npoints $nunits $sram_type\n";
 }
 
-    print("bookmarkpl\n"); #----------------------------------------------------------------
-
 sub do_fft {
-    # Use whatever results we find in "$LOGFILE"
-    #my $npoints = shift;
-    #my $nunits = shift;
-    #my $sram_type = shift;
+
     ##############################################################################
-    # Print results from FFT.
+    # Print results from FFT log file
 
-    #my $fft = `cat /home/steveri/fftgen/$LOGFILE | egrep '^SRAM.*Wrote'`;
-    #my $fft = `cat /home/steveri/fftgen/$LOGFILE | awk -f bin/process_test5.awk | egrep '^ix'`;
-
-    # 1905 can run from any directory!
-    # my $fft = `cat $FFTGEN_DIR/$LOGFILE | awk -f bin/process_test5.awk | egrep '^ix'`;
     my $fft = `cat $RUN_DIR/$LOGFILE | awk -f $FFTGEN_DIR/bin/process_test5.awk | egrep '^ix'`;
-
 
     # Above command should have yielded e.g.
     #
@@ -144,28 +133,18 @@ sub do_fft {
     # ix06: SRAM002 t5 16500: Wrote(f) wr_data_i mem[0] <= ( 0.000000, 0.000000)
     # ix07: SRAM001 t5 16500: Wrote(f) wr_data_i mem[0] <= ( 1.000000,-0.198912)
 
-    #print $fft;
+    # Optional debugging
+    if ($DBG) { print($fft); }
 
-    #my @fft = split("\n", $fft);
+    # Build ar, ai arrays containing real and imaginary numbers in above lines
+
     my @ar = (); # Real part of complex number
     my @ai = (); # Imaginary part of complex number
     foreach my $line (split("\n", $fft)) {
-        if ($DBG9) { print "foo $line\n"; }
-            
-    #         # From sample line
-    #         # "SRAM005 t5  9000: Wrote(f) wr_data_i mem[0] <= ( 1.000000,-0.668179)"
-    #         # Want to extract $1 = "1.000000" and $2 = "-0.668179"
-    # 
-    #         if ($line =~ /^(SRAM...).*\( *([^ ,]*), *([^ ,]*).$/) {
-    #             my ($sram,$real,$imag) = ($1,$2,$3);
-    #             #print "bar    $sram $real $imag\n";
-    #             $ar{$sram} = $real;
-    #             $ai{$sram} = $imag;
-    #         }
-    # 
+
         # From sample line
         # "ix05: SRAM007 t5 15500: Wrote(f) wr_data_i mem[0] <= ( 1.000000,-0.668179)"
-        # Want to extract $1 = "5" and $2 = "1.000000" and $3 = "-0.668179"
+        # Want to extract (ix,real,imag) = ("5","1.000000","-0.668179")
  
         if ($line =~ /^ix([0-9]+).*\( *([^ ,]*), *([^ ,]*).$/) {
             my ($ix,$real,$imag) = ($1,$2,$3);
@@ -174,36 +153,31 @@ sub do_fft {
             $ai[$ix] = $imag;
         }
     }
-
     if ($DBG) {
+        print('real\n'); print @ar;
+        print('imag\n'); print @ai;
         print "      _____________FFT____________\n";
-    }
 
-#    my $i = 0;
-#    my @ar = ();
-#    my @ai = ();
-#    foreach my $bank (sort (keys %ar)) {
-    for (my $ix = 0; $ix < @ar; $ix++) {
-        #print "baz \"$ix\" r=$ar{$ix} i=$ai{$ix}\n";
-        if ($DBG) {
+        #    my $i = 0;
+        #    my @ar = ();
+        #    my @ai = ();
+        #    foreach my $bank (sort (keys %ar)) {
+        for (my $ix = 0; $ix < @ar; $ix++) {
+            #print "baz \"$ix\" r=$ar{$ix} i=$ai{$ix}\n";
             printf("    %4d   %9s    %9s\n", $ix, $ar[$ix], $ai[$ix]);
+            #printf("    %4d   %6.3f    %6.3f\n", $i, $ar[$i], $ai[$i]);
+            #        @ar = (@ar, $ar{$bank});
+            #        @ai = (@ai, $ai{$bank});
         }
-        #printf("    %4d   %6.3f    %6.3f\n", $i, $ar[$i], $ai[$i]);
-
-#        @ar = (@ar, $ar{$bank});
-#        @ai = (@ai, $ai{$bank});
     }
     return (@ar,@ai);
 }
-
 
 sub golden_model {
     my $npoints = shift;
     my $nunits = shift;
 
-    ##############################################################################
-    # Print results from Golden Model
-
+    # Low-level debugging can muck things up here.
     if ($ENV{ALL_LDBG}) {
         print STDERR "WARNING\n";
         print STDERR "WARNING Env var ALL_LDBG is set (=$ENV{ALL_LDBG})".
@@ -211,11 +185,12 @@ sub golden_model {
         print STDERR "WARNING\n\n";
     }
 
-#     my $golden_model = "/home/steveri/fftgen/bin/fft_golden_model.pl";
-    my $golden_model = "$FFTGEN_DIR/bin/fft_golden_model.pl";
+    # Invoke the Golden Model and capture the results
 
-#    my $gm = `$golden_model 8 1`;
-    # Only want the lines with numbers ONLY.
+    # E.g. my $gm = `$golden_model 8 1`;
+    # Add egrep filter to eschew any lines with non-numeric
+    # characters (probably not strictly necessary).
+    my $golden_model = "$FFTGEN_DIR/bin/fft_golden_model.pl";
     my $gm = `$golden_model $npoints $nunits | egrep -v '[a-zZ-Z]'`;
     if ($DBG) {
         print "\n";
@@ -223,14 +198,23 @@ sub golden_model {
         print $gm;
         print "\n";
     }
+    # Example:
+    #      ______GOLDEN MODEL______
+    #        0    4.000     0.000
+    #        1    1.000    -2.414
+    #        2    0.000     0.000
+    #        3    1.000    -0.414
+    #        4    0.000     0.000
+    #        5    1.000     0.414
+    #        6    0.000     0.000
+    #        7    1.000     2.414
 
-    # Build and return real and imag arrays.
+    # Build ar, ai arrays containing real and imaginary numbers from each line.
+    # Each line looks like this: " 1   1.000   -2.414"
 
     my @ar = ();
     my @ai = ();
     foreach my $line (split("\n", $gm)) {
-        # Each line looks like this:
-        # "       1    1.000    -2.414"
         if ($line =~ /\s*(\S+)\s*(\S+)\s*(\S+)/) {
             my ($ix,$real,$imag) = ($1,$2,$3);
             #print "foo found $real and $imag\n";
@@ -251,48 +235,71 @@ sub print_results {
     my $gm_results = shift;  # Pointer to results e.g. \@gm_results
     my $fft_results = shift; # Pointer to results e.g. \@fft_results
 
+    # Compare GM/FFT real or imaginary results according to rtype "Real" or not
+
     my $nerrors = 0;
     my $nwarnings = 0;
+
+    # E.g. if npoints=8, then [0..7] are real nums and [8,15] are corresponding imag pts.
     my ($first,$last) = ($rtype eq "Real") ? (0, $npoints) : ($npoints, 2*$npoints);
+
     print "$rtype results:      GM          FFT\n";
+
+    # Each result MUST match to at least one decimal place;
+    # emit warning if errors at two or three d.p.
+
     for (my $i=$first; $i < $last; $i++) {
         #printf("             %6s    %9s\n", $gm_results[$i], $fft_results[$i]);
         #printf("             %6.3f    %6.3f\n", $gm_results[$i]+0, $fft_results[$i]+0);
 
-        # Should match to three decimal places; two or one means WARNING
-        my $gr3 = sprintf("%9.3f",  @{$gm_results}[$i]+0);
-        my $fr3 = sprintf("%9.3f", @{$fft_results}[$i]+0);
+        my $gr =  @{$gm_results}[$i]+0;
+        my $fr = @{$fft_results}[$i]+0;
+    
+        # Enable this block to test the warnings and errors when npoints=8 and nunits=1
+        # Correct answer is i[11,13,15] = -2.414, 0.404, 2.414
+        if (0) {
+            if ($i == 11) { $fr = '   -0.415'; } # 3-fig warn vs. -2.414
+            if ($i == 13) { $fr = '    0.424'; } # 2-fig warn vs.  0.414
+            if ($i == 15) { $fr = '    2.511'; } # ERROR vs. 2.414
+        }
+
+        # Results to three sig figs; mismatch = WARNING
+        my $gr3 = sprintf("%9.3f", $gr);
+        my $fr3 = sprintf("%9.3f", $fr);
         # Oh this is annoying; must canonicalize "-0.000" => "0.000"
         $gr3 =~ s/[-]0[.]000/ 0.000/;
         $fr3 =~ s/[-]0[.]000/ 0.000/;
 
-        my $gr2 = sprintf("%9.2f",  @{$gm_results}[$i]+0);
-        my $fr2 = sprintf("%9.2f", @{$fft_results}[$i]+0);
-        # Oh this is annoying; must canonicalize "-0.000" => "0.000"
+        # Results to two sig figs; mismatch = WARNING
+        my $gr2 = sprintf("%9.2f", $gr);
+        my $fr2 = sprintf("%9.2f", $fr);
+        # Oh this is annoying; must canonicalize "-0.00" => "0.00"
         $gr2 =~ s/[-]0[.]00/ 0.00/;
         $fr2 =~ s/[-]0[.]00/ 0.00/;
 
-        my $gr1 = sprintf("%9.1f",  @{$gm_results}[$i]+0);
-        my $fr1 = sprintf("%9.1f", @{$fft_results}[$i]+0);
-        # Oh this is annoying; must canonicalize "-0.000" => "0.000"
+        # Results to one sig figs; mismatch = ERROR
+        my $gr1 = sprintf("%9.1f", $gr);
+        my $fr1 = sprintf("%9.1f", $fr);
+        # Oh this is annoying; must canonicalize "-0.0" => "0.0"
         $gr1 =~ s/[-]0[.]0/ 0.0/;
         $fr1 =~ s/[-]0[.]0/ 0.0/;
 
+        # Should match to three decimal places; two or one means WARNING
         # Warning if no match @ three sig figs.
         my $status = "";
-        if ($gr3 ne $fr3) {
-            if ($gr2 ne $fr2) {
-                if ($gr1 ne $fr1) {
-                    $status = " *** ERROR '$gr1' ne '$fr1'";
-                    $nerrors++;
-                } else {
-                    $status = " *** WARNING only match to 1 sig fig";
-                    $nwarnings++;
-                }
-            } else {
-                $status = " *** WARNING only match to 2 sig figs";
-                $nwarnings++;
-            }
+
+        # Confidence?
+        if ($gr1 ne $fr1) {
+            $status = " *** ERROR '$gr1' ne '$fr1'";
+            $nerrors++;
+        }
+        elsif ($gr2 ne $fr2) {
+            $status = " *** WARNING mismatch at 2nd sig fig";
+            $nwarnings++;
+        }
+        elsif ($gr3 ne $fr3) {
+            $status = " *** WARNING mismatch at 3rd sig fig";
+            $nwarnings++;
         }
         printf("             %s    %s$status\n", $gr3, $fr3);
     }

@@ -108,27 +108,10 @@ ERROR: Golden model produced {ngr} results and FFT produced {nfr}.
 ''')
         exit(13)
 
-print("bookmarkpy") #----------------------------------------------------------------
-
-# Same as shell `backtick` e.g. result=`echo foo | sed 's/oo/ox/'`
-#   shell: result=`echo foo | sed 's/oo/ox/'`
-#   this:  result= my_syscall("echo foo | sed 's/oo/ox/'")
-def my_syscall(cmd):
-    '''Example: [status,stdout,stderr]=my_syscall("echo foo | sed 's/oo/ox/'")
-    '''
-    from subprocess import run, PIPE
-    p = run(cmd, shell=True, stdout=PIPE, stderr=PIPE)
-    #
-    [exit_status, stdout, stderr] = [
-        p.returncode, p.stdout.decode(), p.stderr.decode() ]
-    #
-    return stdout
-
-
 def do_fft(DBG=0):
 
     ##############################################################################
-    # Print results from FFT.
+    # Print results from FFT log file
 
     cmd = f"cat ./{LOGFILE} | awk -f {FFTGEN_DIR}/bin/process_test5.awk | egrep '^ix'"
     fft = my_syscall(cmd)
@@ -152,7 +135,6 @@ def do_fft(DBG=0):
 
     ar = []   # Real parts of complex numbers
     ai = []   # Imaginary parts of complex numbers
-
     for line in fft.split('\n'):
 
         # From sample line
@@ -160,18 +142,17 @@ def do_fft(DBG=0):
         # Want to extract (ix,real,imag) = ("5","1.000000","-0.668179")
 
         parse = re.search(r'^ix([0-9]+).*\( *([^ ,]*), *([^ ,]*).$', line)
-        if not parse: continue
+        if parse:
+            [ ix, real, imag ] = [ parse.group(1), parse.group(2), parse.group(3) ]
 
-        [ ix, real, imag ] = [ parse.group(1), parse.group(2), parse.group(3) ]
-
-        # E.g. if index ix=3, we should be about to push the fourth number in each array
-        assert len(ar) == int(ix); ar = ar + [ real ]
-        assert len(ai) == int(ix); ai = ai + [ imag ]
+            # E.g. if index ix=3, we should be about to push the fourth number in each array
+            assert len(ar) == int(ix); ar = ar + [ real ]
+            assert len(ai) == int(ix); ai = ai + [ imag ]
 
     # Debugging
-    if DBG: print('real', ar)
-    if DBG: print('imag', ai)
     if DBG:
+        print('real', ar)
+        print('imag', ai)
         print("     ______________FFT___________")
         for ix in range(0,len(ar)):
             print(f"    {ix:4d} {ar[ix]:>9s}    {ai[ix]:>9s}")
@@ -180,15 +161,11 @@ def do_fft(DBG=0):
 
 def golden_model(npoints, nunits, DBG=0):
     '''Can use either perl or python golden model!'''
-
-    # return golden_model_perl(npoints, nunits, DBG=0)
+  # return golden_model_perl( npoints, nunits, DBG=0)
     return golden_model_numpy(npoints, nunits, DBG=0)
 
-def golden_model_numpy(npoints, nunits, DBG=0):
-    from numpy import fft
-
+def golden_model_numpy(npoints, nunits, DBG=0):     # Note: 'nunits' is unused!
     '''Calculate FFT of a step-down function'''
-    # Note: 'nunits' is unused!
 
     # Build a step-function test array of input datapoints, e.g. for npoints=8:
     # test_array = [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0]
@@ -201,7 +178,7 @@ def golden_model_numpy(npoints, nunits, DBG=0):
         print("")
 
     # Calculate the fft
-    fft_results = fft.fft(test_array)
+    from numpy import fft; fft_results = fft.fft(test_array)
 
     # Unpack results into separate real and imaginary arrays
     ar=[]; ai=[]
@@ -221,45 +198,43 @@ def golden_model_numpy(npoints, nunits, DBG=0):
 
 def golden_model_perl(npoints, nunits, DBG=0):
     '''Invoke the Golden Model and capture the results'''
-    # E.g. gm = `golden_model 8 1`
 
+    # E.g. my gm = my_syscall(f"{golden_model} 8 1")
+    # Add egrep filter to eschew any lines with non-numeric
+    # characters (probably not strictly necessary).
     golden_model = f"{FFTGEN_DIR}/bin/fft_golden_model.pl"
-
-    # Eschew any lines with non-numeric characters in them
-    # (Probably not strictly necessary).
     cmd = f"{golden_model} {npoints} {nunits} | egrep -v '[a-zZ-Z]'"
     gm = my_syscall(cmd)
     if DBG:
-        print(""); print("     ______GOLDEN MODEL______")
-        print(gm); print("")
+        print("")
+        print("     ______GOLDEN MODEL______")
+        print(gm)
+        print("")
 
-        # Example:
-        #      ______GOLDEN MODEL______
-        #        0    4.000     0.000
-        #        1    1.000    -2.414
-        #        2    0.000     0.000
-        #        3    1.000    -0.414
-        #        4    0.000     0.000
-        #        5    1.000     0.414
-        #        6    0.000     0.000
-        #        7    1.000     2.414
+    # Example:
+    #      ______GOLDEN MODEL______
+    #        0    4.000     0.000
+    #        1    1.000    -2.414
+    #        2    0.000     0.000
+    #        3    1.000    -0.414
+    #        4    0.000     0.000
+    #        5    1.000     0.414
+    #        6    0.000     0.000
+    #        7    1.000     2.414
 
-    # Build ar, ai arrays containing real and imaginary numbers from each line
+    # Build ar, ai arrays containing real and imaginary numbers from each line.
     # Each line looks like this: " 1   1.000   -2.414"
 
     ar = []   # Real part of complex number
     ai = []   # Imaginary part of complex number
-
     for line in gm.split('\n'):
-
         parse = re.search(r'\s*(\S+)\s*(\S+)\s*(\S+)', line)
-        if not parse: continue
+        if parse:
+            [ ix, real, imag ] = [ parse.group(1), parse.group(2), parse.group(3) ]
 
-        [ ix, real, imag ] = [ parse.group(1), parse.group(2), parse.group(3) ]
-
-        # E.g. if index ix=3, we should be about to push the fourth number in each array
-        assert len(ar) == int(ix); ar = ar + [ real ]
-        assert len(ai) == int(ix); ai = ai + [ imag ]
+            # E.g. if index ix=3, we should be about to push the fourth number in each array
+            assert len(ar) == int(ix); ar = ar + [ real ]
+            assert len(ai) == int(ix); ai = ai + [ imag ]
 
     if DBG:
         print('real', ar)
@@ -277,12 +252,9 @@ def print_results(rtype, npoints, gm_results, fft_results, DBG=0):
     nerrors   = 0;
     nwarnings = 0;
 
-    # E.g. if npoints=8 res[0..7] are real nums and res[8,15] are the corresponing imaginaries
+    # E.g. if npoints=8, then [0..7] are real nums and [8,15] are corresponding imag pts.
     npoints=int(npoints)
     [ first, last ] = [0, npoints] if (rtype == "Real") else [npoints, 2*npoints]
-
-    if DBG: print("first=",first)
-    if DBG: print('last=' ,last)
 
     print(f"{rtype} results:      GM          FFT")
 
@@ -293,6 +265,13 @@ def print_results(rtype, npoints, gm_results, fft_results, DBG=0):
 
         # Format with three, two and one sig figs
         g = gm_results[i]; f = fft_results[i]
+
+        # Enable this block to test the warnings and errors
+        if (0):
+            if (i == 11): f = -0.415  # 3-fig warn vs. -2.414
+            if (i == 13): f =  0.424  # 2-fig warn vs.  0.414
+            if (i == 15): f =  2.511  # ERROR vs. 2.414
+
         [gr3,fr3] = sigfig(g, f, '%.3f', '[-]0[.]000','0.000')
         [gr2,fr2] = sigfig(g, f, '%.2f', '[-]0[.]00' ,'0.00' )
         [gr1,fr1] = sigfig(g, f, '%.1f', '[-]0[.]0'  ,'0.0'  )
@@ -300,27 +279,20 @@ def print_results(rtype, npoints, gm_results, fft_results, DBG=0):
         # ERROR if no match @ one sig figs.
         # Warning if no match @ two or three sig figs.
 
-        # Enable this block to test the warnings and errors
-        # if (i == 15):
-        if (0):
-            [fr1,fr2,fr3] = ['2.4', '2.41', '2.414'] # no err
-            [fr1,fr2,fr3] = ['2.4', '2.41', '2.413'] # 3-fig warn
-            [fr1,fr2,fr3] = ['2.4', '2.42', '2.413'] # 2-fig warn
-            [fr1,fr2,fr3] = ['2.5', '2.42', '2.413'] # ERROR
-
         status = ""
         if DBG: print(i, gr1, fr1)
-        if (gr3 != fr3):
-            if (gr2 != fr2):
-                if (gr1 != fr1):
-                    status = f" *** ERROR '{gr1}' ne '{fr1}'";
-                    nerrors = nerrors + 1
-                else:
-                    status = " *** WARNING only match to 1 sig fig";
-                    nwarnings = nwarnings + 1
-            else:
-                status = " *** WARNING only match to 2 sig figs";
-                nwarnings = nwarnings + 1
+
+        if (gr1 != fr1):
+                status = f" *** ERROR '{gr1}' ne '{fr1}'";
+                nerrors = nerrors + 1
+
+        elif (gr2 != fr2):
+            status = " *** WARNING mismatch at 2nd sig fig";
+            nwarnings = nwarnings + 1
+
+        elif (gr3 != fr3):
+            status = " *** WARNING mismatch at 3rd sig fig";
+            nwarnings = nwarnings + 1
 
         print(f"             {gr3:>9s}    {fr3:>9s}{status}")
 
@@ -345,6 +317,20 @@ def sigfig(g, f, fmt, neg, pos, DBG=0):
 
     # return [gr.strip(), fr.strip()] # Don't need the strip anymore, right?
     return [gr, fr]
+
+# Same as shell `backtick` e.g. result=`echo foo | sed 's/oo/ox/'`
+#   shell: result=`echo foo | sed 's/oo/ox/'`
+#   this:  result= my_syscall("echo foo | sed 's/oo/ox/'")
+def my_syscall(cmd):
+    '''Example: [status,stdout,stderr]=my_syscall("echo foo | sed 's/oo/ox/'")
+    '''
+    from subprocess import run, PIPE
+    p = run(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    #
+    [exit_status, stdout, stderr] = [
+        p.returncode, p.stdout.decode(), p.stderr.decode() ]
+    #
+    return stdout
 
 main()
 
