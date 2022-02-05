@@ -4,15 +4,25 @@ import sys
 import re
 
 # Compares FFT log file from rtl simulation, against a golden model.
-# Summarize results from each and says either PASS or FAIL.
+# Summarizes results from each and says either PASS or FAIL.
 
-# NOTE this script calls a perl script "fft_golden_model.pl", see below :(
+# This script should produce same results as the prior perl version
+# "golden_test.pl". E.g. to compare the two
+# 
+#   f=../tst/regress/old/verlint/fft.log
+#   golden_test.pl $f 8 1 2port > tmp.pl
+#   golden_test.py $f 8 1 2port > tmp.py
+#   diff tmp.p[ly]
 
-########################################################################
-def HELP():
+# Set one or more of these vars to "1" to test the script
+DBG = 0
+DBG9 = 0
+
+# Help message
+if (len(sys.argv) != 5):
     scriptname = sys.argv[0];
     print(f"""
-    DESCRIPTION: Generates correct fft answers and compares vs. ${LOGFILE}
+    DESCRIPTION: Generates correct fft answers and compares vs. <logfile>
 
     USAGE:
         {scriptname} <logfile> <npoints> <n_butterfly_units> <sram_type>
@@ -20,22 +30,22 @@ def HELP():
     Examples:
       {scriptname} fft.log  8    1 2port
       {scriptname} simv.log 1024 4 1port
+      {scriptname} ../tst/regress/old/verlint/fft.log 8 1 2port
 
     To test failure mechanism, use sram_type "test_error"
       {scriptname} fft.log  8    1 test_error
       
 
     """)
-    exit(0)
+    exit(13)
 
-########################################################################
-# This script should produce same results as the prior perl version
-# "golden_test.pl". E.g. to test can do
-# 
-#   f=../tst/regress/old/verlint/fft.log
-#   golden_test.pl $f 8 1 2port > tmp.pl
-#   golden_test.py $f 8 1 2port > tmp.py
-#   diff tmp.p[ly]
+# Process command-line arguments
+[ LOGFILE, npoints, nunits, sram_type ] = sys.argv[1:]
+
+print(f'''
+Comparing FFT log '{LOGFILE}' vs. gold model (GM)
+with npoints={npoints}, nunits={nunits}, sram_type='{sram_type}'\
+''')
 
 ########################################################################
 # Set FFTGEN_DIR as the path to the local fftgen repo.
@@ -44,32 +54,14 @@ def HELP():
 scriptdir=os.path.dirname(os.path.realpath(__file__))
 FFTGEN_DIR=os.path.dirname(scriptdir)
 
-# Default FFT LOGFILE name is "simv.log" but it will be reset after
-# command-line args are processed
-global LOGFILE; LOGFILE = "simv.log";
-
-# Process command-line arguments, throw a help message if necessary.
-if (len(sys.argv) != 5): HELP()
-else:
-    [ LOGFILE, npoints, nunits, sram_type ] = sys.argv[1:]
-
-print(f'''\
-Comparing FFT log '{LOGFILE}' vs. gold model (GM)
-with npoints={npoints}, nunits={nunits}, sram_type='{sram_type}'\
-''')
-
-# Set one or more of these vars to "1" to test the script
-DBG = 0; DBG9 = 0;
+# Compare results in "$FFTGEN_DIR/$LOGFILE" against result of running golden model
 
 def main():
-    do_test(npoints, nunits, sram_type)
-    exit()
-
+    do_test(npoints, nunits, sram_type, DBG=0); exit()
 
 def do_test(npoints, nunits, sram_type, DBG=0):
-
-    # Compare results in <LOGFILE> against result of
-    # running golden model on "npoints" and "nunits"
+    print("bookmarkpy")
+    '''Compare results in <LOGFILE> against result of running golden model'''
 
     # Examples:
     #   do_test  8, 1, "2port"
@@ -91,10 +83,10 @@ def do_test(npoints, nunits, sram_type, DBG=0):
     # gm_results=range(9) # Uncomment to check error message
     quick_check(LOGFILE, len(gm_results), len(fft_results))
 
-    # Secret sram type to test error handling.
+    # Secret sram type to test error handling; inserts a single faulty datapoint
     if (sram_type == "test_error"):
         sram_type = "1port"
-        fft_results[3] = "999.9"   # Guarantees at least one error
+        fft_results[3] = "99999"   # Guarantees at least one error
 
     nerrors = 0
     nerrors += print_results("Real", npoints, gm_results, fft_results)

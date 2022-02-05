@@ -4,14 +4,17 @@ use strict;
 # Compares FFT log file from rtl simulation, against a golden model.
 # Summarizes results from each and says either PASS or FAIL.
 
+# This script should produce same results as the alternative python version
+# "golden_test.py". E.g. to compare the two
+# 
+#   f=../tst/regress/old/verlint/fft.log
+#   golden_test.pl $f 8 1 2port > tmp.pl
+#   golden_test.py $f 8 1 2port > tmp.py
+#   diff tmp.p[ly]
+
 # Set one or more of these vars to "1" to test the script
 my $DBG = 0;
 my $DBG9 = 0;
-
-# Set TEST_ERROR to insert a single faulty datapoint
-# Can also set this from command line, by ussing sram "test_error" e.g.
-# golden_test.py 8 1 fft.log 8 1 test_error
-my $TEST_ERROR = 0;
 
 # Help message
 if (@ARGV != 4) {
@@ -36,37 +39,38 @@ if (@ARGV != 4) {
 
 # Process command-line arguments
 my ($LOGFILE, $npoints,$nunits,$sram_type) = ($ARGV[0], $ARGV[1], $ARGV[2], $ARGV[3]);
+
 print "Comparing FFT log '$LOGFILE' vs. gold model (GM)\n";
 print "with npoints=$npoints, nunits=$nunits, sram_type='$sram_type'\n";
 
-if ($sram_type eq "test_error") {
-    $sram_type = "1port";
-    $TEST_ERROR = 1;  # Guarantees at least one error
-}
 
-# Compare results in "$FFTGEN_DIR/$LOGFILE" against result of running golden model
-# on "npoints" and "nunits"
-
-my $FFTGEN_DIR = mydir("..");  # Script lives in $FFTGEN_DIR/bin
-
-# 1905 Assumes called from run dir; is this okay?
+########################################################################
+# Set FFTGEN_DIR as the path to the local fftgen repo.
+# Assumes that this script lives in FFTGEN_DIR/bin
+# E.g. scriptdir='/home/steveri/github/fftgen/bin'
+my $FFTGEN_DIR = mydir("..");
 my $RUN_DIR = ".";
 
 
-#golden_model(16, 1);
-#do_test(8, 1, "1port");
-#do_test(16, 1, "1port");
+# Compare results in "$FFTGEN_DIR/$LOGFILE" against result of running golden model
 do_test($npoints, $nunits, $sram_type);
 exit(0);
-
-#do_test  8, 1, "2port";
-#do_test 16, 4, "1port";
 
 sub do_test {
     my $npoints = shift;
     my $nunits = shift;
     my $sram_type = shift;
+    my $DBG = 0;
 
+    # Compare results in <LOGFILE> against result of running golden model
+
+    # Examples:
+    #   do_test  8, 1, "2port"
+    #   do_test 16, 4, "1port"
+
+    if ($DBG) { print('do_test %s %s %s\n', $npoints, $nunits, $sram_type); }
+
+print("bookmarkpl\n");
     my @gm_results = golden_model($npoints, $nunits);
 
 #    foreach my $result (@gm_results) { print "bat $result\n"; } print "\n";
@@ -76,6 +80,8 @@ sub do_test {
     print "\n";
 #    foreach my $result (@fft_results) { print "fat $result\n\n"; } print "\n";
 
+    # If lengths don't match, maybe user got command line args wrong (???)
+    # gm_results=(0,1,2,3,4,5,6,7,8); # Uncomment to check error message
     if ($#gm_results != $#fft_results) {
 
         my $errmsg = sprintf("ERROR Golden model produced %d results and FFT produced %d.\n",
@@ -86,10 +92,15 @@ sub do_test {
         exit(-1);
     }
 
+    # Secret sram type to test error handling; inserts a single faulty datapoint
+    if ($sram_type eq "test_error") {
+        $sram_type = "1port";
+        $fft_results[3] = "99999";   # Guarantees at least one error
+    }
+
+#     if ($TEST_ERROR) { $gm_results[3] = "42"; }
+
     my $nerrors = 0;
-
-    if ($TEST_ERROR) { $gm_results[3] = "42"; }
-
     $nerrors += print_results("Real", $npoints, \@gm_results, \@fft_results);
     $nerrors += print_results("Imag", $npoints, \@gm_results, \@fft_results);
 
