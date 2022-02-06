@@ -53,8 +53,6 @@ else                           { print ", NOT using the crazy eye.\n\n"; }
 #    parity_map(), parity_mod(), get_twiddles()
 #    debug subs show_i(), show_d(), show_bits()
 
-print("bookmarkpl\n");
-
 sub build_base_schedule {
 
     ########################################################################
@@ -127,6 +125,8 @@ sub build_base_schedule {
 
     return %datapoints;
 }
+
+if ($ALL_LDBG) { print("bookmarkpl\n"); }
 
 sub build_extended_schedule {
 

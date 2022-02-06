@@ -46,8 +46,6 @@ else:
 #    parity_map(), parity_mod(), get_twiddles()
 #    debug subs show_i(), show_d(), show_bits() (TODO)
 
-print("bookmarkpy")
-
 def build_base_schedule(D, G, DBG=0):
     '''
     ########################################################################
@@ -82,16 +80,10 @@ def build_base_schedule(D, G, DBG=0):
 
     # Overlap stages S-T through D
     LLDBG=0
-    #for (s = (S-T)+1; s < S; s++) {
-    s = (S-T)+1
-    while (s < S):
+    for s in range((S-T)+1, S):
 
         if DBG: print("Building overlap stage s={s}")
-        #for (ilow=0; ilow<(D/G); ilow++) {
-        ilow=0
-        while ilow < (D/G):
-            #for (t=0; t<G; t++) {
-
+        for ilow in range(0, int(D/G)):
             for t in range(0,G):
             
                 i = (ilow << T) + t;      # Counts from 0 to D-1
@@ -113,18 +105,18 @@ def build_base_schedule(D, G, DBG=0):
                 if DBG: show_d("%s => ", datapoints[s_i], D, G)
                 
             if DBG: print('') # group separator
-            ilow = ilow + 1
-
-        s=s+1
 
     if DBG: print('')
+
+    # For comparison to perl version
     if ALL_LDBG: 
         print(f"build_base_schedule({D},{G})=")
         pprint(datapoints); print("")
 
     return datapoints
 
-# build_base_schedule DONE
+if (ALL_LDBG): print("bookmarkpy")
+
 
 # TODO build_extended_schedule
 def build_extended_schedule(D, G, datapoints, DBG=0):
