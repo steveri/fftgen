@@ -418,8 +418,6 @@ sub replace_bit {
     return $newnum;
 }
 
-if ($ALL_LDBG) { print("bookmarkpl\n"); }
-
 ##############################################################################
 # Compatibility module fft_schedule(npoints,nunits,reschedule)
 # must do the same thing as previously: supply @fft_info array
@@ -467,7 +465,7 @@ sub fft_schedule_round7 {
     my %deltapoints = build_extended_schedule($D,$G,\%datapoints);
     my $schedule = \%deltapoints; # Somewhat unnecessary dontcha think.
 
-    # Debugging
+    # Debugging vs. python version e.g.
     if ($ALL_LDBG) {
         printf("extended_schedule=\n");
         my @printlist = ();
@@ -526,6 +524,8 @@ sub fft_schedule_round7 {
     }
     return @fft_info;
 }
+
+if ($ALL_LDBG) { print("bookmarkpl\n"); }
 
 sub init_fft_info {
     my $fft_info = shift;

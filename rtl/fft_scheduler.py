@@ -353,8 +353,6 @@ def replace_bit(n,i,b, DBG=0):
 
     return newnum;
 
-if (ALL_LDBG): print("bookmarkpy")
-
 ##############################################################################
 # Compatibility module fft_schedule(npoints,nunits,reschedule)
 # must do the same thing as previously: supply @fft_info array
@@ -371,13 +369,16 @@ if (ALL_LDBG): print("bookmarkpy")
 # Also see bin/test_scheduler.pl.
 # (See perl versions maybe, don't think these are translated yet.)
 
+# For now, "round7 is the only option here
 def fft_schedule(npoints, nunits, reschedule, DBG=0):
-
     return fft_schedule_round7(npoints, nunits, "", "")
 
+#     if ($SCHED_ALG eq 'round7') {
+#         return fft_schedule_round7($npoints, $nunits, $reschedule); }
+#     else {
+#         return fft_schedule_modbncombo($npoints, $nunits, $reschedule); }
 
 def fft_schedule_round7(npoints, nunits, reschedule, DBG=0):
-    DBG=1 # for temporary
     # $npoints    # length of FFT: must be a power of two
     # $nunits     # Number of butterfly units employed per cycle.
     # $reschedule # "" or any non-zero value e.g. "reschedule_for_conflicts" 
@@ -386,15 +387,14 @@ def fft_schedule_round7(npoints, nunits, reschedule, DBG=0):
     G = 4 * nunits
     S = int(math.log2(D))
 
-    # This fixes a bug when e.g. G=8 and D=4 e.g. nbutts=4 and
-    # npoints=8 and pipedepth=2 (8 4 2port)
+    # This fixes a bug when e.g. G=8 and D=4 e.g. nbutts=4 and npoints=8 and pipedepth=2 (8 4 2port)
     if (G > D): G = D
 
     datapoints  = build_base_schedule(D,G, DBG=0)
     deltapoints = build_extended_schedule(D,G,datapoints)
     schedule = deltapoints     # Somewhat unnecessary dontcha think.
 
-    # Debugging
+    # Debugging vs. perl version e.g.
     if ALL_LDBG:
         print("extended_schedule=")
         pprint(schedule); print("")
@@ -432,31 +432,24 @@ def fft_schedule_round7(npoints, nunits, reschedule, DBG=0):
             print("Index (%2d,%2d) => banks (%2d,%2d)" % (op1, op2, b1, b2), end='')
             print(",  twid(c,s) = (%6.3f, %6.3f)" % (cos, sin))
 
-            # TODO STILL build init_fft_info
-            #             init_fft_info(\@fft_info, $fftno,   $s,   $op1, $op2,   $b1,$b2,   $cos,$sin);
-            #             $fftno++;
-
-            LDBG=0
             assert fftno == len(fft_info)
             fft_info = fft_info + init_fft_info(fftno,   s,   op1, op2,   b1,b2,   cos,sin);
-            if LDBG: pprint(fft_info)
 
             fftno = fftno + 1
             assert fftno == len(fft_info)
 
+            LLDBG=0
+            if LLDBG: pprint(fft_info)
+
     # Okay, now add conflict/bypass buffer information.
     (nstages,npoints,nunits) = (S,D,G/4)
     for stage in range (1,nstages):  # E.g. (0, 1, 2, 3)
-
-# bookmark1 add_bypass_info() DONE
-# bookmark1 finish round7, see bookmark3
-# fft_golden_model.pl 8 1 > fgm.pl.out; fft_golden_model.py 8 1 > fgm.py.out; diff fgm.p[ly].out
-
-
         add_bypass_info(fft_info, npoints, nunits, stage-1);
 
     return fft_info
 
+
+if (ALL_LDBG): print("bookmarkpy")
 
 def init_fft_info(fftno,
     stage,
