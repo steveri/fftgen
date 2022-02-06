@@ -6,6 +6,9 @@ $| = 1; # Autoflush output why not.
 my $ALL_LDBG=0;
 if ($ENV{ALL_LDBG} ne "") { $ALL_LDBG = $ENV{ALL_LDBG}; }
 
+# For comparison to python version
+if ($ALL_LDBG) { print "PERL\n"; }
+
 # E.g. extensive comparison w/ python version
 #    function fgm {
 #      fft_golden_model.pl 8 1 > tmp.pl
@@ -31,11 +34,9 @@ sub DBG_ON { $DBG = 1; }
 my $SCHED_ALG = 'round7';
 if ($ENV{SCHED_ALG} ne "") { $SCHED_ALG = $ENV{SCHED_ALG}; }
 
-# For comparison to python version
-if ($ALL_LDBG) { print "PERL\n"; }
+print "// Scheduling algorithm='$SCHED_ALG'";
 
 # To turn crazy_eye on remotely, set shell variable USE_CRAZY to 1
-print "// Scheduling algorithm='$SCHED_ALG'";
 if    ($SCHED_ALG eq 'round7') { print "\n\n"; }
 elsif ($ENV{USE_CRAZY} == 1)   { print ", using the crazy eye.\n\n"; }
 else                           { print ", NOT using the crazy eye.\n\n"; }
@@ -52,6 +53,8 @@ else                           { print ", NOT using the crazy eye.\n\n"; }
 #    parity_map(), parity_mod(), get_twiddles()
 #    debug subs show_i(), show_d(), show_bits()
 
+print("bookmarkpl\n");
+
 sub build_base_schedule {
 
     ########################################################################
@@ -61,8 +64,8 @@ sub build_base_schedule {
     my $D = shift; # Number of datapoints in the FFT transform
     my $G = shift; # Desired group size
 
+    # Caclulate number of stages S and toggle bits T
     my ($S,$T) = (log2($D), log2($G)); # Number of stages S and toggle bits T
-    my %datapoints = {};
 
     # Debugging
     if ($ALL_LDBG) {
@@ -70,7 +73,9 @@ sub build_base_schedule {
         printf("Will build overlap stages %d to %d\n", $S-$T+1, $S-1 );
         print("\n")
     }
+
     # Normal stages 0 through S-T
+    my %datapoints = {};
     for (my $s=0; $s <= ($S-$T); $s++) {
         if ($DBG) { print "Building normal stage $s\n"; }
         for (my $i=0; $i<$D; $i++) {
@@ -418,6 +423,19 @@ sub replace_bit {
 }
 
 ##############################################################################
+# Compatibility module fft_schedule(npoints,nunits,reschedule)
+# must do the same thing as previously: supply @fft_info array
+# containing, on a per-cycle basis:
+#
+# $fft_info[cy]->{op1,op2,ctwid,stwid}
+#
+# ops and cynums are generated assuming a two-deep pipeline RE/W
+# so group size is G=4*nunits
+#
+# Call from fft_golden_model looks like this:
+#    my @fft_info = fft_scheduler::fft_schedule($npoints, $nunits, "");
+
+##############################################################################
 # To test the scheduler, use sub test_fft_scheduler().
 # Also see bin/test_scheduler.pl.
 
@@ -434,19 +452,6 @@ sub fft_schedule {
         return fft_schedule_modbncombo($npoints, $nunits, $reschedule);
     }
 }
-
-##############################################################################
-# Compatibility module fft_schedule(npoints,nunits,reschedule)
-# must do the same thing as previously: supply @fft_info array
-# containing, on a per-cycle basis:
-#
-# $fft_info[cy]->{op1,op2,ctwid,stwid}
-#
-# ops and cynums are generated assuming a two-deep pipeline RE/W
-# so group size is G=4*nunits
-#
-# Call from fft_golden_model looks like this:
-#    my @fft_info = fft_scheduler::fft_schedule($npoints, $nunits, "");
 
 sub fft_schedule_round7 {
     my $npoints    = shift; # length of FFT: must be a power of two

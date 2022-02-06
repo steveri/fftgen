@@ -7,6 +7,9 @@ from pprint import pprint
 # Turn on ALL_LDBG for extensive debug info
 ALL_LDBG = int(os.getenv("ALL_LDBG", 0))
 
+# For comparison to perl version
+if ALL_LDBG: print("PYTHON")
+
 # E.g. extensive comparison w/ perl version
 #    function fgm {
 #      fft_golden_model.pl 8 1 > tmp.pl
@@ -16,24 +19,402 @@ ALL_LDBG = int(os.getenv("ALL_LDBG", 0))
 #    export ALL_LDBG=1
 #    ( c; set -x; fgm )
 
-# arg2 means default to round7 if var not exist yet
+# Not used (yet) because only ported 'round7' to python
+# my $rtldir = mydir(".");  # This script lives in $FFTGEN/rtl;
+# push (@INC, "$rtldir/");  # swizzler lives in $FFTGEN/rtl
+# require swizzler;
+
+# Default to round7 if SCHED_ALG not exists
 SCHED_ALG = os.getenv("SCHED_ALG", "round7")
 assert SCHED_ALG == "round7",\
     f"\nERROR Found env var SCHED_ALG='{os.environ['SCHED_ALG']}'"+\
     "; don't know how to do that (yet)."
 
+print(f"// Scheduling algorithm='{SCHED_ALG}'", end='')
+
 # To turn crazy_eye on remotely, set shell variable USE_CRAZY to 1
 # Looks like...crazy eye gets ignored when alg is round7?
 USE_CRAZY = int(os.getenv("USE_CRAZY", 0))
-
-# For comparison to perl version
-if ALL_LDBG: print("PYTHON")
-
-print(f"// Scheduling algorithm='{SCHED_ALG}'", end='')
 if       SCHED_ALG == 'round7': print("\n")
 else:
     if  USE_CRAZY == 1: print(", using the crazy eye.\n")
     else:               print(", NOT using the crazy eye.\n")
+
+##############################################################################
+# NEW (ROUND7) STUFF:
+#    build_base_schedule(), build_extended_schedule()
+#    parity_map(), parity_mod(), get_twiddles()
+#    debug subs show_i(), show_d(), show_bits() (TODO)
+
+print("bookmarkpy")
+
+def build_base_schedule(D, G, DBG=0):
+    '''
+    ########################################################################
+    # Given a group size G and desired number of datapoints D, build a basic
+    # conflict-free schedule $datapoints{s,i}
+    '''
+
+    # Caclulate number of stages S and toggle bits T
+    S = int( math.log2(D) )
+    T = int( math.log2(G) ) 
+
+    # Debugging
+    if ALL_LDBG:
+        print("Will build normal  stages", 0,     "to", S-T)
+        print("Will build overlap stages", S-T+1, "to", S-1)
+        print("")
+
+    datapoints = {}
+
+    # Normal stages 0 through S-T
+    for s in range(0, (S-T)+1):
+        if DBG: print("Building normal stage {s}")
+
+        for i in range(0, D):
+            if DBG: show_i(i, D, S)
+            datapoints[f"{s},{i}"] = lrot(i, S, s);
+            if DBG: print(datapoints)
+
+            if DBG: show_d("%s => ", datapoints[f"{s},{i}"], D, G)
+            if DBG:
+                if (i>0 and (i%G == (G-1))): print('') # group separator
+
+    # Overlap stages S-T through D
+    LLDBG=0
+    #for (s = (S-T)+1; s < S; s++) {
+    s = (S-T)+1
+    while (s < S):
+
+        if DBG: print("Building overlap stage s={s}")
+        #for (ilow=0; ilow<(D/G); ilow++) {
+        ilow=0
+        while ilow < (D/G):
+            #for (t=0; t<G; t++) {
+
+            for t in range(0,G):
+            
+                i = (ilow << T) + t;      # Counts from 0 to D-1
+                if DBG: show_i(i,D,S)
+
+                shift_amt = (s-(S-T)); #DBG
+                if LLDBG: print(f"\n\nrotate {T}-bit t={t} left by {shift_amt} places")
+
+                t_rot = lrot(t, T, s-(S-T))
+                if LLDBG: print("( t_rot <<", (S-T), f") | {ilow} = {t_rot}")
+
+                iprime = (t_rot<<(S-T)) | ilow
+                if LLDBG: print(f"iprime={iprime}")
+
+                s_i=f"{s},{i}"
+                datapoints[s_i] = (t_rot<<(S-T)) | ilow
+                
+                if LLDBG: print(f"datapoints['{s},{i}'] = ", datapoints[s_i])
+                if DBG: show_d("%s => ", datapoints[s_i], D, G)
+                
+            if DBG: print('') # group separator
+            ilow = ilow + 1
+
+        s=s+1
+
+    if DBG: print('')
+    if ALL_LDBG: 
+        print(f"build_base_schedule({D},{G})=")
+        pprint(datapoints); print("")
+
+    return datapoints
+
+# build_base_schedule DONE
+
+# TODO build_extended_schedule
+def build_extended_schedule(D, G, datapoints, DBG=0):
+
+    ########################################################################
+    # Given a group size G, and number of datapoints D, and a conflict-free
+    # datapoint sequence %datapoints{s,i} for an FFT w/o pipeline overlap,
+    # produce a CFS for FFT w/pipeline overlap
+
+    # my $D = shift;          # Number of datapoints in the FFT transform
+    # my $G = shift;          # Desired group size
+    # my $datapoints = shift; # Pointer to hash containing datapoints
+
+    DBG = DBG | ALL_LDBG
+
+    (S,T) = (int(math.log2(D)), int(math.log2(G)))
+
+    deltapoints = {}
+
+    # Forward stages
+#     for (s=0; $s <= ($S-$T); $s++) {
+#    for s in range(0, S-T): NO!!!
+    s = 0;
+    while s <= (S-T):
+
+        if DBG: print(f"Transform normal stage {s}")
+        # for (my $i=0; $i<$D; $i++) {
+        for i in range(0,D):
+
+            s_i = f"{s},{i}"
+            d = datapoints[s_i]
+            if DBG: show_d("  %s => ", d, D)
+
+            #for (my $t=($T-1); $t>=0; $t--) {
+            for t in range( T-1, -1, -1):
+                # Replace bit d(s+t) w/ P(s+t)
+                bitpos =  (s+t)
+                P = parity_mod(d, T, bitpos);
+                
+                d = replace_bit(d, bitpos, P);
+                if DBG: print(f"P[{bitpos}]={P} ", end='')
+
+            if DBG: show_d("=> %s", d, D); print('')
+            deltapoints[s_i] = d
+
+        if DBG: print('')
+        s = s + 1
+
+    # Reverse stages
+    for s in range((S-T)+1, S):
+
+        if DBG: print(f"Transform overlap stage {s}")
+        for i in range(0,D):
+
+            s_i = f"{s},{i}"
+
+            d = datapoints[s_i]
+            if DBG: show_d("  %s => ", d, D)
+    
+            for t in range(0,T):
+
+                # Replace bit d(bitpos) w/ P(bitpos)
+                bitpos = (S-1)-t
+                P = parity_mod(d, T, bitpos);
+                d = replace_bit(d, bitpos, P);
+                if DBG: print(f"P[{bitpos}]={P} ", end='')
+
+            if DBG: show_d("=> %s", d, D); print("")
+            deltapoints[s_i] = d
+
+        if DBG: print("")
+
+    return deltapoints
+
+# Given group size G, calculate mem bank m that corresponds to datapoint d
+def parity_map(d, G, DBG=0):
+#     d = shift;    # Datapoint index
+#     G = shift;    # Group size
+
+    T = int(math.log2(G)) # Number of toggle bits
+
+    # Calculate m= P(0) + 2P(1) + 4P(2) + ... + 2^(T-1)*P(T-1)
+#     my ($m, @P) = (0,());
+    (m, P) = (0, [0] * T)
+
+#     for (t=$T-1; $t>=0; $t--) {
+#   for t in range(T-1, -1, -1)
+    t = T - 1
+    while t >= 0:
+
+        P[t] = parity_mod(d, T, t)
+        if DBG: print(f"P[t]={P[t]} ", end='')
+        m = 2*m + P[t];
+
+        t = t - 1
+
+    if DBG: print(f"   m={m}")
+    return m
+
+# parity_map DONE
+
+
+# Take parity of every nth bit in operand op,
+# starting w/bit (b mod n), where LSB is bit number 0.
+def parity_mod(op,n,b, DBG=0):
+    # E.g. if $op=118 (1101 1110) and n=3 and b=1
+    # Then parity_mod returns XOR of bits 1,4,7 = xor(1,1,1) = 1
+
+#     op = shift; # Operand e.g. 1101 1110
+#     my  $n = shift; # XOR together every nth bit of operand, e.g. $n=3
+#     my  $b = shift; # Start with bit $b, e.g. $b=1
+
+    b = int(b % n)
+
+    # Shift the word such that desired starting bit is LSB
+    tmp = op >> b;
+
+    # XOR every nth bit and return the answer.
+    parity = 0
+    while (tmp):
+        parity = parity ^ (tmp & 0x1)
+        tmp = (tmp >> n)
+
+    if DBG: bits = show_bits(op,4)
+    if DBG: print(f"parmod {op} = {bits} ; even_parity({op},{n},{b}) = {parity}\n")
+    return parity
+
+# parity_mod DONE
+
+def get_twiddles(op, s, S, warn, DBG=1):
+    # Want op = sequential opnum (0,1,2...D-1) not index (0,4,1,5...) or whatever
+
+    # Op must be (I think) the smallest of the pair ($op, $op + 2^$s)
+    zbit = 2 ** s
+    if (op & zbit):
+
+        # I think this is not used!!!
+#         if (warn != "nowarn"):
+#             print("WARNING: opnum should be smallest of the pair")
+
+        op = op & ~zbit;
+
+    i = rrot(op, S, s+1);
+
+    s2 = (S-1) - s;                  # s2:  1  2  3  4  5 ...   10
+    n2 = 2 ** (s+1);                 # n2:  2  4  8 16 32 ... 1024
+    k  = i >> s2;
+    e  = -6.283185307179586;         #  e: -2pi, dunno why really
+    cos = math.cos(0.0 + k * e/n2);  # Somehow the "0.0" prevents "-0" answers...!?
+    sin = math.sin(0.0 + k * e/n2);
+    #printf("TWID op=%2d,     s=$s and S=$S =>     cos is %6.3f\n", $op, $cos); 
+    return (cos,sin)
+
+# get_twiddles DONE
+
+
+########################################################################
+# For debugging only, and only with sched alg 'round7'
+
+def show_i(i, D, S):
+
+    # istring = $D > 10 ? sprintf("%2d", $i) : $i;
+    istring = i
+    if (D > 10): istring = "%2d" % i
+
+    #ibits = show_bits($i,$S); 
+    ibits = show_bits(i,S); print(f"    i={istring}({ibits}) => ", end='')
+
+def show_d(fmt, d, D, G=0):
+#     fmt = shift; # E.g. "%s => "
+#     d = shift;
+#     D = shift;
+#     G = shift; # Optional
+
+    S = math.log2(D)
+
+#     dstring = $D > 10 ? sprintf("%2d", $d) : $d;
+    dstring = d
+    if (D > 10): dstring = "%2d" % d
+
+    dbits = show_bits(d,S)
+    # printf $fmt, "d=$dstring($dbits)";
+    print( fmt % f"d={dstring}({dbits})", end='')
+
+    # If $G was specified, print the map why not.
+    if (G > 0): parity_map(d, G)
+#     print('')
+
+
+def show_bits(n, w, DBG=0):
+    '''
+    Turn decimal n into a length-w array of its composite bits.
+    E.g. show_bits(7,8) = "00000111"
+    '''
+    # Turn n into its equivalent binary representation
+    bits = bin(n).replace('0b','')
+    
+    # 0-extend to length w
+    while (len(bits) < w): bits = '0' + bits
+    
+    if DBG: print(f"\n{n} = '{bits}' maybe")
+    
+    return(bits)
+
+
+##############################################################################
+# Simple helper functions --- all but log2() are used only by 'round7'
+#
+# log2(n) => E.g. log2(1024) returns "10"
+#
+# sub reverse_bits(i,nbits)
+#    # Reverse the bits in the n-bit intege i
+#    # E.g. reverse_bits(13,4)=11 and reverse_bits(13,5)=22
+#
+# sub rrot(n,nbits,shift_amt)
+#    # Right-rotate n-bit integer n by shift_amt
+#    # E.g. rrot(13,4,1) = 14  and rrot(13,5,1) = 22
+#
+# sub lrot(n,nbits,shift_amt)
+#    # Left-rotate n-bit integer n by shift_amt
+#    # E.g. lrot(13,4,1) = 11  and lrot(13,5,1) = 26
+#
+##############################################################################
+
+# def log2() => use math.log2
+# def reverse_bits => use python built-in functions
+# def blow2bits => use python built-in functions
+
+# Right-rotate
+def rrot(n, size, shift_amt, DBG=0):
+#     n         = shift;  # Integer to be rotated e.g. 7 ('00111')
+#     size      = shift;  # Size of integer e.g. 5 (bits)
+#     shift_amt = shift;  # Rotate right this many places\ e.g. 1.
+# Example: rrot(7,4,1) = 11  ('0111' => '1011')
+    
+    LDBG = 0
+    if DBG:
+        n_string = show_bits(n, size)
+        print(f"\nRotate '{n_string}' right by '{shift_amt}' places.")
+        
+    for i in range(0, shift_amt):
+        lsb = n%2;
+        if LDBG: print(f"lsb is {lsb}")
+        msb = lsb * 2**(size-1); # New msb is old lsb.
+        n = (n >> 1) + msb;
+        if LDBG:
+            n_string = show_bits(n, size);
+            print(f"msb is {msb}; new n is '{n_string}'")
+            
+    if DBG:
+        n_string = int2bin(n, size);
+        print(f"Result is '{n_string}\n")
+        
+    return n
+
+def int2bin(n, size): return show_bits(n, size)
+
+
+# rrot(7,4,1) # 11
+# rrot(rrot(7,4,1),4,1) # 13
+
+
+# Left-rotate
+def lrot(n, size, shift_amt):
+#     n         = shift;  # Integer to be rotated e.g. 7 ('00111')
+#     size      = shift;  # Size of integer e.g. 5 (bits)
+#     shift_amt = shift;  # Rotate right this many places\ e.g. 1.
+
+    # lrot by s bits is same as rrot by nbits-s
+    n = rrot(n, size, size-shift_amt)
+    return(n)
+
+def replace_bit(n,i,b, DBG=0):
+    # In the given number $n, replace bit $i with new bit $b
+
+    oldbit = n & (1<<i);
+    newbit =     (b<<i);
+
+    newnum = n ^ oldbit ^ newbit;
+
+    if DBG:
+        oldbits = show_bits(n,8)
+        newbits = show_bits(newnum,8)
+        print(f"rb {n} = {oldbits}; replace bit {i} with {b} => {newbits} = {newnum}")
+
+    return newnum;
+
+# replace_bit DONE
+
+
 
 
 
@@ -47,6 +428,11 @@ else:
 # ops and cynums are generated assuming a two-deep pipeline RE/W
 # so group size is G=4*nunits
 #
+
+##############################################################################
+# To test the scheduler, use sub test_fft_scheduler().
+# Also see bin/test_scheduler.pl.
+# (See perl versions maybe, don't think these are translated yet.)
 
 def fft_schedule(npoints, nunits, reschedule, DBG=0):
 
@@ -134,6 +520,37 @@ def fft_schedule_round7(npoints, nunits, reschedule, DBG=0):
 
     return fft_info
 
+
+def init_fft_info(fftno,
+    stage,
+    op1, op2,
+    bank1,
+    bank2,
+    ctwid,stwid
+):
+
+    info = {}
+    info["stage"] = stage
+    info["op1"]   = op1
+    info["op2"]   = op2
+    info["bank1"] = bank1
+    info["bank2"] = bank2
+    info["ctwid"] = ctwid
+    info["stwid"] = stwid
+
+    # For $nunits==1 only, uses "access"
+    # Choices for {access} (default is always "SRAM"):
+    # ("SRAM", "op1 from buf", "op2 from buf", "op1 to buf", "op2 to buf")
+    info["access"] = "SRAM"
+
+    # For $nunits>1 only, uses op[12]_buffer and op[12]_buffer_access
+    info["op1_buffer"] = -1;            # 0, 1, 2, or 3
+    info["op2_buffer"] = -1;
+    info["op1_buffer_access"] = "NONE"; # "RD", "WR", "NONE", or "BOTH"
+    info["op2_buffer_access"] = "NONE"; # "RD", "WR", "NONE", or "BOTH"
+
+    # Return dict inside a list for conatenation to fft_info[]
+    return [info]
 
 def add_bypass_info(fft_info, npoints, nunits, curstage):
 
@@ -291,66 +708,8 @@ def get_ops_and_banks(fft_info, fi):
     return (op1, op2, bank1, bank2);
 
 
-def init_fft_info(fftno,
-    stage,
-    op1, op2,
-    bank1,
-    bank2,
-    ctwid,stwid
-):
-
-    info = {}
-    info["stage"] = stage
-    info["op1"]   = op1
-    info["op2"]   = op2
-    info["bank1"] = bank1
-    info["bank2"] = bank2
-    info["ctwid"] = ctwid
-    info["stwid"] = stwid
-
-    # For $nunits==1 only, uses "access"
-    # Choices for {access} (default is always "SRAM"):
-    # ("SRAM", "op1 from buf", "op2 from buf", "op1 to buf", "op2 to buf")
-    info["access"] = "SRAM"
-
-    # For $nunits>1 only, uses op[12]_buffer and op[12]_buffer_access
-    info["op1_buffer"] = -1;            # 0, 1, 2, or 3
-    info["op2_buffer"] = -1;
-    info["op1_buffer_access"] = "NONE"; # "RD", "WR", "NONE", or "BOTH"
-    info["op2_buffer_access"] = "NONE"; # "RD", "WR", "NONE", or "BOTH"
-
-    # Return dict inside a list for conatenation to fft_info[]
-    return [info]
 
 
-
-
-
-def get_twiddles(op, s, S, warn, DBG=1):
-    # Want op = sequential opnum (0,1,2...D-1) not index (0,4,1,5...) or whatever
-
-    # Op must be (I think) the smallest of the pair ($op, $op + 2^$s)
-    zbit = 2 ** s
-    if (op & zbit):
-
-        # I think this is not used!!!
-#         if (warn != "nowarn"):
-#             print("WARNING: opnum should be smallest of the pair")
-
-        op = op & ~zbit;
-
-    i = rrot(op, S, s+1);
-
-    s2 = (S-1) - s;                  # s2:  1  2  3  4  5 ...   10
-    n2 = 2 ** (s+1);                 # n2:  2  4  8 16 32 ... 1024
-    k  = i >> s2;
-    e  = -6.283185307179586;         #  e: -2pi, dunno why really
-    cos = math.cos(0.0 + k * e/n2);  # Somehow the "0.0" prevents "-0" answers...!?
-    sin = math.sin(0.0 + k * e/n2);
-    #printf("TWID op=%2d,     s=$s and S=$S =>     cos is %6.3f\n", $op, $cos); 
-    return (cos,sin)
-
-# get_twiddles DONE
 
 
 ##############################################################################
@@ -370,371 +729,33 @@ def get_twiddles(op, s, S, warn, DBG=1):
 # if "SCHED_ARG" in os.environ:
 #     if os.environ["SCHED_ARG"] != "":
 
-##############################################################################
-# NEW (ROUND7) STUFF:
-#    build_base_schedule(), build_extended_schedule()
-#    parity_map(), parity_mod(), get_twiddles()
-#    debug subs show_i(), show_d(), show_bits() (TODO)
-
-def build_base_schedule(D, G, DBG=0):
-    # D = Number of datapoints in the FFT transform
-    # G = Desired group size
-    '''
-    # Given a group size G and desired number of datapoints D, build a basic
-    # conflict-free schedule $datapoints{s,i}
-    '''
-    # Caclulate number of stages S and toggle bits T
-    S = int( math.log2(D) )
-    T = int( math.log2(G) ) 
-
-    DBG = DBG | ALL_LDBG
-
-    # Debugging
-    if DBG:
-        print("Will build normal  stages", 0,     "to", S-T)
-        print("Will build overlap stages", S-T+1, "to", S-1)
-        print("")
-
-    datapoints = {}
-    LDBG=0
-    # Normal stages 0 through S-T
-    for s in range(0, (S-T)+1):
-        if LDBG: print("Building normal stage {s}")
-
-        for i in range(0, D):
-            if LDBG: show_i(i, D, S)
-            datapoints[f"{s},{i}"] = lrot(i, S, s);
-            if LDBG: print(datapoints)
-
-            if LDBG: show_d("%s => ", datapoints[f"{s},{i}"], D, G)
-            if LDBG:
-                if (i>0 and (i%G == (G-1))): print('') # group separator
-
-    # Overlap stages S-T through D
-
-    #for (s = (S-T)+1; s < S; s++) {
-    s = (S-T)+1
-    while (s < S):
-
-        if LDBG: print("Building overlap stage s={s}")
-        #for (ilow=0; ilow<(D/G); ilow++) {
-        ilow=0
-        while ilow < (D/G):
-            #for (t=0; t<G; t++) {
-
-            for t in range(0,G):
-            
-                i = (ilow << T) + t;      # Counts from 0 to D-1
-                if LDBG: show_i(i,D,S)
-
-                shift_amt = (s-(S-T)); #DBG
-                if LDBG: print(f"\n\nrotate {T}-bit t={t} left by {shift_amt} places")
-
-                t_rot = lrot(t, T, s-(S-T))
-                if LDBG: print("( t_rot <<", (S-T), f") | {ilow} = {t_rot}")
 
-                iprime = (t_rot<<(S-T)) | ilow
-                if LDBG: print(f"iprime={iprime}")
 
-                s_i=f"{s},{i}"
-                datapoints[s_i] = (t_rot<<(S-T)) | ilow
-                
-                if LDBG: print(f"datapoints['{s},{i}'] = ", datapoints[s_i])
-                if LDBG: show_d("%s => ", datapoints[s_i], D, G)
-                
-            if LDBG: print('') # group separator
-            ilow = ilow + 1
 
-        s=s+1
 
-    if LDBG: print('')
-    if DBG: 
-        print(f"build_base_schedule({D},{G})=")
-        pprint(datapoints); print("")
 
-    return datapoints
 
-# build_base_schedule DONE
 
-# TODO build_extended_schedule
-def build_extended_schedule(D, G, datapoints, DBG=0):
 
-    ########################################################################
-    # Given a group size G, and number of datapoints D, and a conflict-free
-    # datapoint sequence %datapoints{s,i} for an FFT w/o pipeline overlap,
-    # produce a CFS for FFT w/pipeline overlap
 
-    # my $D = shift;          # Number of datapoints in the FFT transform
-    # my $G = shift;          # Desired group size
-    # my $datapoints = shift; # Pointer to hash containing datapoints
 
-    DBG = DBG | ALL_LDBG
 
-    (S,T) = (int(math.log2(D)), int(math.log2(G)))
 
-    deltapoints = {}
 
-    # Forward stages
-#     for (s=0; $s <= ($S-$T); $s++) {
-#    for s in range(0, S-T): NO!!!
-    s = 0;
-    while s <= (S-T):
 
-        if DBG: print(f"Transform normal stage {s}")
-        # for (my $i=0; $i<$D; $i++) {
-        for i in range(0,D):
 
-            s_i = f"{s},{i}"
-            d = datapoints[s_i]
-            if DBG: show_d("  %s => ", d, D)
 
-            #for (my $t=($T-1); $t>=0; $t--) {
-            for t in range( T-1, -1, -1):
-                # Replace bit d(s+t) w/ P(s+t)
-                bitpos =  (s+t)
-                P = parity_mod(d, T, bitpos);
-                
-                d = replace_bit(d, bitpos, P);
-                if DBG: print(f"P[{bitpos}]={P} ", end='')
 
-            if DBG: show_d("=> %s", d, D); print('')
-            deltapoints[s_i] = d
 
-        if DBG: print('')
-        s = s + 1
 
-    # Reverse stages
-    for s in range((S-T)+1, S):
 
-        if DBG: print(f"Transform overlap stage {s}")
-        for i in range(0,D):
 
-            s_i = f"{s},{i}"
 
-            d = datapoints[s_i]
-            if DBG: show_d("  %s => ", d, D)
-    
-            for t in range(0,T):
 
-                # Replace bit d(bitpos) w/ P(bitpos)
-                bitpos = (S-1)-t
-                P = parity_mod(d, T, bitpos);
-                d = replace_bit(d, bitpos, P);
-                if DBG: print(f"P[{bitpos}]={P} ", end='')
 
-            if DBG: show_d("=> %s", d, D); print("")
-            deltapoints[s_i] = d
 
-        if DBG: print("")
 
-    return deltapoints
 
-
-
-def replace_bit(n,i,b, DBG=0):
-    # In the given number $n, replace bit $i with new bit $b
-
-    oldbit = n & (1<<i);
-    newbit =     (b<<i);
-
-    newnum = n ^ oldbit ^ newbit;
-
-    if DBG:
-        oldbits = show_bits(n,8)
-        newbits = show_bits(newnum,8)
-        print(f"rb {n} = {oldbits}; replace bit {i} with {b} => {newbits} = {newnum}")
-
-    return newnum;
-
-# replace_bit DONE
-
-
-
-
-
-
-
-
-
-
-# Given group size G, calculate mem bank m that corresponds to datapoint d
-def parity_map(d, G, DBG=0):
-#     d = shift;    # Datapoint index
-#     G = shift;    # Group size
-
-    T = int(math.log2(G)) # Number of toggle bits
-
-    # Calculate m= P(0) + 2P(1) + 4P(2) + ... + 2^(T-1)*P(T-1)
-#     my ($m, @P) = (0,());
-    (m, P) = (0, [0] * T)
-
-#     for (t=$T-1; $t>=0; $t--) {
-#   for t in range(T-1, -1, -1)
-    t = T - 1
-    while t >= 0:
-
-        P[t] = parity_mod(d, T, t)
-        if DBG: print(f"P[t]={P[t]} ", end='')
-        m = 2*m + P[t];
-
-        t = t - 1
-
-    if DBG: print(f"   m={m}")
-    return m
-
-# parity_map DONE
-
-
-# Take parity of every nth bit in operand op,
-# starting w/bit (b mod n), where LSB is bit number 0.
-def parity_mod(op,n,b, DBG=0):
-    # E.g. if $op=118 (1101 1110) and n=3 and b=1
-    # Then parity_mod returns XOR of bits 1,4,7 = xor(1,1,1) = 1
-
-#     op = shift; # Operand e.g. 1101 1110
-#     my  $n = shift; # XOR together every nth bit of operand, e.g. $n=3
-#     my  $b = shift; # Start with bit $b, e.g. $b=1
-
-    b = int(b % n)
-
-    # Shift the word such that desired starting bit is LSB
-    tmp = op >> b;
-
-    # XOR every nth bit and return the answer.
-    parity = 0
-    while (tmp):
-        parity = parity ^ (tmp & 0x1)
-        tmp = (tmp >> n)
-
-    if DBG: bits = show_bits(op,4)
-    if DBG: print(f"parmod {op} = {bits} ; even_parity({op},{n},{b}) = {parity}\n")
-    return parity
-
-# parity_mod DONE
-
-
-
-
-def show_d(fmt, d, D, G=0):
-#     fmt = shift; # E.g. "%s => "
-#     d = shift;
-#     D = shift;
-#     G = shift; # Optional
-
-    S = math.log2(D)
-
-#     dstring = $D > 10 ? sprintf("%2d", $d) : $d;
-    dstring = d
-    if (D > 10): dstring = "%2d" % d
-
-    dbits = show_bits(d,S)
-    # printf $fmt, "d=$dstring($dbits)";
-    print( fmt % f"d={dstring}({dbits})", end='')
-
-    # If $G was specified, print the map why not.
-    if (G > 0): parity_map(d, G)
-#     print('')
-
-
-
-
-
-
-##############################################################################
-# Simple helper functions --- all but log2() are used only by 'round7'
-#
-# log2(n) => E.g. log2(1024) returns "10"
-#
-# sub reverse_bits(i,nbits)
-#    # Reverse the bits in the n-bit integer i
-#    # E.g. reverse_bits(13,4)=11 and reverse_bits(13,5)=22
-#
-# sub rrot(n,nbits,shift_amt)
-#    # Right-rotate n-bit integer n by shift_amt
-#    # E.g. rrot(13,4,1) = 14  and rrot(13,5,1) = 22
-#
-# sub lrot(n,nbits,shift_amt)
-#    # Left-rotate n-bit integer n by shift_amt
-#    # E.g. lrot(13,4,1) = 11  and lrot(13,5,1) = 26
-#
-##############################################################################
-
-def rrot(n, size, shift_amt, DBG=0):
-#     n         = shift;  # Integer to be rotated e.g. 7 ('00111')
-#     size      = shift;  # Size of integer e.g. 5 (bits)
-#     shift_amt = shift;  # Rotate right this many places\ e.g. 1.
-# Example: rrot(7,4,1) = 11  ('0111' => '1011')
-    
-    LDBG = 0
-    if DBG:
-        n_string = show_bits(n, size)
-        print(f"\nRotate '{n_string}' right by '{shift_amt}' places.")
-        
-    for i in range(0, shift_amt):
-        lsb = n%2;
-        if LDBG: print(f"lsb is {lsb}")
-        msb = lsb * 2**(size-1); # New msb is old lsb.
-        n = (n >> 1) + msb;
-        if LDBG:
-            n_string = show_bits(n, size);
-            print(f"msb is {msb}; new n is '{n_string}'")
-            
-    if DBG:
-        n_string = int2bin(n, size);
-        print(f"Result is '{n_string}\n")
-        
-    return n
-
-def int2bin(n, size): return show_bits(n, size)
-
-
-# rrot(7,4,1) # 11
-# rrot(rrot(7,4,1),4,1) # 13
-
-
-def lrot(n, size, shift_amt):
-#     n         = shift;  # Integer to be rotated e.g. 7 ('00111')
-#     size      = shift;  # Size of integer e.g. 5 (bits)
-#     shift_amt = shift;  # Rotate right this many places\ e.g. 1.
-
-    # lrot by s bits is same as rrot by nbits-s
-    n = rrot(n, size, size-shift_amt)
-    return(n)
-
-
-
-
-
-
-
-
-
-
-
-def show_i(i, D, S):
-
-    # istring = $D > 10 ? sprintf("%2d", $i) : $i;
-    istring = i
-    if (D > 10): istring = "%2d" % i
-
-    #ibits = show_bits($i,$S); 
-    ibits = show_bits(i,S); print(f"    i={istring}({ibits}) => ", end='')
-
-
-def show_bits(n, w, DBG=0):
-    '''
-    Turn decimal n into a length-w array of its composite bits.
-    E.g. show_bits(7,8) = "00000111"
-    '''
-    # Turn n into its equivalent binary representation
-    bits = bin(n).replace('0b','')
-    
-    # 0-extend to length w
-    while (len(bits) < w): bits = '0' + bits
-    
-    if DBG: print(f"\n{n} = '{bits}' maybe")
-    
-    return(bits)
 
 
 # def build_extended_schedule(D,G,datapoints): return 0
