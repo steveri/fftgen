@@ -449,38 +449,36 @@ def fft_schedule_round7(npoints, nunits, reschedule, DBG=0):
     return fft_info
 
 
-if (ALL_LDBG): print("bookmarkpy")
+def init_fft_info(fftno, stage,  op1, op2,   bank1, bank2,    ctwid,stwid):
 
-def init_fft_info(fftno,
-    stage,
-    op1, op2,
-    bank1,
-    bank2,
-    ctwid,stwid
-):
-
-    info = {}
-    info["stage"] = stage
-    info["op1"]   = op1
-    info["op2"]   = op2
-    info["bank1"] = bank1
-    info["bank2"] = bank2
-    info["ctwid"] = ctwid
-    info["stwid"] = stwid
+    fft_info_local = {}
+    fft_info_local["stage"] = stage
+    fft_info_local["op1"]   = op1
+    fft_info_local["op2"]   = op2
+    fft_info_local["bank1"] = bank1
+    fft_info_local["bank2"] = bank2
+    fft_info_local["ctwid"] = ctwid
+    fft_info_local["stwid"] = stwid
 
     # For $nunits==1 only, uses "access"
     # Choices for {access} (default is always "SRAM"):
     # ("SRAM", "op1 from buf", "op2 from buf", "op1 to buf", "op2 to buf")
-    info["access"] = "SRAM"
+    fft_info_local["access"] = "SRAM"
 
     # For $nunits>1 only, uses op[12]_buffer and op[12]_buffer_access
-    info["op1_buffer"] = -1;            # 0, 1, 2, or 3
-    info["op2_buffer"] = -1;
-    info["op1_buffer_access"] = "NONE"; # "RD", "WR", "NONE", or "BOTH"
-    info["op2_buffer_access"] = "NONE"; # "RD", "WR", "NONE", or "BOTH"
+    fft_info_local["op1_buffer"] = -1;            # 0, 1, 2, or 3
+    fft_info_local["op2_buffer"] = -1;
+    fft_info_local["op1_buffer_access"] = "NONE"; # "RD", "WR", "NONE", or "BOTH"
+    fft_info_local["op2_buffer_access"] = "NONE"; # "RD", "WR", "NONE", or "BOTH"
 
-    # Return dict inside a list for conatenation to fft_info[]
-    return [info]
+    # Return dict inside a list for conatenation to upper-level fft_info[]
+    return [fft_info_local]
+
+# Not translated (yet), see fft_scheduler.pm
+# def print_fft_info
+# def print_fft_info_round7
+
+if (ALL_LDBG): print("bookmarkpy")
 
 def add_bypass_info(fft_info, npoints, nunits, curstage):
 

@@ -525,8 +525,6 @@ sub fft_schedule_round7 {
     return @fft_info;
 }
 
-if ($ALL_LDBG) { print("bookmarkpl\n"); }
-
 sub init_fft_info {
     my $fft_info = shift;
     my $fftno    = shift;
@@ -607,6 +605,8 @@ sub mydir {
     my ($filename, $dir, $suffix) = fileparse($fullpath);
     return abs_path("$dir/$offset");
 }
+
+if ($ALL_LDBG) { print("bookmarkpl\n"); }
 
 ###############################################################################
 # add_bypass_info() calculates and adds bypass info to @fft_info
