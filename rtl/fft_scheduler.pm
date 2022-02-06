@@ -126,8 +126,6 @@ sub build_base_schedule {
     return %datapoints;
 }
 
-if ($ALL_LDBG) { print("bookmarkpl\n"); }
-
 sub build_extended_schedule {
 
     ########################################################################
@@ -188,6 +186,8 @@ sub build_extended_schedule {
     }
     return %deltapoints;
 }
+
+if ($ALL_LDBG) { print("bookmarkpl\n"); }
 
 # Given group size G, calculate mem bank m that corresponds to datapoint d
 sub parity_map {

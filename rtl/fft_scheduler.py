@@ -115,10 +115,6 @@ def build_base_schedule(D, G, DBG=0):
 
     return datapoints
 
-if (ALL_LDBG): print("bookmarkpy")
-
-
-# TODO build_extended_schedule
 def build_extended_schedule(D, G, datapoints, DBG=0):
 
     ########################################################################
@@ -126,31 +122,21 @@ def build_extended_schedule(D, G, datapoints, DBG=0):
     # datapoint sequence %datapoints{s,i} for an FFT w/o pipeline overlap,
     # produce a CFS for FFT w/pipeline overlap
 
-    # my $D = shift;          # Number of datapoints in the FFT transform
-    # my $G = shift;          # Desired group size
-    # my $datapoints = shift; # Pointer to hash containing datapoints
-
-    DBG = DBG | ALL_LDBG
-
     (S,T) = (int(math.log2(D)), int(math.log2(G)))
 
     deltapoints = {}
 
-    # Forward stages
-#     for (s=0; $s <= ($S-$T); $s++) {
-#    for s in range(0, S-T): NO!!!
-    s = 0;
-    while s <= (S-T):
+    DBG = DBG | ALL_LDBG
 
+    # Forward stages
+    for s in range(0, (S-T)+1):
         if DBG: print(f"Transform normal stage {s}")
-        # for (my $i=0; $i<$D; $i++) {
         for i in range(0,D):
 
             s_i = f"{s},{i}"
             d = datapoints[s_i]
             if DBG: show_d("  %s => ", d, D)
 
-            #for (my $t=($T-1); $t>=0; $t--) {
             for t in range( T-1, -1, -1):
                 # Replace bit d(s+t) w/ P(s+t)
                 bitpos =  (s+t)
@@ -163,7 +149,6 @@ def build_extended_schedule(D, G, datapoints, DBG=0):
             deltapoints[s_i] = d
 
         if DBG: print('')
-        s = s + 1
 
     # Reverse stages
     for s in range((S-T)+1, S):
@@ -190,6 +175,8 @@ def build_extended_schedule(D, G, datapoints, DBG=0):
         if DBG: print("")
 
     return deltapoints
+
+if (ALL_LDBG): print("bookmarkpy")
 
 # Given group size G, calculate mem bank m that corresponds to datapoint d
 def parity_map(d, G, DBG=0):
