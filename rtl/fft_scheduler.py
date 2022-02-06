@@ -24,6 +24,10 @@ if ALL_LDBG: print("PYTHON")
 # push (@INC, "$rtldir/");  # swizzler lives in $FFTGEN/rtl
 # require swizzler;
 
+# Originally, valid settings were 'round7' (new/best), 'mod_bn_combo'
+# (old) and maybe 'takala'. But now I think they are all deprecated
+# except for 'round7'
+
 # Default to round7 if SCHED_ALG not exists
 SCHED_ALG = os.getenv("SCHED_ALG", "round7")
 assert SCHED_ALG == "round7",\
@@ -31,6 +35,9 @@ assert SCHED_ALG == "round7",\
     "; don't know how to do that (yet)."
 
 print(f"// Scheduling algorithm='{SCHED_ALG}'", end='')
+
+# Note I think crazy-eye was specific to the deprecated algorithm
+# "mod_bn_combo" and is NO LONGER USED
 
 # To turn crazy_eye on remotely, set shell variable USE_CRAZY to 1
 # Looks like...crazy eye gets ignored when alg is round7?
@@ -555,8 +562,6 @@ def add_bypass_info(fft_info, npoints, nunits, curstage):
         assert (found_conflict != 0),\
             "\nERROR no bank conflict between stages?"
 
-if (ALL_LDBG): print("bookmarkpy")
-
 def find_conflict(fft_info, fcur, which_op, fnxt):
 
     (cur_op1, cur_op2, curb1, curb2) = get_ops_and_banks(fft_info, fcur)
@@ -576,12 +581,11 @@ def find_conflict(fft_info, fcur, which_op, fnxt):
 
     
 def bypass_next_read (
-    fft_info, firstcy_nxtstage, lastcy_nxtstage, cur_op, bufnum, LDBG
-):
+    fft_info, firstcy_nxtstage, lastcy_nxtstage, cur_op, bufnum, LDBG):
+    'Find next usage of $cur_op; read it from bypass_buffer[$bufnum] instead of SRAM'
 
-    # Find next usage of $cur_op; read it from bypass_buffer[$bufnum] instead of SRAM
     for fi in range(firstcy_nxtstage, (lastcy_nxtstage+1)):
-   #for (my $fi=$firstcy_nxtstage; $fi < $lastcy_nxtstage; $fi++) {  # Substitute this to break subtly.
+  # for fi in range(firstcy_nxtstage, (lastcy_nxtstage)):  # Substitute this to break subtly.
 
         if cur_op == fft_info[fi]["op1"]:
 
@@ -597,9 +601,6 @@ def bypass_next_read (
             if LDBG: print(f"  {fi}: Bypass-read  op2 from buffer {bufnum}\n")
             return
 
-
-
-
 def bypass_read(fft_info, readcy, bufnum, op):
 
     #my $dbgmsg = "  $readcy: Bypass-read  $op from buffer $bufnum\n";
@@ -609,22 +610,13 @@ def bypass_read(fft_info, readcy, bufnum, op):
         print('\nERROR fft_scheduler.pm: not prepared to handle "BOTH"?')
 
     fft_info[readcy][f"{op}_buffer_access"] = "RD"
-    
-    # BUG/TODO/FIXME different bypass mechanism for nunits==1
-    # if ($nunits==1) { @{$fft_info}[$fi]->{access} = "op1 from buffer"; }
-    fft_info[readcy]["access"] = f"{op} from buffer"; # Used only for nunits==1 (?)
+    fft_info[readcy]["access"] = f"{op} from buffer";
 
 
-
-
-
-
-def bypass_write(fft_info, fcur, bufnum, op):
-    # (where op = 'op1' or 'op2')
+def bypass_write(fft_info, fcur, bufnum, op):   # (where op = 'op1' or 'op2')
 
     fft_info[fcur][f"{op}_buffer"]        = bufnum
     fft_info[fcur][f"{op}_buffer_access"] = "WR"
-    
 
 def get_ops_and_banks(fft_info, fi):
     op1    = fft_info[fi]["op1"]
@@ -634,55 +626,3 @@ def get_ops_and_banks(fft_info, fi):
 
     return (op1, op2, bank1, bank2);
 
-
-
-
-
-
-##############################################################################
-# "fft_scheduler.pm" translation begins approximately HERE
-
-
-# # Valid settings are 'round7' (new/best), 'mod_bn_combo' (old) and maybe 'takala'
-# my $SCHED_ALG = 'round7';
-# if ($ENV{SCHED_ALG} ne "") { $SCHED_ALG = $ENV{SCHED_ALG}; }
-
-
-##############################################################################
-# fft_scheduler does this:
-#     if ($SCHED_ALG eq 'round7') { return fft_schedule_round7(...)     }
-#     else {                        return fft_schedule_modbncombo(...) }
-# I.e. uses fft_schedule_round7 unless env var $SCHED_ARG is set to something else :(
-# if "SCHED_ARG" in os.environ:
-#     if os.environ["SCHED_ARG"] != "":
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def build_extended_schedule(D,G,datapoints): return 0

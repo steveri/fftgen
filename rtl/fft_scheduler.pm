@@ -690,8 +690,6 @@ sub add_bypass_info {
     }
 }
 
-if ($ALL_LDBG) { print("bookmarkpl\n"); }
-
 sub find_conflict {
     my $fft_info = shift;
     my $fcur = shift;
@@ -708,8 +706,6 @@ sub find_conflict {
     my $LDBG=$ALL_LDBG;
     if ($LDBG) { print "  bnr(): cy$fcur.$which_op=b$curbank; cy$fnxt.op1=b$nxtb1 and cy$fnxt.op1=b$nxtb2\n"; }
 
-
-#    if (($curb1 == $nxtb1) || ($curb2 == $nxtb2)) { return $cur_op; }
     if (($curbank == $nxtb1) || ($curbank == $nxtb2)) { return $cur_op; }
     else { return ""; }
 }
@@ -724,7 +720,6 @@ sub bypass_next_read {
     my $bufnum = shift;
     my $LDBG = shift;
 
-    # Find next usage of $cur_op; read it from bypass_buffer[$bufnum] instead of SRAM
     for (my $fi=$firstcy_nxtstage; $fi <= $lastcy_nxtstage; $fi++) {
    #for (my $fi=$firstcy_nxtstage; $fi < $lastcy_nxtstage; $fi++) {  # Substitute this to break subtly.
 
@@ -753,14 +748,12 @@ sub bypass_read {
 
     #my $dbgmsg = "  $readcy: Bypass-read  $op from buffer $bufnum\n";
     @{$fft_info}[$readcy]->{"${op}_buffer"} = $bufnum;
+
     if (@{$fft_info}[$readcy]->{"${op}_buffer_access"} eq "WR") {
         print "\nERROR fft_scheduler.pm: not prepared to handle \"BOTH\"?\n";
     };
     @{$fft_info}[$readcy]->{"${op}_buffer_access"} = "RD";
-    
-    # BUG/TODO/FIXME different bypass mechanism for nunits==1
-    # if ($nunits==1) { @{$fft_info}[$fi]->{access} = "op1 from buffer"; }
-    @{$fft_info}[$readcy]->{access} = "$op from buffer"; # Used only for nunits==1
+    @{$fft_info}[$readcy]->{access} = "$op from buffer";
 }
 
 sub bypass_write {
@@ -772,8 +765,6 @@ sub bypass_write {
     @{$fft_info}[$fcur]->{"${op}_buffer"} = $bufnum;
     @{$fft_info}[$fcur]->{"${op}_buffer_access"} = "WR";
 }
-
-
 
 sub get_ops_and_banks {
     my $fft_info = shift;
@@ -1688,7 +1679,7 @@ sub find_ag_alg {
 
 sub decode_alg {
     # Algorithm is encoded as follows: (npoints, mask, ii_bit0, ii_bit1, ii_bit2...)
-    # E.g. ii2ii4ii8m1 is encoded as (32, 0x1, 2,4,8)
+    # E.g. ii2ii4ii8m1 is encoded as (32, 0x1, 2,4,8)ss
 
     my $npoints = shift;
     my $mask    = shift;
