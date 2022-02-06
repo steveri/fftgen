@@ -242,7 +242,8 @@ def get_twiddles(op, s, S, warn, DBG=1):
     s2 = (S-1) - s                  # s2:  1  2  3  4  5 ...   10
     n2 = 2 ** (s+1)                 # n2:  2  4  8 16 32 ... 1024
     k  = i >> s2
-    e  = -6.283185307179586         #  e: -2pi, dunno why really
+    e  = -6.283185307179586         # e = -2pi, dunno why really
+    e  = -2.0 * math.pi             # Flaunt it I suppose
     cos = math.cos(0.0 + k * e/n2)  # Somehow the "0.0" prevents "-0" answers...!?
     sin = math.sin(0.0 + k * e/n2)
     #printf("TWID op=%2d,     s=$s and S=$S =>     cos is %6.3f\n", $op, $cos) 

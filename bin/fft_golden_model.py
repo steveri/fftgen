@@ -168,8 +168,15 @@ def do_fft(npoints, nunits, ar, ai, DBG=0):
             print("tws = %6.3f" % s);
             print("")
 
-        t1 = c * in2_real - s * in2_imag;
-        t2 = s * in2_real + c * in2_imag;
+        t1 = c * in2_real - s * in2_imag
+        t2 = s * in2_real + c * in2_imag
+
+        # Ugh
+        # In python, (-1.0 * 0.0) = -0.0
+        # In perl,   (-1.0 * 0.0) =  0.0
+        # So we do this to compare w/ equivalent perl model :(
+        if (t1 == -0.0): t1 = 0.0
+        if (t2 == -0.0): t2 = 0.0
 
         if (LDBG):
             print("t1 = %6.3f" % t1);
