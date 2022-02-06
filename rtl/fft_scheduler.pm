@@ -295,8 +295,6 @@ sub show_bits {
     return $bits;
 }
 
-if ($ALL_LDBG) { print("bookmarkpl\n"); }
-
 ##############################################################################
 # Simple helper functions --- all but log2() are used only by 'round7'
 #
@@ -368,8 +366,8 @@ sub rrot {
     my $size      = shift;  # Size of integer e.g. 5 (bits)
     my $shift_amt = shift;  # Rotate right this many places\ e.g. 1.
 
-    my $LDBG = 0;
-    if ($LDBG) {
+    my $LLDBG = 0;
+    if ($LLDBG) {
         my $n_string = show_bits($n, $size);
         print "\nRotate '$n_string' right by '$shift_amt' places.\n";
     }
@@ -383,7 +381,7 @@ sub rrot {
 #        print "msb is $msb; new n is '$n_string'\n";
     }
 
-    if ($LDBG) {
+    if ($LLDBG) {
         my $n_string = int2bin($n, $size);
         print "Result is '$n_string\n\n";
     }
@@ -419,6 +417,8 @@ sub replace_bit {
 
     return $newnum;
 }
+
+if ($ALL_LDBG) { print("bookmarkpl\n"); }
 
 ##############################################################################
 # Compatibility module fft_schedule(npoints,nunits,reschedule)

@@ -276,8 +276,6 @@ def show_bits(n, w, DBG=0):
     return(bits)
 
 
-if (ALL_LDBG): print("bookmarkpy")
-
 ##############################################################################
 # Simple helper functions --- all but log2() are used only by 'round7'
 #
@@ -299,47 +297,42 @@ if (ALL_LDBG): print("bookmarkpy")
 
 # def log2() => use math.log2
 # def reverse_bits => use python built-in functions
-# def blow2bits => use python built-in functions
+# def blow2bits    => use python built-in functions
 
 # Right-rotate
 def rrot(n, size, shift_amt, DBG=0):
-#     n         = shift;  # Integer to be rotated e.g. 7 ('00111')
-#     size      = shift;  # Size of integer e.g. 5 (bits)
-#     shift_amt = shift;  # Rotate right this many places\ e.g. 1.
-# Example: rrot(7,4,1) = 11  ('0111' => '1011')
-    
-    LDBG = 0
-    if DBG:
+    "Example: rrot(7,4,1) = 11  ('0111' => '1011')"
+
+    #     n         = shift;  # Integer to be rotated e.g. 7 ('00111')
+    #     size      = shift;  # Size of integer e.g. 5 (bits)
+    #     shift_amt = shift;  # Rotate right this many places\ e.g. 1.
+
+    LLDBG = 0
+    if LLDBG:
         n_string = show_bits(n, size)
         print(f"\nRotate '{n_string}' right by '{shift_amt}' places.")
         
     for i in range(0, shift_amt):
         lsb = n%2;
-        if LDBG: print(f"lsb is {lsb}")
+        if LLDBG: print(f"lsb is {lsb}")
         msb = lsb * 2**(size-1); # New msb is old lsb.
         n = (n >> 1) + msb;
-        if LDBG:
+        if LLDBG:
             n_string = show_bits(n, size);
             print(f"msb is {msb}; new n is '{n_string}'")
             
-    if DBG:
+    if LLDBG:
+        def int2bin(n, size): return show_bits(n, size)
         n_string = int2bin(n, size);
         print(f"Result is '{n_string}\n")
         
     return n
 
-def int2bin(n, size): return show_bits(n, size)
-
-
-# rrot(7,4,1) # 11
-# rrot(rrot(7,4,1),4,1) # 13
-
-
 # Left-rotate
 def lrot(n, size, shift_amt):
-#     n         = shift;  # Integer to be rotated e.g. 7 ('00111')
-#     size      = shift;  # Size of integer e.g. 5 (bits)
-#     shift_amt = shift;  # Rotate right this many places\ e.g. 1.
+    #     n         =   # Integer to be rotated e.g. 7 ('00111')
+    #     size      =   # Size of integer e.g. 5 (bits)
+    #     shift_amt =   # Rotate right this many places\ e.g. 1.
 
     # lrot by s bits is same as rrot by nbits-s
     n = rrot(n, size, size-shift_amt)
@@ -360,11 +353,7 @@ def replace_bit(n,i,b, DBG=0):
 
     return newnum;
 
-# replace_bit DONE
-
-
-
-
+if (ALL_LDBG): print("bookmarkpy")
 
 ##############################################################################
 # Compatibility module fft_schedule(npoints,nunits,reschedule)
