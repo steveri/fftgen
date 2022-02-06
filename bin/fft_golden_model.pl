@@ -6,12 +6,22 @@ use strict;
 my $ALL_LDBG=0;
 if ($ENV{ALL_LDBG} ne "") { $ALL_LDBG = $ENV{ALL_LDBG}; }
 
+# E.g. extensive comparison w/ python version
+#    function fgm {
+#      fft_golden_model.pl 8 1 > tmp.pl
+#      fft_golden_model.py 8 1 > tmp.py
+#      diff tmp.pl tmp.py
+#    }
+#    export ALL_LDBG=1
+#    ( c; set -x; fgm )
+
+# Want "round7" scheduler function etc. from "../rtl/fft_scheduler.py"
 #push (@INC, "/home/steveri/fftgen/rtl/");
 my $rtldir = mydir("../rtl");  # Script lives in $FFTGEN/bin;
 push (@INC, "$rtldir/");       # scheduler lives in $FFTGEN/rtl
 require fft_scheduler;
 
-#test_fft(8, 1);
+# test_fft(8, 1);
 
 # Example usage, from golden_test.p[ly]:
 # fft_golden_model.py 8 1
@@ -127,31 +137,24 @@ sub do_fft {
 
     my @fft_info = fft_scheduler::fft_schedule($npoints, $nunits, "", "");
 
-#   my @fft_info =
-#       $ENV{USE_CRAZY} ?
-#       fft_scheduler::fft_schedule($npoints, $nunits, "reschedule", "") :
-#       fft_scheduler::fft_schedule($npoints, $nunits, "", "") ;
+    # I guess we don't do this no more
+    #   my @fft_info =
+    #       $ENV{USE_CRAZY} ?
+    #       fft_scheduler::fft_schedule($npoints, $nunits, "reschedule", "") :
+    #       fft_scheduler::fft_schedule($npoints, $nunits, "", "") ;
 
     # BUG/FIXME/TODO maybe later, emulate swizzle and bypass behavior
     # Maybe later, emulate swizzle and bypass behavior
     # For now, FFT in place.  Also, serialize all parallel-butt action.
 
+    print("bookmarkpl")
+
     for (my $cy=0; $cy < @fft_info; $cy++) {
 
-#        my $stage = $fft_info[$cy]->{stage};
         my $op1 = $fft_info[$cy]->{op1};
         my $op2 = $fft_info[$cy]->{op2};
-#        my $bank1 = $fft_info[$cy]->{bank1};
-#        my $bank2 = $fft_info[$cy]->{bank2};
         my $ctwid = $fft_info[$cy]->{ctwid};
         my $stwid = $fft_info[$cy]->{stwid};
-#        my $access = $fft_info[$cy]->{access};
-
-#        # For nunits==4 (only)
-#        my $op1_buffer = $fft_info[$cy]->{op1_buffer};
-#        my $op2_buffer = $fft_info[$cy]->{op2_buffer};
-#        my $op1_buffer_access = $fft_info[$cy]->{op1_buffer_access};
-#        my $op2_buffer_access = $fft_info[$cy]->{op2_buffer_access};
 
         my ($c,$s) = ($ctwid,$stwid);
 
@@ -179,17 +182,11 @@ sub do_fft {
             printf("t2 = %6.3f\n", $t2);
             print  "\n";
         }
-        # $ar[$op2] = $ar[$op1] - $t1;
-        # $ai[$op2] = $ai[$op1] - $t2;
-                
         my $out2_real = $in1_real - $t1;
         my $out2_imag = $in1_imag - $t2;
 
         $ar[$op2] = $out2_real;
         $ai[$op2] = $out2_imag;
-
-        # $ar[$op1] = $ar[$op1] + $t1;
-        # $ai[$op1] = $ai[$op1] + $t2
 
         my $out1_real = $in1_real + $t1;
         my $out1_imag = $in1_imag + $t2;
