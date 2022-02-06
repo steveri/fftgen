@@ -6,6 +6,15 @@ $| = 1; # Autoflush output why not.
 my $ALL_LDBG=0;
 if ($ENV{ALL_LDBG} ne "") { $ALL_LDBG = $ENV{ALL_LDBG}; }
 
+# E.g. extensive comparison w/ python version
+#    function fgm {
+#      fft_golden_model.pl 8 1 > tmp.pl
+#      fft_golden_model.py 8 1 > tmp.py
+#      diff tmp.pl tmp.py
+#    }
+#    export ALL_LDBG=1
+#    ( c; set -x; fgm )
+
 my $rtldir = mydir(".");  # This script lives in $FFTGEN/rtl;
 push (@INC, "$rtldir/");  # swizzler lives in $FFTGEN/rtl
 require swizzler;

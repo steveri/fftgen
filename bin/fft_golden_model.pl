@@ -147,8 +147,6 @@ sub do_fft {
     # Maybe later, emulate swizzle and bypass behavior
     # For now, FFT in place.  Also, serialize all parallel-butt action.
 
-    print("bookmarkpl")
-
     for (my $cy=0; $cy < @fft_info; $cy++) {
 
         my $op1 = $fft_info[$cy]->{op1};

@@ -145,8 +145,6 @@ def do_fft(npoints, nunits, ar, ai, DBG=0):
     # Maybe later, emulate swizzle and bypass behavior
     # For now, FFT in place.  Also, serialize all parallel-butt action.
 
-    print("bookmarkpy")
-
     for cy in range( len(fft_info) ):
 
         op1 = fft_info[cy]["op1"]
