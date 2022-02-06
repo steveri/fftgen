@@ -176,35 +176,23 @@ def build_extended_schedule(D, G, datapoints, DBG=0):
 
     return deltapoints
 
-if (ALL_LDBG): print("bookmarkpy")
-
 # Given group size G, calculate mem bank m that corresponds to datapoint d
 def parity_map(d, G, DBG=0):
-#     d = shift;    # Datapoint index
-#     G = shift;    # Group size
 
     T = int(math.log2(G)) # Number of toggle bits
 
     # Calculate m= P(0) + 2P(1) + 4P(2) + ... + 2^(T-1)*P(T-1)
-#     my ($m, @P) = (0,());
     (m, P) = (0, [0] * T)
 
-#     for (t=$T-1; $t>=0; $t--) {
-#   for t in range(T-1, -1, -1)
     t = T - 1
     while t >= 0:
-
         P[t] = parity_mod(d, T, t)
         if DBG: print(f"P[t]={P[t]} ", end='')
         m = 2*m + P[t];
-
         t = t - 1
 
     if DBG: print(f"   m={m}")
     return m
-
-# parity_map DONE
-
 
 # Take parity of every nth bit in operand op,
 # starting w/bit (b mod n), where LSB is bit number 0.
@@ -212,14 +200,14 @@ def parity_mod(op,n,b, DBG=0):
     # E.g. if $op=118 (1101 1110) and n=3 and b=1
     # Then parity_mod returns XOR of bits 1,4,7 = xor(1,1,1) = 1
 
-#     op = shift; # Operand e.g. 1101 1110
-#     my  $n = shift; # XOR together every nth bit of operand, e.g. $n=3
-#     my  $b = shift; # Start with bit $b, e.g. $b=1
+    #  op => Operand e.g. 1101 1110
+    #  n  => XOR together every nth bit of operand, e.g. $n=3
+    #  b  => Start with bit $b, e.g. $b=1
 
     b = int(b % n)
 
     # Shift the word such that desired starting bit is LSB
-    tmp = op >> b;
+    tmp = op >> b
 
     # XOR every nth bit and return the answer.
     parity = 0
@@ -231,34 +219,29 @@ def parity_mod(op,n,b, DBG=0):
     if DBG: print(f"parmod {op} = {bits} ; even_parity({op},{n},{b}) = {parity}\n")
     return parity
 
-# parity_mod DONE
-
+# Get the twiddle factor associated w/operand $op in stage $s of $S stages.
 def get_twiddles(op, s, S, warn, DBG=1):
     # Want op = sequential opnum (0,1,2...D-1) not index (0,4,1,5...) or whatever
+
 
     # Op must be (I think) the smallest of the pair ($op, $op + 2^$s)
     zbit = 2 ** s
     if (op & zbit):
-
-        # I think this is not used!!!
-#         if (warn != "nowarn"):
-#             print("WARNING: opnum should be smallest of the pair")
-
+        if (warn != "nowarn"): print("WARNING: opnum should be smallest of the pair") # I think this is not used!!!
         op = op & ~zbit;
 
     i = rrot(op, S, s+1);
 
-    s2 = (S-1) - s;                  # s2:  1  2  3  4  5 ...   10
-    n2 = 2 ** (s+1);                 # n2:  2  4  8 16 32 ... 1024
-    k  = i >> s2;
-    e  = -6.283185307179586;         #  e: -2pi, dunno why really
-    cos = math.cos(0.0 + k * e/n2);  # Somehow the "0.0" prevents "-0" answers...!?
-    sin = math.sin(0.0 + k * e/n2);
-    #printf("TWID op=%2d,     s=$s and S=$S =>     cos is %6.3f\n", $op, $cos); 
+    s2 = (S-1) - s                  # s2:  1  2  3  4  5 ...   10
+    n2 = 2 ** (s+1)                 # n2:  2  4  8 16 32 ... 1024
+    k  = i >> s2
+    e  = -6.283185307179586         #  e: -2pi, dunno why really
+    cos = math.cos(0.0 + k * e/n2)  # Somehow the "0.0" prevents "-0" answers...!?
+    sin = math.sin(0.0 + k * e/n2)
+    #printf("TWID op=%2d,     s=$s and S=$S =>     cos is %6.3f\n", $op, $cos) 
     return (cos,sin)
 
-# get_twiddles DONE
-
+if (ALL_LDBG): print("bookmarkpy")
 
 ########################################################################
 # For debugging only, and only with sched alg 'round7'

@@ -187,12 +187,11 @@ sub build_extended_schedule {
     return %deltapoints;
 }
 
-if ($ALL_LDBG) { print("bookmarkpl\n"); }
-
 # Given group size G, calculate mem bank m that corresponds to datapoint d
 sub parity_map {
     my $d = shift;    # Datapoint index
     my $G = shift;    # Group size
+
     my $T = log2($G); # Number of toggle bits
 
     # Calculate m= P(0) + 2P(1) + 4P(2) + ... + 2^(T-1)*P(T-1)
@@ -238,11 +237,11 @@ sub get_twiddles {
     my $s = shift;
     my $S = shift;
     my $nowarn = shift;
-    my $warn = ($nowarn == 0) ? 0 : 1;
 
     # Op must be (I think) the smallest of the pair ($op, $op + 2^$s)
     my $zbit = 2**$s;
     if ($op & $zbit) {
+        my $warn = ($nowarn == 0) ? 0 : 1;
         if ($warn) { print "WARNING: opnum should be smallest of the pair\n"; }
         $op = $op & ~$zbit;
     }
@@ -257,6 +256,8 @@ sub get_twiddles {
     #printf("TWID op=%2d,     s=$s and S=$S =>     cos is %6.3f\n", $op, $cos); 
     return ($cos,$sin);
 }
+
+if ($ALL_LDBG) { print("bookmarkpl\n"); }
 
 ########################################################################
 # For debugging only, and only with sched alg 'round7'
