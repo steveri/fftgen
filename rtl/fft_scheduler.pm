@@ -606,8 +606,6 @@ sub mydir {
     return abs_path("$dir/$offset");
 }
 
-if ($ALL_LDBG) { print("bookmarkpl\n"); }
-
 ###############################################################################
 # add_bypass_info() calculates and adds bypass info to @fft_info
 #
@@ -643,6 +641,7 @@ sub add_bypass_info {
     my $bufnum = 0;
 
     my $LDBG = $ALL_LDBG;
+
     # See if there's a bank conflict between last group in current stage and first group of next stage.
     for (my $fcur = $lastpack_curstage; $fcur < $firstcy_nxtstage; $fcur++) {
         my $found_conflict = 0;
@@ -661,6 +660,7 @@ sub add_bypass_info {
                 # (Error if bufnum >= 4)
                 $found_conflict = 1;
                 if ($LDBG) {
+                    # NOTE odnod message only invoked once per stage pair comparison
                     my $odnodmsg = "\nOD NOD must buffer things between stages $curstage/$nxtstage.\n";
                     if ($odnod) { $odnod=0; print $odnodmsg; }
                 }
@@ -689,6 +689,8 @@ sub add_bypass_info {
         }
     }
 }
+
+if ($ALL_LDBG) { print("bookmarkpl\n"); }
 
 sub find_conflict {
     my $fft_info = shift;

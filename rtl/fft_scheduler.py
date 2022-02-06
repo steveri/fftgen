@@ -478,7 +478,22 @@ def init_fft_info(fftno, stage,  op1, op2,   bank1, bank2,    ctwid,stwid):
 # def print_fft_info
 # def print_fft_info_round7
 
-if (ALL_LDBG): print("bookmarkpy")
+###############################################################################
+# add_bypass_info() calculates and adds bypass info to @fft_info
+#
+# To call it:
+#     for stage in range (1,nstages):  # E.g. (0, 1, 2, 3)
+#         add_bypass_info(fft_info, npoints, nunits, stage-1);
+#
+# In the case where there's just one butterfly unit, it suffices to set
+# 
+#    @{$fft_info}[$i]->{access} = (
+#      "op1 from buffer", "op2 from buffer", "op1 to buffer" or "op2 to buffer")
+#
+# When there's more than one butterfly unit we use op[12]_buffer and op[12]_buffer_access
+#
+#    @{$fft_info}[$i]->{op1_buffer} = $bufnum;       # also {op2_buffer}
+#    @{$fft_info}[$i]->{op1_buffer_access} = "WR";   # "RD", "WR", "NONE", or "BOTH"
 
 def add_bypass_info(fft_info, npoints, nunits, curstage):
 
@@ -489,23 +504,17 @@ def add_bypass_info(fft_info, npoints, nunits, curstage):
     lastcy_nxtstage   = int((curstage+2) * npoints/2 - 1)
     lastpack_curstage = int(firstcy_nxtstage - nunits)
 
-    odnod = 1; # First conflict (only) should trigger an OD NOD message.
-    bufnum = 0;
+    odnod  = 1 # First conflict (only) should trigger an OD NOD message.
+    bufnum = 0
 
     LDBG = ALL_LDBG;
 
-    # See if there's a bank conflict between last group in current stage
-    # and first group of next stage.
+    # See if there's a bank conflict between last group in current stage and first group of next stage.
 
     # for (fcur = lastpack_curstage; fcur < firstcy_nxtstage; fcur++) {
-#     for fcur in range(lastpack_curstage, firstcy_nxtstage):
-    fcur = lastpack_curstage
-    while fcur < firstcy_nxtstage:
+    for fcur in range(lastpack_curstage, firstcy_nxtstage):
         found_conflict = 0;
-        #for (fnxt = $firstcy_nxtstage; $fnxt < ($firstcy_nxtstage + $nunits); $fnxt++) {
-#         for fnxt in (firstcy_nxtstage, (firstcy_nxtstage + nunits)):
-        fnxt = firstcy_nxtstage
-        while fnxt < (firstcy_nxtstage + nunits):
+        for fnxt in range(firstcy_nxtstage, int(firstcy_nxtstage + nunits)):
 
             # Look for bank1, bank2 conflicts each in turn.
             for which_op in ['op1', 'op2']:
@@ -527,7 +536,6 @@ def add_bypass_info(fft_info, npoints, nunits, curstage):
 
                 # In cycle $fcur, write $which_op to buffer $bufnum instead of SRAM
                 if LDBG: print(f"  {fcur}: Bypass-write {which_op} to buffer {bufnum}")
-
                 bypass_write(fft_info, fcur, bufnum, which_op)
 
                 # Search fft_info from firstcy to lastcy, find next usage of $cur_op;
@@ -537,27 +545,36 @@ def add_bypass_info(fft_info, npoints, nunits, curstage):
                     cur_op, bufnum, LDBG);
 
                 # FIXME should be an assert here
-                if (bufnum > nunits):
-                    print("\nERROR fft_scheduler.pm: too many bufs!")
+                if (bufnum > nunits): print("\nERROR fft_scheduler.pm: too many bufs!")
                 bufnum = bufnum + 1
 
                 # BUG/TODO/FIXME different bypass mechanism for nunits==1
                 # BUG/TODO/FIXME is it used?
-                if (nunits==1):
-                    fft_info[fcur]["access"] = f"{which_op} to buffer"
-
-            fnxt = fnxt + 1
+                if (nunits==1): fft_info[fcur]["access"] = f"{which_op} to buffer"
 
         assert (found_conflict != 0),\
             "\nERROR no bank conflict between stages?"
 
-        fcur = fcur + 1
+if (ALL_LDBG): print("bookmarkpy")
 
-#     print("FOOOOO")
-#     pprint(fft_info[fcur]); exit(13)
+def find_conflict(fft_info, fcur, which_op, fnxt):
 
-# bypass_next_read() DONE
+    (cur_op1, cur_op2, curb1, curb2) = get_ops_and_banks(fft_info, fcur)
+    cur_op  = cur_op1 if (which_op == 'op1') else cur_op2
+    curbank = curb1   if (which_op == 'op1') else curb2
 
+    fnxt = int(fnxt)
+    nxtb1 = fft_info[fnxt]["bank1"]
+    nxtb2 = fft_info[fnxt]["bank2"]
+
+    LDBG=ALL_LDBG
+    if LDBG: print(f"  bnr(): cy{fcur}.{which_op}=b{curbank}; cy{fnxt}.op1=b{nxtb1} and cy{fnxt}.op1=b{nxtb2}")
+
+    if ((curbank == nxtb1) or (curbank == nxtb2)): return cur_op
+    else: return ""
+
+
+    
 def bypass_next_read (
     fft_info, firstcy_nxtstage, lastcy_nxtstage, cur_op, bufnum, LDBG
 ):
@@ -609,24 +626,6 @@ def bypass_write(fft_info, fcur, bufnum, op):
     fft_info[fcur][f"{op}_buffer_access"] = "WR"
     
 
-def find_conflict(fft_info, fcur, which_op, fnxt):
-
-    (cur_op1, cur_op2, curb1, curb2) = get_ops_and_banks(fft_info, fcur)
-    cur_op  = cur_op1 if (which_op == 'op1') else cur_op2
-    curbank = curb1   if (which_op == 'op1') else curb2
-
-    fnxt = int(fnxt)
-    nxtb1 = fft_info[fnxt]["bank1"]
-    nxtb2 = fft_info[fnxt]["bank2"]
-
-    LDBG=ALL_LDBG
-    if LDBG: print(f"  bnr(): cy{fcur}.{which_op}=b{curbank}; cy{fnxt}.op1=b{nxtb1} and cy{fnxt}.op1=b{nxtb2}")
-
-    if ((curbank == nxtb1) or (curbank == nxtb2)): return cur_op
-    else: return ""
-
-
-    
 def get_ops_and_banks(fft_info, fi):
     op1    = fft_info[fi]["op1"]
     op2    = fft_info[fi]["op2"]
