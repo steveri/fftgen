@@ -271,18 +271,18 @@ sub print_results {
         $fr3 =~ s/[-]0[.]000/ 0.000/;
 
         # Results to two sig figs; mismatch = WARNING
-        my $gr2 = sprintf("%9.2f", $gr);
-        my $fr2 = sprintf("%9.2f", $fr);
-        # Oh this is annoying; must canonicalize "-0.00" => "0.00"
-        $gr2 =~ s/[-]0[.]00/ 0.00/;
-        $fr2 =~ s/[-]0[.]00/ 0.00/;
+        my $gr2 = sprintf("%9.2f", $gr3);
+        my $fr2 = sprintf("%9.2f", $fr3);
+#         # Oh this is annoying; must canonicalize "-0.00" => "0.00"
+#         $gr2 =~ s/[-]0[.]00/ 0.00/;
+#         $fr2 =~ s/[-]0[.]00/ 0.00/;
 
         # Results to one sig figs; mismatch = ERROR
-        my $gr1 = sprintf("%9.1f", $gr);
-        my $fr1 = sprintf("%9.1f", $fr);
-        # Oh this is annoying; must canonicalize "-0.0" => "0.0"
-        $gr1 =~ s/[-]0[.]0/ 0.0/;
-        $fr1 =~ s/[-]0[.]0/ 0.0/;
+        my $gr1 = sprintf("%9.1f", $gr1);
+        my $fr1 = sprintf("%9.1f", $fr1);
+#         # Oh this is annoying; must canonicalize "-0.0" => "0.0"
+#         $gr1 =~ s/[-]0[.]0/ 0.0/;
+#         $fr1 =~ s/[-]0[.]0/ 0.0/;
 
         # Should match to three decimal places; two or one means WARNING
         # Warning if no match @ three sig figs.
