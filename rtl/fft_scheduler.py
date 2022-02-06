@@ -241,40 +241,24 @@ def get_twiddles(op, s, S, warn, DBG=1):
     #printf("TWID op=%2d,     s=$s and S=$S =>     cos is %6.3f\n", $op, $cos) 
     return (cos,sin)
 
-if (ALL_LDBG): print("bookmarkpy")
-
 ########################################################################
 # For debugging only, and only with sched alg 'round7'
 
 def show_i(i, D, S):
-
-    # istring = $D > 10 ? sprintf("%2d", $i) : $i;
-    istring = i
-    if (D > 10): istring = "%2d" % i
-
-    #ibits = show_bits($i,$S); 
+    istring = ("%2d" % i) if (D>10) else i
     ibits = show_bits(i,S); print(f"    i={istring}({ibits}) => ", end='')
 
 def show_d(fmt, d, D, G=0):
-#     fmt = shift; # E.g. "%s => "
-#     d = shift;
-#     D = shift;
-#     G = shift; # Optional
+    # E.g. fmt = "%s => "
 
     S = math.log2(D)
 
-#     dstring = $D > 10 ? sprintf("%2d", $d) : $d;
-    dstring = d
-    if (D > 10): dstring = "%2d" % d
-
-    dbits = show_bits(d,S)
-    # printf $fmt, "d=$dstring($dbits)";
-    print( fmt % f"d={dstring}({dbits})", end='')
+    dstring = ("%2d" % d) if (D>10) else d
+    dbits = show_bits(d,S); print( fmt % f"d={dstring}({dbits})", end='')
 
     # If $G was specified, print the map why not.
     if (G > 0): parity_map(d, G)
-#     print('')
-
+    # print('')
 
 def show_bits(n, w, DBG=0):
     '''
@@ -291,6 +275,8 @@ def show_bits(n, w, DBG=0):
     
     return(bits)
 
+
+if (ALL_LDBG): print("bookmarkpy")
 
 ##############################################################################
 # Simple helper functions --- all but log2() are used only by 'round7'

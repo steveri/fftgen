@@ -257,8 +257,6 @@ sub get_twiddles {
     return ($cos,$sin);
 }
 
-if ($ALL_LDBG) { print("bookmarkpl\n"); }
-
 ########################################################################
 # For debugging only, and only with sched alg 'round7'
 
@@ -270,8 +268,6 @@ sub show_i {
     my $istring = $D > 10 ? sprintf("%2d", $i) : $i;
     my $ibits = show_bits($i,$S); print "    i=$istring($ibits) => ";
 }
-
-
 sub show_d {
     my $fmt = shift; # E.g. "%s => "
     my $d = shift;
@@ -287,7 +283,6 @@ sub show_d {
     if ($G > 0) { parity_map($d, $G); print "\n"; }
 
 }
-
 sub show_bits {
     # Turn number n=10 into an nbit binary string "1010"
     # E.g. show_bits(7,8) = "00000111"
@@ -299,6 +294,8 @@ sub show_bits {
     my $bits = scalar(reverse(@bits));
     return $bits;
 }
+
+if ($ALL_LDBG) { print("bookmarkpl\n"); }
 
 ##############################################################################
 # Simple helper functions --- all but log2() are used only by 'round7'
