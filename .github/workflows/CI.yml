@@ -33,6 +33,12 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
 
+      - name: 'SIMV ANALYZER'
+        run: |
+          # I have this (very fast) test for the analyzer, why not use it.
+          # FIXME not sure what this really does...?
+          cd bin/simv_analysis; make test
+
       - name: Install csh
         run: sudo apt-get install csh
 
@@ -45,11 +51,11 @@ jobs:
       - name: Install numpy for perl v python tests
         run:  pip install numpy
 
-      - name: 'SIMV ANALYZER'
+      - name: Install FPU
         run: |
-          # I have this (very fast) test for the analyzer, why not use it.
-          # FIXME not sure what this really does...?
-          cd bin/simv_analysis; make test
+          # Fetch the FPU
+          test -e rtl/lib && unlink rtl/lib
+          git clone https://github.com/steveri/fpu rtl/lib
 
       - name: 'PERL v. PYTHON quick test (golden_test.{pl,py})'
         run : |
@@ -71,24 +77,13 @@ jobs:
           diff tmp.pl tmp.py -I '^PERL$\|^PYTHON$'
           unset ALL_LDBG
 
-      # Will it blend?
-      - name: 'setup for regressions'
+      - name: 'FFT REGRESSIONS (perl)'
         run: |
           # Echo commands; exit on failure
           set -x; set -e
 
-          # Where are we?
-          TRAVIS_BUILD_DIR=`pwd`
-
           # Initialize Genesis2 environment
           source bin/setup_genesis.sh
-
-
-      - name: 'FFT REGRESSIONS (perl)'
-        run: |
-          # Fetch the FPU
-          test -e rtl/lib && unlink rtl/lib
-          git clone https://github.com/steveri/fpu rtl/lib
 
           # Prep to run the regressions
           echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
@@ -100,6 +95,32 @@ jobs:
 
           # Run the regressions
           do_test='../bin/golden_test.csh -sim verilator'
+          $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
+
+          # Check for errors
+          egrep 'FAIL|ERR' test_results.log && exit 13 || echo okay
+
+          # Log should be about 18K lines long
+          wc -l test_results.log
+
+      - name: 'FFT REGRESSIONS (python)'
+        run: |
+          # Echo commands; exit on failure
+          set -x; set -e
+
+          # Initialize Genesis2 environment
+          source bin/setup_genesis.sh
+
+          # Prep to run the regressions
+          echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
+          echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
+          mkdir regression; cd regression
+
+          # ("nobuf" allows continuous streaming to stdout instead of buffering)
+          nobuf='stdbuf -oL -eL'
+
+          # Run the regressions
+          do_test='../bin/golden_test.csh --python -sim verilator'
           $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
 
           # Check for errors

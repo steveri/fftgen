@@ -15,11 +15,14 @@ SYNOPSIS
   $0 -sim vcs -gt8k
   $0 -sim verilator 128 8 2port
 
+  $0 --python <args>
+
 ARGUMENT SUMMARY
   no arguments  - use standard test suite of 48 programs with npoints=(8,16,32..1024)
   -gt8k         - use extra-large test suite w/ npoints=(2K, 4K, 8K)
   -sim <sim>    - specify simulator to use, either "vcs" or "verilator"
   <pts bts mem> - instead of running a suite, run a single test
+  --python      - use python instead of perl to generate and compare results
 
   where
     <pts> = 8, 16, 32, 64, 128, 256, 512, or 1024
@@ -78,8 +81,18 @@ EOF
 exit
 endif
 
-unset gt8k
-if ("$0:t" == "gt8k.csh") set gt8k
+set PYTHON_OR_PERL = "PERL"
+if ("$1" == "--python") then
+    set PYTHON_OR_PERL = "PYTHON" ; shift
+else if ("$1" == "--perl") then
+    set PYTHON_OR_PERL = "PERL"   ; shift
+endif
+
+# # !!? What the hell is this???
+# # I think maybe it was a shortcut for "golden_test -gt8k ... ?"?
+# unset gt8k
+# if ("$0:t" == "gt8k.csh") set gt8k
+
 
 # Find main $FFTGEN directory  (script lives in $FFTGEN/bin)
 set myname=$0
@@ -364,10 +377,16 @@ foreach t ($tests:q)
   # Now check against the golden model.
   # Save results in a summary file.
 
-  echo
+  set golden_test = $BIN/golden_test.pl
+  if ($PYTHON_OR_PERL == "PYTHON") set golden_test = $BIN/golden_test.py
+
+  echo ''
   # Note "make gen" deletes all logfiles *.log in "." (should I fix that?)
   set logfile = "/tmp/golden_test_${npoints}_${nunits}_${nports}.log"
-  $BIN/golden_test.pl $simlog $npoints $nunits $nports \
+#   $BIN/golden_test.pl $simlog $npoints $nunits $nports
+  echo $PYTHON_OR_PERL $golden_test $simlog $npoints $nunits $nports
+  echo ''
+  $golden_test $simlog $npoints $nunits $nports \
     | tee $logfile | egrep '^PASS|^FAIL|ERROR|WARNING|See|less' \
     | sed 's/\(^ERROR.*\)/\1 --- '"$npoints $nunits $nports/"\
     | sed "s/^\(.*\)/TR \1 ($SIMULATOR)/" | tee -a $summfile
