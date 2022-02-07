@@ -1,8 +1,33 @@
-See README.md
+Also see README.md
+
+==============================================================================
+Feb 2022
+
+Extensive comparison of python and perl versions.
+
+golden_test:
+    unset ALL_LDBG
+    gunzip -c ../examples-rtl/8.1.1port/fft.log.gz > tmp.fftlog
+    golden_test.pl tmp.fftlog 8 1 2port > tmp.pl
+    golden_test.py tmp.fftlog 8 1 2port > tmp.py
+    diff -bB tmp.pl tmp.py
+
+fft_golden_model
+    export ALL_LDBG=1
+    p=16; u=1;
+    fft_golden_model.pl $p $u > tmp.pl
+    fft_golden_model.py $p $u > tmp.py
+
+    # Only diff should be that one says "PERL" and one says "PYTHON"
+    diff tmp.pl tmp.py -I '^PERL$\|^PYTHON$'
+    unset ALL_LDBG
 
 
 
-------------------------------------------------------------------------------
+==============================================================================
+Jun 2019
+
+
 DONE superceded by simv_analysis, see simv_analysis/README.md
 # log=simv.log
 # log=/nobackup/steveri/github/fftgen/examples/test8.vcs/simv.log

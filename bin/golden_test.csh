@@ -368,7 +368,7 @@ foreach t ($tests:q)
   # Note "make gen" deletes all logfiles *.log in "." (should I fix that?)
   set logfile = "/tmp/golden_test_${npoints}_${nunits}_${nports}.log"
   $BIN/golden_test.pl $simlog $npoints $nunits $nports \
-    |& tee $logfile | egrep '^PASS|^FAIL|ERROR|WARNING|See|less' \
+    | tee $logfile | egrep '^PASS|^FAIL|ERROR|WARNING|See|less' \
     | sed 's/\(^ERROR.*\)/\1 --- '"$npoints $nunits $nports/"\
     | sed "s/^\(.*\)/TR \1 ($SIMULATOR)/" | tee -a $summfile
 
@@ -402,6 +402,16 @@ echo "$npass/$ntests tests PASSED"
 echo "    (NOTE 47/48 pass is normal because '8 4 1' not supported.)"
 echo
 
+if ($ntests == 48) then
+    if ($npass != 47) then
+        echo "ERROR golden_test.csh - should be 47/48 passes"
+        exit 13
+    endif
+else if ($npass != $ntests) then
+    echo "ERROR golden_test.csh - test(s) failed"
+    exit 13
+endif
+
 echo Warnings:
 grep -i warn $summfile || echo "   (no warnings found.)"
 echo
@@ -410,9 +420,9 @@ echo Errors:
 grep -i err $summfile || echo "   (no errors found.)"
 echo
 
-/bin/rm $summfile
-echo "WARNING did not keep result summary file '$summfile'"
 # echo "Result summary is here: '$summfile'"
+/bin/rm $summfile
+echo "NOTE did not keep result summary file '$summfile'"
 
 
 ##############################################################################
