@@ -46,7 +46,7 @@ jobs:
         run:  pip install numpy
 
 
-      - name: 'PERL v. PYTHON'
+      - name: 'PERL v. PYTHON quick test (golden_test.{pl,py})'
         run : |
           # Echo commands; exit on failure
           set -x; set -e
@@ -55,6 +55,17 @@ jobs:
           bin/golden_test.pl tmp.fftlog 8 1 2port > tmp.pl
           bin/golden_test.py tmp.fftlog 8 1 2port > tmp.py
           diff -bB tmp.pl tmp.py
+
+      - name: 'PERL v. PYTHON extended test (ALL_LDBG + fft_golden_model.{pl.py})'
+        run : |
+          export ALL_LDBG=1
+          p=16; u=1;
+          fft_golden_model.pl $p $u > tmp.pl
+          fft_golden_model.py $p $u > tmp.py
+
+          # Only diff should be that one says "PERL" and one says "PYTHON"
+          diff tmp.pl tmp.py -I '^PERL$\|^PYTHON$'
+          unset ALL_LDBG
 
 
       - name: 'FFT REGRESSIONS'
