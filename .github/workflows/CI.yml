@@ -49,7 +49,7 @@ jobs:
         run: |
           # I have this (very fast) test for the analyzer, why not use it.
           # FIXME not sure what this really does...?
-          cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
+          cd bin/simv_analysis; make test
 
       - name: 'PERL v. PYTHON quick test (golden_test.{pl,py})'
         run : |
