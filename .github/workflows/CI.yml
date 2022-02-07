@@ -42,6 +42,10 @@ jobs:
       - name: Install verilator
         run: sudo apt-get install verilator
 
+      - name: Install numpy for perl v python tests
+        run:  pip install numpy
+
+
       - name: 'PERL v. PYTHON'
         run : |
           # Echo commands; exit on failure
