@@ -71,7 +71,8 @@ jobs:
           diff tmp.pl tmp.py -I '^PERL$\|^PYTHON$'
           unset ALL_LDBG
 
-      - name: 'FFT REGRESSIONS (perl)'
+      # Will it blend?
+      - name: 'setup for regressions'
         run: |
           # Echo commands; exit on failure
           set -x; set -e
@@ -82,6 +83,9 @@ jobs:
           # Initialize Genesis2 environment
           source bin/setup_genesis.sh
 
+
+      - name: 'FFT REGRESSIONS (perl)'
+        run: |
           # Fetch the FPU
           test -e rtl/lib && unlink rtl/lib
           git clone https://github.com/steveri/fpu rtl/lib
