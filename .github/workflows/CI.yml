@@ -87,7 +87,7 @@ jobs:
           # Prep to run the regressions
           echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
           echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
-          test -f regression && /bin/rm -rf regression
+          test -e regression && /bin/rm -rf regression
           mkdir regression; cd regression
 
           # ("nobuf" allows continuous streaming to stdout instead of buffering)
@@ -114,7 +114,7 @@ jobs:
           # Prep to run the regressions
           echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
           echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
-          test -f regression && /bin/rm -rf regression
+          test -e regression && /bin/rm -rf regression
           mkdir regression; cd regression
 
           # ("nobuf" allows continuous streaming to stdout instead of buffering)
