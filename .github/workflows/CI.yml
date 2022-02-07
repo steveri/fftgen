@@ -45,6 +45,11 @@ jobs:
       - name: Install numpy for perl v python tests
         run:  pip install numpy
 
+      - name: SIMV ANALYZER
+        run |
+          # I have this (very fast) test for the analyzer, why not use it.
+          # FIXME not sure what this really does...?
+          cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
 
       - name: 'PERL v. PYTHON quick test (golden_test.{pl,py})'
         run : |
@@ -66,11 +71,8 @@ jobs:
           diff tmp.pl tmp.py -I '^PERL$\|^PYTHON$'
           unset ALL_LDBG
 
-
-      - name: 'FFT REGRESSIONS'
+      - name: 'FFT REGRESSIONS (perl)'
         run: |
-          # FFT REGRESSIONS
-
           # Echo commands; exit on failure
           set -x; set -e
 
@@ -101,8 +103,3 @@ jobs:
 
           # Log should be about 18K lines long
           wc -l test_results.log
-
-          ### SIMV ANALYZER
-          # I have this test for the analyzer, why not use it.
-          # FIXME not sure what this really does...?
-          cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
