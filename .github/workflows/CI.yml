@@ -46,7 +46,7 @@ jobs:
         run:  pip install numpy
 
       - name: 'SIMV ANALYZER'
-        run |
+        run: |
           # I have this (very fast) test for the analyzer, why not use it.
           # FIXME not sure what this really does...?
           cd ${TRAVIS_BUILD_DIR}/bin/simv_analysis; make test
