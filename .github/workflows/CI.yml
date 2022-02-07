@@ -51,9 +51,8 @@ jobs:
       - name: Install numpy for perl v python tests
         run:  pip install numpy
 
-      - name: Install FPU
+      - name: Overwrite default FPU w latest version from repo
         run: |
-          # Fetch the FPU
           test -e rtl/lib && unlink rtl/lib
           git clone https://github.com/steveri/fpu rtl/lib
 
@@ -88,13 +87,14 @@ jobs:
           # Prep to run the regressions
           echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
           echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
+          test -f regression && /bin/rm -rf regression
           mkdir regression; cd regression
 
           # ("nobuf" allows continuous streaming to stdout instead of buffering)
           nobuf='stdbuf -oL -eL'
 
           # Run the regressions
-          do_test='../bin/golden_test.csh -sim verilator'
+          do_test='../bin/golden_test.csh --perl -sim verilator'
           $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
 
           # Check for errors
@@ -114,6 +114,7 @@ jobs:
           # Prep to run the regressions
           echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
           echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
+          test -f regression && /bin/rm -rf regression
           mkdir regression; cd regression
 
           # ("nobuf" allows continuous streaming to stdout instead of buffering)
