@@ -45,7 +45,7 @@ jobs:
       - name: Install numpy for perl v python tests
         run:  pip install numpy
 
-      - name: SIMV ANALYZER
+      - name: 'SIMV ANALYZER'
         run |
           # I have this (very fast) test for the analyzer, why not use it.
           # FIXME not sure what this really does...?
