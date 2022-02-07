@@ -1,0 +1,100 @@
+DBG2-ix0 FINAL 001500  reads  ( 0.000000, 0.000000) from SRAM000[0] (ix0)
+
+DBG2-ix0 FINAL 001500  reads  ( 1.000000, 0.000000) from SRAM000[0] (ix0)
+DBG5-ix0 FINAL 002500 BFLY0_op1 writes ( 1.000000, 0.000000)  to  SRAM000[0] (ix0)
+
+DBG2-ix0 FINAL 005500 BFLY0_op1 reads  ( 0.000000, 0.000000) from SRAM000[0] (ix0)
+
+DBG2-ix0 FINAL 005500 BFLY0_op1 reads  ( 1.000000, 0.000000) from SRAM000[0] (ix0)
+DBG5-ix0 FINAL 006500 BFLY0_op1 writes ( 2.000000, 0.000000)  to  SRAM000[0] (ix0)
+
+DBG2-ix0 FINAL 009500 BFLY0_op1 reads  ( 0.000000, 0.000000) from SRAM000[0] (ix0)
+
+DBG2-ix0 FINAL 009500 BFLY0_op1 reads  ( 2.000000, 0.000000) from SRAM000[0] (ix0)
+DBG5-ix0 FINAL 010500 BFLY0_op1 writes ( 4.000000, 0.000000)  to  SRAM000[0] (ix0)
+======================================================================================
+DBG2-ix1 FINAL 001500  reads  ( 0.000000, 0.000000) from SRAM001[0] (ix1)
+DBG5-ix1 FINAL 002500 BFLY0_op2 writes ( 1.000000, 0.000000)  to  SRAM001[0] (ix1)
+
+DBG2-ix1 FINAL 008500 BFLY0_op2 reads  ( 0.000000, 0.000000) from SRAM001[0] (ix1)
+
+DBG2-ix1 FINAL 008500 BFLY0_op2 reads  ( 1.000000, 0.000000) from SRAM001[0] (ix1)
+
+DBG2-ix1 FINAL 011500 BFLY0_op1 reads  ( 0.000000, 0.000000) from SRAM001[0] (ix1)
+
+DBG2-ix1 FINAL 011500 BFLY0_op1 reads  ( 1.000000, 0.000000) from SRAM001[0] (ix1)
+DBG5-ix1 FINAL 012500 BFLY0_op1 writes ( 1.000000,-2.414213)  to  SRAM001[0] (ix1)
+======================================================================================
+DBG2-ix2 FINAL 002500  reads  ( 0.000000, 0.000000) from SRAM002[0] (ix2)
+
+DBG2-ix2 FINAL 002500  reads  ( 1.000000, 0.000000) from SRAM002[0] (ix2)
+DBG5-ix2 FINAL 003500 BFLY0_op1 writes ( 1.000000, 0.000000)  to  SRAM002[0] (ix2)
+
+DBG2-ix2 FINAL 005500 BFLY0_op1 reads  ( 1.000000, 0.000000) from SRAM002[0] (ix2)
+DBG5-ix2 FINAL 006500 BFLY0_op2 writes ( 0.000000, 0.000000)  to  SRAM002[0] (ix2)
+
+DBG2-ix2 FINAL 010500 BFLY0_op2 reads  ( 0.000000, 0.000000) from SRAM002[0] (ix2)
+DBG5-ix2 FINAL 011500 BFLY0_op1 writes ( 0.000000, 0.000000)  to  SRAM002[0] (ix2)
+======================================================================================
+DBG2-ix3 FINAL 002500  reads  ( 0.000000, 0.000000) from SRAM003[0] (ix3)
+DBG5-ix3 FINAL 003500 BFLY0_op2 writes ( 1.000000, 0.000000)  to  SRAM003[0] (ix3)
+
+DBG2-ix3 FINAL 008500 BFLY0_op2 reads  ( 0.000000, 0.000000) from SRAM003[0] (ix3)
+
+DBG2-ix3 FINAL 008500 BFLY0_op2 reads  ( 1.000000, 0.000000) from SRAM003[0] (ix3)
+DBG5-ix3 FINAL 009500 BFLY0_op2 writes ( 1.000000, 1.000000)  to  SRAM003[0] (ix3)
+
+DBG2-ix3 FINAL 012500 BFLY0_op2 reads  ( 0.000000, 0.000000) from SRAM003[0] (ix3)
+
+DBG2-ix3 FINAL 012500 BFLY0_op2 reads  ( 1.000000, 1.000000) from SRAM003[0] (ix3)
+DBG5-ix3 FINAL 013500 BFLY0_op1 writes ( 1.000000,-0.414214)  to  SRAM003[0] (ix3)
+======================================================================================
+DBG2-ix4 FINAL 003500  reads  ( 0.000000, 0.000000) from SRAM001[1] (ix4)
+
+DBG2-ix4 FINAL 003500  reads  ( 1.000000, 0.000000) from SRAM001[1] (ix4)
+DBG5-ix4 FINAL 004500 BFLY0_op1 writes ( 1.000000, 0.000000)  to  SRAM001[1] (ix4)
+
+DBG2-ix4 FINAL 006500 BFLY0_op1 reads  ( 0.000000, 0.000000) from SRAM001[1] (ix4)
+
+DBG2-ix4 FINAL 006500 BFLY0_op1 reads  ( 1.000000, 0.000000) from SRAM001[1] (ix4)
+DBG5-ix4 FINAL 007500 BFLY0_op1 writes ( 2.000000, 0.000000)  to  SRAM001[1] (ix4)
+
+DBG2-ix4 FINAL 009500 BFLY0_op1 reads  ( 2.000000, 0.000000) from SRAM001[1] (ix4)
+DBG5-ix4 FINAL 010500 BFLY0_op2 writes ( 0.000000, 0.000000)  to  SRAM001[1] (ix4)
+======================================================================================
+DBG2-ix5 FINAL 003500  reads  ( 0.000000, 0.000000) from SRAM000[1] (ix5)
+DBG5-ix5 FINAL 004500 BFLY0_op2 writes ( 1.000000, 0.000000)  to  SRAM000[1] (ix5)
+
+DBG2-ix5 FINAL 007500 BFLY0_op2 reads  ( 0.000000, 0.000000) from SRAM000[1] (ix5)
+
+DBG2-ix5 FINAL 007500 BFLY0_op2 reads  ( 1.000000, 0.000000) from SRAM000[1] (ix5)
+DBG5-ix5 FINAL 008500 BFLY0_op1 writes ( 1.000000,-1.000000)  to  SRAM000[1] (ix5)
+
+DBG2-ix5 FINAL 011500 BFLY0_op1 reads  ( 0.000000, 0.000000) from SRAM000[1] (ix5)
+
+DBG2-ix5 FINAL 011500 BFLY0_op1 reads  ( 1.000000,-1.000000) from SRAM000[1] (ix5)
+DBG5-ix5 FINAL 012500 BFLY0_op2 writes ( 1.000000, 0.414214)  to  SRAM000[1] (ix5)
+======================================================================================
+DBG2-ix6 FINAL 004500  reads  ( 0.000000, 0.000000) from SRAM003[1] (ix6)
+
+DBG2-ix6 FINAL 004500  reads  ( 1.000000, 0.000000) from SRAM003[1] (ix6)
+DBG5-ix6 FINAL 005500 BFLY0_op1 writes ( 1.000000, 0.000000)  to  SRAM003[1] (ix6)
+
+DBG2-ix6 FINAL 006500 BFLY0_op1 reads  ( 0.000000, 0.000000) from SRAM003[1] (ix6)
+
+DBG2-ix6 FINAL 006500 BFLY0_op1 reads  ( 1.000000, 0.000000) from SRAM003[1] (ix6)
+DBG5-ix6 FINAL 007500 BFLY0_op2 writes ( 0.000000, 0.000000)  to  SRAM003[1] (ix6)
+
+DBG2-ix6 FINAL 010500 BFLY0_op2 reads  ( 0.000000, 0.000000) from SRAM003[1] (ix6)
+DBG5-ix6 FINAL 011500 BFLY0_op2 writes ( 0.000000, 0.000000)  to  SRAM003[1] (ix6)
+======================================================================================
+DBG2-ix7 FINAL 004500  reads  ( 0.000000, 0.000000) from SRAM002[1] (ix7)
+
+DBG2-ix7 FINAL 007500 BFLY0_op2 reads  ( 0.000000, 0.000000) from SRAM002[1] (ix7)
+DBG5-ix7 FINAL 008500 BFLY0_op2 writes ( 1.000000, 1.000000)  to  SRAM002[1] (ix7)
+
+DBG2-ix7 FINAL 012500 BFLY0_op2 reads  ( 0.000000, 0.000000) from SRAM002[1] (ix7)
+
+DBG2-ix7 FINAL 012500 BFLY0_op2 reads  ( 1.000000, 1.000000) from SRAM002[1] (ix7)
+DBG5-ix7 FINAL 013500 BFLY0_op2 writes ( 1.000000, 2.414213)  to  SRAM002[1] (ix7)
+======================================================================================

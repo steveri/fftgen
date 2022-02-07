@@ -1,8 +1,4 @@
-#!/bin/csh -f
-## Copyright 2013, all rights reserved.
-## See below (end of file) for extended copyright information.
-##
-#!/bin/csh -f
+#!/bin/bash
 
 ########################################################################
 # For now, assume input is "stdin"
@@ -11,11 +7,11 @@
 # Keep ONLY lines containing ("FINAL" or "ERROR" *and* "^DBG..ix") or "twid"
 # *but not* lines containing "^DBG3" or "IGNORE"
 
-set tmp=/tmp/sum.$$
+tmp=/tmp/sum.$$
 cat > $tmp.1
 
-cat $tmp.1 \
 #  | egrep '(^DBG..ix.*(FIN|ERR))|twid' \
+cat $tmp.1 \
   | egrep '^DBG..ix.*(FIN|ERR)' \
   | egrep -v '^DBG3|IGNORE' \
   > $tmp
@@ -32,7 +28,7 @@ cat $tmp \
 ########################################################################
 # Make an array containing all the ix values
 # E.g. ix_array = (0 1 2 3 4 5 6 7)
-set ix_array = (`cat $tmp.ix`)
+ix_array=(`cat $tmp.ix`)
 
 ########################################################################
 # For each index in order, capture its progress as it gets read out,
@@ -44,8 +40,11 @@ set ix_array = (`cat $tmp.ix`)
 # except at end do a "hline"
 
 echo -n "" > $tmp.3
-foreach i ($ix_array:q)
-  set ix = ix$i
+
+# foreach i ($ix_array:q)
+cat $tmp.ix | while read i; do
+
+  ix=ix$i
   #echo $ix
   cat $tmp\
     | grep "^DBG..$ix " | uniq  \
@@ -57,9 +56,9 @@ foreach i ($ix_array:q)
 '\
     >> $tmp.3
 
-   set hline = "===========================================";
+   hline="===========================================";
    echo "$hline$hline" >> $tmp.3
-end
+done
 
 cat $tmp.3
 

@@ -3,7 +3,7 @@ Also see README.md
 ==============================================================================
 Feb 2022
 
-Extensive comparison of python and perl versions.
+To do extensive comparison of python and perl versions:
 
 golden_test:
     unset ALL_LDBG
@@ -75,11 +75,11 @@ DONE: LOSE / MOVE TO ARCHIVES
   make_distribution.csh
   setup_genesis.sh.orig
   stanford_vcs_hack
-  summarize_analysis.csh
+  summarize_analysis.csh => summarize_analysis.sh
   switch.csh.old
 
 DONE superceded by simv_analysis, see simv_analysis/README.md
-  analyze_reads_and_writes.pl, summarize_analysis.csh
+  analyze_reads_and_writes.pl, summarize_analysis.csh (now summarize_analysis.sh)
   - tools to analyze reads and writes in simv.log;  doesn't seem to work very well
   - I think these are superceded by the contents of subdir simv_analysis
 

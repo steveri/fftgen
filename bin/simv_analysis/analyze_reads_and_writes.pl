@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-### TO USE: bin/analyze_reads_and_writes.pl -d9 | bin/summarize_analysis.csh | less
+### TO USE: bin/analyze_reads_and_writes.pl -d9 | bin/summarize_analysis.sh | less
 
 # Command is "$0"; command-line arguments can be found in array @ARGV
 use strict;
