@@ -42,6 +42,17 @@ jobs:
       - name: Install verilator
         run: sudo apt-get install verilator
 
+      - name: 'PERL v. PYTHON'
+        run : |
+          # Echo commands; exit on failure
+          set -x; set -e
+          unset ALL_LDBG
+          gunzip -c ../examples-rtl/8.1.1port/fft.log.gz > tmp.fftlog
+          golden_test.pl tmp.fftlog 8 1 2port > tmp.pl
+          golden_test.py tmp.fftlog 8 1 2port > tmp.py
+          diff -bB tmp.pl tmp.py
+
+
       - name: 'FFT REGRESSIONS'
         run: |
           # FFT REGRESSIONS
