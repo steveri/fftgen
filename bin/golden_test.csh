@@ -297,7 +297,10 @@ foreach t ($tests:q)
   # alias mr   make -j 1 run TOP=fft
   alias mr   make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR
 
+  # Duh? Why twice?
+  echo 1. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
   mr |& egrep -v '^Makefile' >> $tmp
+  echo 2. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
   mr |& egrep -v '^Makefile' >> $tmp
 
   # If "make run" failed, print out a coherent error message.
@@ -317,10 +320,10 @@ foreach t ($tests:q)
 
   echo ""
   echo "Processing bsr macros in $simlog..."
-  echo "  awk -f $BIN/bsr.awk %9.6f < $simlog > $simlog.bsr$$"
-          awk -f $BIN/bsr.awk %9.6f < $simlog > $simlog.bsr$$
-  echo "  mv $simlog.bsr$$ $simlog"
-          mv $simlog.bsr$$ $simlog
+  echo "  awk -f $BIN/bsr.awk %9.6f < $simlog > $simlog.bsr.tmp"
+          awk -f $BIN/bsr.awk %9.6f < $simlog > $simlog.bsr.tmp
+  echo "  mv $simlog.bsr.tmp $simlog"
+          mv $simlog.bsr.tmp $simlog
   echo ""
 
   ########################################################################

@@ -39,9 +39,6 @@ jobs:
           # FIXME not sure what this really does...?
           cd bin/simv_analysis; make test
 
-      - name: Install csh
-        run: sudo apt-get install csh
-
       - name: Install Genesis2
         run: source bin/setup_genesis.sh
 
@@ -94,7 +91,7 @@ jobs:
           nobuf='stdbuf -oL -eL'
 
           # Run the regressions
-          do_test='../bin/golden_test.csh --perl -sim verilator'
+          do_test='../bin/golden_test.sh --perl -sim verilator'
           $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
 
           # Check for errors
@@ -121,7 +118,7 @@ jobs:
           nobuf='stdbuf -oL -eL'
 
           # Run the regressions
-          do_test='../bin/golden_test.csh --python -sim verilator'
+          do_test='../bin/golden_test.sh --python -sim verilator'
           $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
 
           # Check for errors
