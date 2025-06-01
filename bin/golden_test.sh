@@ -120,7 +120,7 @@ elif [ "$1" == "--perl" ]; then
     PYTHON_OR_PERL="PERL"   ; shift
 fi
 
-DBG=
+[ "$DBG" ] || DBG=  # Can override with env var, see?
 if [ "$DBG" == 1 ]; then echo PYTHON_OR_PERL = $PYTHON_OR_PERL; fi
 
 # # !!? What the hell is this???
@@ -202,7 +202,7 @@ if [ $"DBG" == 1 ]; then
 fi
 ##############################################################################
 
-# For one-off tests specified on command line e.g. "golden_test.csh 8 1 1port"
+# For one-off tests specified on command line e.g. "golden_test.sh 8 1 1port"
 if [ $# == 3 ]; then
     tests=("$1 $2 $3")
     if [ $DBG ]; then
@@ -244,6 +244,13 @@ else
             tests=("${tests[@]}" "hline 2 3")
         done
     done
+
+    if [ "$DO_2PORT_ONLY" ]; then
+        # Delete all tests except sram=2port
+        # This hack exists b/c Verilator only works on 2port srams
+        t2=$(printf '%s\n' "${tests[@]}" | egrep '2port|hline')
+        mapfile -t tests < <(echo "${t2[@]}")
+    fi
 
     ntests=0;
     echo "Tests to run:"
@@ -372,6 +379,7 @@ for t in "${tests[@]}"; do
   function mr { make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR; }
 
   # Duh? Why twice?
+  [ $DBG ] && echo "  make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR"
   echo 1. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
   mr |& egrep -v '^Makefile' >> $tmp
   echo 2. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
@@ -489,7 +497,7 @@ for t in "${tests[@]}"; do
 done
 
 if [ ! -e $summfile ]; then
-  echo "ERROR golden_test.csh - no summary file generated"
+  echo "ERROR golden_test.sh - no summary file generated"
   exit 13
 fi
 
@@ -500,11 +508,11 @@ echo
 
 if [ $ntests == 48 ]; then
     if [ $npass != 47 ]; then
-        echo "ERROR golden_test.csh - should be 47/48 passes"
+        echo "ERROR golden_test.sh - should be 47/48 passes"
         exit 13
     fi
 elif [ $npass != $ntests ]; then
-    echo "ERROR golden_test.csh - test(s) failed"
+    echo "ERROR golden_test.sh - test(s) failed"
     exit 13
 fi
 
