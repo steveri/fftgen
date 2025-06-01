@@ -7,7 +7,7 @@ my $ALL_LDBG=0;
 if ($ENV{ALL_LDBG} ne "") { $ALL_LDBG = $ENV{ALL_LDBG}; }
 
 # For comparison to python version
-if ($ALL_LDBG) { print "PERL\n"; }
+if ($ALL_LDBG) { print "// PERL\n"; }
 
 # E.g. extensive comparison w/ python version
 #    function fgm {

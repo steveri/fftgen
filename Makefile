@@ -106,7 +106,7 @@ else
   $(warning WARNING: GENESIS_HIERARCHY set to $(GENESIS_HIERARCHY))
 endif
 
-# For more Genesis parsing options, type 'Genesis2.pl -help'
+# Genesis-parse options from 'Genesis2.pl -help'
 #        [-parse]                    ---   should we parse input file to generate perl modules?
 #        [-sources|srcpath dir]      ---   Where to find source files
 #        [-includes|incpath dir]     ---   Where to find included files
@@ -115,9 +115,10 @@ endif
 #                                    ---   (such as "for" or "while")
 #                                    ---   may not work properly.
 #        [-perl_modules modulename]  ---   Additional perl modules to load
+
 GENESIS_PARSE_FLAGS := 	-parse $(GENESIS_SRC) $(GENESIS_INC) $(GENESIS_LIB) -input $(GENESIS_INPUTS) 		
 
-# For more Genesis parsing options, type 'Genesis2.pl -help'
+# Genesis-generate options from 'Genesis2.pl -help'
 #        [-generate]                 ---   should we generate a verilog hierarchy?
 #        [-top topmodule]            ---   Name of top module to start generation from
 #        [-depend filename]          ---   Should Genesis2 generate a dependency file list? (list of input files)
@@ -127,8 +128,13 @@ GENESIS_PARSE_FLAGS := 	-parse $(GENESIS_SRC) $(GENESIS_INC) $(GENESIS_LIB) -inp
 #        [-xml filename]             ---   Input XML representation of definitions
 #        [-cfg filename]                 # Config file to specify parameter values as a Perl script (overrides xml definitions)
 #	 [-parameter path.to.prm1=value1 path.to.another.prm2=value2] --- List of parameter override definitions
-#					  				  from command line (overrides xml and cfg definitions)
-GENESIS_GEN_FLAGS :=	-gen -top $(GENESIS_TOP) 				\
+
+# As of genesis version 9a3686c, must use new option '-unqstyle numeric' or it breaks :(
+#        [-unqstyle style]               # Preferred module uniquification style [param numeric]
+
+UNQSTYLE = $(shell Genesis2.pl --help | grep unqstyle > /dev/null && echo '-unqstyle numeric')
+
+GENESIS_GEN_FLAGS :=	-gen $(UNQSTYLE) -top $(GENESIS_TOP)			\
 			-synthtop $(GENESIS_SYNTH_TOP_PATH)			\
 			-depend depend.list					\
 			-product $(GENESIS_VLOG_LIST)				\
