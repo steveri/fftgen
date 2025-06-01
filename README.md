@@ -79,9 +79,5 @@ If you want to not fool with genesis and just use see/use straight SystemVerilog
 - see 0notes-fft.txt, README.txt for latest/best info
 
 
-
-
-
-
-#### NOTES
-
+#### CURRENT STATUS Jun 2025
+- verilator only works with 2port atm, not sure why...
