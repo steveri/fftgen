@@ -28,101 +28,29 @@ jobs:
 
       # Action, branch, and repo information.
       - run: echo Action = ${{ github.event_name }}, branch = ${{ github.ref }}
-      # - run: echo "Branch '${{ github.ref }}' in repo '${{ github.repository }}'."
 
-      - name: Check out repository code
+      - name: Install '${{ github.repository }}', branch '${{ github.ref }}'
         uses: actions/checkout@v2
 
+      - name: Install verilator 5.028
+        uses: veryl-lang/setup-verilator@v1
+        with:
+          version: 5.028
+
+      # See bin/simv_analysis/README.md etc.
       - name: 'SIMV ANALYZER'
-        run: |
-          # I have this (very fast) test for the analyzer, why not use it.
-          # FIXME not sure what this really does...?
-          cd bin/simv_analysis; make test
+        run: cd bin/simv_analysis; make test
 
-      - name: Install Genesis2
-        run: source bin/setup_genesis.sh
-
-      - name: Install verilator
-        run: sudo apt-get install verilator
-
-      - name: Install numpy for perl v python tests
-        run:  pip install numpy
-
-      - name: Overwrite default FPU w latest version from repo
-        run: |
-          test -e rtl/lib && unlink rtl/lib
-          git clone https://github.com/steveri/fpu rtl/lib
-
+      # ------------------------------------------------------------------------
       - name: 'PERL v. PYTHON quick test (golden_test.{pl,py})'
-        run : |
-          # Echo commands; exit on failure
-          set -x; set -e
-          unset ALL_LDBG
-          gunzip -c examples-rtl/8.1.1port/fft.log.gz > tmp.fftlog
-          bin/golden_test.pl tmp.fftlog 8 1 2port > tmp.pl
-          bin/golden_test.py tmp.fftlog 8 1 2port > tmp.py
-          diff -bB tmp.pl tmp.py
+        run : test/test-pypl.sh --gold
 
       - name: 'PERL v. PYTHON extended test (ALL_LDBG + fft_golden_model.{pl.py})'
-        run : |
-          export ALL_LDBG=1; p=16; u=1;
-          bin/fft_golden_model.pl $p $u > tmp.pl
-          bin/fft_golden_model.py $p $u > tmp.py
+        run : test/test-pypl.sh --comp
 
-          # Only diff should be that one says "PERL" and one says "PYTHON"
-          diff tmp.pl tmp.py -I '^PERL$\|^PYTHON$'
-          unset ALL_LDBG
+      # ------------------------------------------------------------------------
+      - name: 'FFT REGRESSIONS (verilator+perl)'
+        run : test/test-regress.sh -sim verilator --perl
 
-      - name: 'FFT REGRESSIONS (perl)'
-        run: |
-          # Echo commands; exit on failure
-          set -x; set -e
-
-          # Initialize Genesis2 environment
-          source bin/setup_genesis.sh
-
-          # Prep to run the regressions
-          echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
-          echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
-          test -e regression && /bin/rm -rf regression
-          mkdir regression; cd regression
-
-          # ("nobuf" allows continuous streaming to stdout instead of buffering)
-          nobuf='stdbuf -oL -eL'
-
-          # Run the regressions
-          do_test='../bin/golden_test.sh --perl -sim verilator'
-          $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
-
-          # Check for errors
-          egrep 'FAIL|ERR' test_results.log && exit 13 || echo okay
-
-          # Log should be about 18K lines long
-          wc -l test_results.log
-
-      - name: 'FFT REGRESSIONS (python)'
-        run: |
-          # Echo commands; exit on failure
-          set -x; set -e
-
-          # Initialize Genesis2 environment
-          source bin/setup_genesis.sh
-
-          # Prep to run the regressions
-          echo "RUN REGRESSIONS (48 passes, six each of 8,16,32..1024)"
-          echo "One of the 48 passes doesn't run ('8 4 1port' is not defined)"
-          test -e regression && /bin/rm -rf regression
-          mkdir regression; cd regression
-
-          # ("nobuf" allows continuous streaming to stdout instead of buffering)
-          nobuf='stdbuf -oL -eL'
-
-          # Run the regressions
-          do_test='../bin/golden_test.sh --python -sim verilator'
-          $do_test |& $nobuf tee test_results.log | $nobuf egrep 'PASS|FAIL|ERR'
-
-          # Check for errors
-          egrep 'FAIL|ERR' test_results.log && exit 13 || echo okay
-
-          # Log should be about 18K lines long
-          wc -l test_results.log
+      - name: 'FFT REGRESSIONS (verilator+python)'
+        run : test/test-regress.sh -sim verilator --python
