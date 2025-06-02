@@ -132,7 +132,8 @@ GENESIS_PARSE_FLAGS := 	-parse $(GENESIS_SRC) $(GENESIS_INC) $(GENESIS_LIB) -inp
 # As of genesis version 9a3686c, must use new option '-unqstyle numeric' or it breaks :(
 #        [-unqstyle style]               # Preferred module uniquification style [param numeric]
 
-UNQSTYLE = $(shell Genesis2.pl --help | grep unqstyle > /dev/null && echo '-unqstyle numeric')
+# UNQSTYLE = $(shell Genesis2.pl --help | grep unqstyle > /dev/null && echo '-unqstyle numeric')
+UNQSTYLE = $(shell Genesis2.pl --help | grep gloggle > /dev/null && echo '-unqstyle numeric')
 
 GENESIS_GEN_FLAGS :=	-gen $(UNQSTYLE) -top $(GENESIS_TOP)			\
 			-synthtop $(GENESIS_SYNTH_TOP_PATH)			\
