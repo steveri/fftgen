@@ -129,19 +129,12 @@ GENESIS_PARSE_FLAGS := 	-parse $(GENESIS_SRC) $(GENESIS_INC) $(GENESIS_LIB) -inp
 #        [-cfg filename]                 # Config file to specify parameter values as a Perl script (overrides xml definitions)
 #	 [-parameter path.to.prm1=value1 path.to.another.prm2=value2] --- List of parameter override definitions
 
-# As of genesis version 9a3686c, must use new option '-unqstyle numeric' or it breaks :(
-#        [-unqstyle style]               # Preferred module uniquification style [param numeric]
-
-# UNQSTYLE = $(shell Genesis2.pl --help | grep unqstyle > /dev/null && echo '-unqstyle numeric')
-UNQSTYLE = $(shell Genesis2.pl --help | grep gloggle > /dev/null && echo '-unqstyle numeric')
-
-GENESIS_GEN_FLAGS :=	-gen $(UNQSTYLE) -top $(GENESIS_TOP)			\
-			-synthtop $(GENESIS_SYNTH_TOP_PATH)			\
-			-depend depend.list					\
-			-product $(GENESIS_VLOG_LIST)				\
-			-hierarchy $(GENESIS_HIERARCHY)				\
+GENESIS_GEN_FLAGS :=	-gen -top $(GENESIS_TOP)		\
+			-synthtop $(GENESIS_SYNTH_TOP_PATH)	\
+			-depend depend.list			\
+			-product $(GENESIS_VLOG_LIST)		\
+			-hierarchy $(GENESIS_HIERARCHY)		\
 			$(GENESIS_CFG)
-
 
 # What the hell...?
 ifneq ($(strip $(GENESIS_CFG_SCRIPT)),)
