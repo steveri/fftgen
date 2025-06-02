@@ -12,6 +12,10 @@
 //;    (Name=>'nwords', Val=>16, Min=>1,
 //;     Doc=>'Number of words in SRAM.');
 //;
+//; my $SRAM_NAME = parameter
+//;    (Name=>'SRAM_NAME', Val=>"SRAM000",
+//;     Doc=>'What is my name e.g. SRAM000, SRAM001...');
+//;
 //; my $SRAM_TYPE = parameter
 //;    (Name=>'SRAM_TYPE', Val=>"1PORT_DBLPUMP",
 //;     List=>["TRUE_1PORT", "TRUE_2PORT", "1PORT_DBLPUMP"],
@@ -82,9 +86,8 @@ module `mname`
    //; sub i { my $s = shift; return sr("${s}[$imag]"); }
    //; sub ri{ my $s = shift; return r($s).", ".i($s); }
    //;
-   //; # "SRAM_unq12" => "SRAM012"
-   //; my $myname = mname;  $myname =~ /_unq(.*)/;
-   //; $myname = sprintf("SRAM%03d", $1-1);
+   //; # E.g. $myname="SRAM002"
+   //; my $myname = $SRAM_NAME;
    //;
 //; if ($SRAM_TYPE eq "TRUE_1PORT") {
 

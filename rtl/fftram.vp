@@ -71,6 +71,7 @@
 //;     my $sname = sprintf("SRAM%03d", $i);
 //;     $sram{$i} = generate('SRAM', $sname,
 //;                          nwords=>$nrows,
+//;                          SRAM_NAME =>$sname,
 //;                          SRAM_TYPE =>$SRAM_TYPE,
 //;                          data_width=>$op_width,
 //;                          test_mode=>$test_mode);
