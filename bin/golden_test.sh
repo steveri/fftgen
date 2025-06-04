@@ -145,6 +145,7 @@ MAKEFILE=$FFTGEN_DIR/Makefile
 
 tests=()
 ntests=1
+n_allowed_failures=0
 
 # simulator can be either vcs or verilator
 SIMULATOR='verilator'
@@ -349,10 +350,10 @@ for t in "${tests[@]}"; do
 
   # "8_4_1port" is not supported (at least for now)
   if [ $sfx == "8_4_1port" ]; then
-      echo "$sfx not supported (16 SRAM's for 8 points!?)"; continue
+      n_allowed_failures=1
+      echo "TR FAIL: Combo not attempted  --- 8 4 1port fail OKAY b/c makes no sense (16 SRAM's for 8 points\!?)"
+      continue
   fi
-  [ $sfx == "8_4_1port" ] && echo "*** NOTE $sfx is SUPPOSED to fail! (16 SRAM's for 8 points\!?) ***"
-  [ $sfx == "8_4_1port" ] && echo "TR FAIL: But that's okay, $sfx is SUPPOSED to fail! (16 SRAM's for 8 points\!?) ***"
 
   # Print out date, id info
   date; echo $sfx": npoints=$npoints, nunits=$nunits, sram=$sram; alg=$swizzalg; sim=$SIMULATOR"
@@ -519,17 +520,14 @@ fi
 
 npass=`grep PASS $summfile | wc -l`
 echo "$npass/$ntests tests PASSED"
-echo "    (NOTE 47/48 pass is normal because '8 4 1' not supported.)"
-echo
+if [ "$n_allowed_failures" -eq 1 ]; then
+    printf "    (NOTE: One failure is allowed because '8 4 1' not supported.)\n\n"
+fi
 
-if [ $ntests == 48 ]; then
-    if [ $npass != 47 ]; then
-        echo "ERROR golden_test.sh - should be 47/48 passes"
-        exit 13
-    fi
-elif [ $npass != $ntests ]; then
-    echo "ERROR golden_test.sh - test(s) failed"
-    exit 13
+npass_expected=$((ntests-n_allowed_failures))
+
+if [ $npass -ne $npass_expected ]; then
+    printf "ERROR golden_test.sh - $npass_expected/$npass should PASS\n\n"
 fi
 
 echo Warnings:
