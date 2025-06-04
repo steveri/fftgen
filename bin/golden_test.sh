@@ -246,14 +246,6 @@ else
         done
     done
 
-#     DO_2PORT_ONLY=
-#     if [ "$DO_2PORT_ONLY" ]; then
-#         # Delete all tests except sram=2port
-#         # This hack exists b/c Verilator only works on 2port srams
-#         t2=$(printf '%s\n' "${tests[@]}" | egrep '2port|hline')
-#         mapfile -t tests < <(echo "${t2[@]}")
-#     fi
-
     # Got 1port working, hoory! But dpump still busted.
     if [ "$SKIP_DPUMP" ]; then
         # Delete all tests except sram=1port,2port, i.e. all dpump tests
