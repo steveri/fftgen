@@ -447,7 +447,12 @@ for t in "${tests[@]}"; do
     | awk '{print $0 "'" --- $npoints $nunits $nports"'"; }'
 
   keep_abbrev=1
-  if [ "$keep_abbrev" ]; then
+  if [ "$DBG" ]; then
+    echo ""
+    echo "Keeping $tmp for debugging purposes"
+    wc -l $tmp
+    echo ""
+  elif [ "$keep_abbrev" ]; then
     echo ""
     echo "Keeping first 300 lines ONLY of $tmp"
     wc -l $tmp
