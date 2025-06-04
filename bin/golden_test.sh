@@ -255,7 +255,6 @@ else
 #     fi
 
     # Got 1port working, hoory! But dpump still busted.
-    SKIP_DPUMP=True
     if [ "$SKIP_DPUMP" ]; then
         # Delete all tests except sram=1port,2port, i.e. all dpump tests
         # This hack exists b/c Verilator still does not work on dpump srams
@@ -519,15 +518,18 @@ if [ ! -e $summfile ]; then
 fi
 
 npass=`grep PASS $summfile | wc -l`
-echo "$npass/$ntests tests PASSED"
+note=""
 if [ "$n_allowed_failures" -eq 1 ]; then
-    printf "    (NOTE: One failure is allowed because '8 4 1' not supported.)\n\n"
+    note=" (NOTE: One failure is allowed b/c '8 4 1' not supported.)"
 fi
+echo "$npass/$ntests tests PASSED$note"
 
 npass_expected=$((ntests-n_allowed_failures))
 
 if [ $npass -ne $npass_expected ]; then
     printf "ERROR golden_test.sh - $npass_expected/$npass should PASS\n\n"
+    printf "FINAL RESULT = FAIL\n"
+    exit 13
 fi
 
 echo Warnings:
@@ -541,6 +543,9 @@ echo
 # echo "Result summary is here: '$summfile'"
 /bin/rm $summfile
 echo "NOTE did not keep result summary file '$summfile'"
+
+printf "FINAL RESULT = PASS\n"
+
 
 # echo ==============================================================================
 # cat $summfile

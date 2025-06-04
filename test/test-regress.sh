@@ -117,7 +117,7 @@ if [ "$is_verilator" ]; then
             exit 13
         fi
     fi
-    verilator_caveats; export DO_2PORT_ONLY=1
+    verilator_caveats; export SKIP_DPUMP=1
 fi
 
 # Run the regressions!
@@ -128,11 +128,8 @@ fi
     echo $fftgen/bin/golden_test.sh $*
     $fftgen/bin/golden_test.sh $* \
         |& $nobuf tee test_results.log \
-        |  $nobuf egrep 'PASS|FAIL|ERR'
+        |  $nobuf egrep 'PASS|FAIL|ERR| failure is allowed'
 
     [ "$is_verilator" ] && verilator_caveats
-
-    egrep 'FAIL|ERR' test_results.log && result=FAIL || result=PASS
-    printf "\nFINAL RESULT = $result\n"
-    [ "$result" == PASS ] || exit 13
+    egrep '^FINAL RESULT.*PASS' test_results.log || exit 13
 )
