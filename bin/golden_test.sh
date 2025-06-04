@@ -245,6 +245,7 @@ else
         done
     done
 
+    DO_2PORT_ONLY=
     if [ "$DO_2PORT_ONLY" ]; then
         # Delete all tests except sram=2port
         # This hack exists b/c Verilator only works on 2port srams
