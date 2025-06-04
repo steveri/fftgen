@@ -434,10 +434,21 @@ module `mname`( input logic clk, output wire done );
    //
    ////////////////////////////////////
 
+   logic [31:0] clock_counter;
    initial begin
       start = 1'b0; // Should be comb logic based on rst_n etc? leave it for now
       rst_n = 1'b1;
+      clock_counter = 32'b0;
    end
+
+   ////////////////////////////////////////////////////////////////////////
+   // clock counter I guess
+   //
+
+   always @ (posedge clk) begin
+     clock_counter <= clock_counter + 32'b1;
+   end
+
 
    // note cgra does this:
    //  always @(posedge clk or posedge reset) begin
