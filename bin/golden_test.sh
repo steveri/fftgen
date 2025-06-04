@@ -352,6 +352,7 @@ for t in "${tests[@]}"; do
       echo "$sfx not supported (16 SRAM's for 8 points!?)"; continue
   fi
   [ $sfx == "8_4_1port" ] && echo "*** NOTE $sfx is SUPPOSED to fail! (16 SRAM's for 8 points\!?) ***"
+  [ $sfx == "8_4_1port" ] && echo "TR FAIL: But that's okay, $sfx is SUPPOSED to fail! (16 SRAM's for 8 points\!?) ***"
 
   # Print out date, id info
   date; echo $sfx": npoints=$npoints, nunits=$nunits, sram=$sram; alg=$swizzalg; sim=$SIMULATOR"

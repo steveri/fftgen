@@ -97,7 +97,7 @@ test -d /tmp/fpu$$ && /bin/rm -rf /tmp/fpu$$
 # Prepare to issue caveats in case of verilator version
 function verilator_caveats {
     printf "\n------------------------------------------------------------------------"
-    printf "\nNote that verilator tests only work for 2port sram."
+    printf "\nNote that verilator tests do not (yet) work for double-pump sram."
     printf "\nThis appears to be a verilator bug; all tests pass for vcs (trust me!)"
     printf "\n------------------------------------------------------------------------\n\n"
 }
