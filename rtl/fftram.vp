@@ -591,6 +591,10 @@ module `mname`
    //; foreach my $p ("1", "2") {
    //////////////////////////////////////////////////////////////////////////////
    // SRAM data in`$p` OUT from sram (or bypass buffer) to butterfly unit
+   // OMG note stupid-endian: match[MSB] = match[0] FIXME FIXME FIXME?
+   //   E.g. if there are four srams
+   //     match==8  =>  match[0] == 1  => SRAM000
+   //     match==1  =>  match[3] == 1  => SRAM003
    //
    //;#   assign BFLY0_in1_data_o =                   <=  BUG/FIXME/TODO inaccurate
    //;#      ( BFLY0_op1_match[0] ) ? (bypass000 ? (buf000 : SRAM000_rd_data)) :
