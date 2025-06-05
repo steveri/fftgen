@@ -145,6 +145,7 @@ MAKEFILE=$FFTGEN_DIR/Makefile
 
 tests=()
 ntests=1
+n_allowed_failures=0
 
 # simulator can be either vcs or verilator
 SIMULATOR='verilator'
@@ -246,7 +247,6 @@ else
     done
 
     # Got 1port working, hoory! But dpump still busted.
-    SKIP_DPUMP=True
     if [ "$SKIP_DPUMP" ]; then
         # Delete all tests except sram=1port,2port, i.e. all dpump tests
         # This hack exists b/c Verilator still does not work on dpump srams
@@ -341,9 +341,10 @@ for t in "${tests[@]}"; do
 
   # "8_4_1port" is not supported (at least for now)
   if [ $sfx == "8_4_1port" ]; then
-      echo "$sfx not supported (16 SRAM's for 8 points!?)"; continue
+      n_allowed_failures=1
+      echo "TR FAIL: Combo not attempted  --- 8 4 1port fail OKAY b/c makes no sense (16 SRAM's for 8 points\!?)"
+      continue
   fi
-  [ $sfx == "8_4_1port" ] && echo "*** NOTE $sfx is SUPPOSED to fail! (16 SRAM's for 8 points\!?) ***"
 
   # Print out date, id info
   date; echo $sfx": npoints=$npoints, nunits=$nunits, sram=$sram; alg=$swizzalg; sim=$SIMULATOR"
@@ -509,17 +510,17 @@ if [ ! -e $summfile ]; then
 fi
 
 npass=`grep PASS $summfile | wc -l`
-echo "$npass/$ntests tests PASSED"
-echo "    (NOTE 47/48 pass is normal because '8 4 1' not supported.)"
-echo
+note=""
+if [ "$n_allowed_failures" -eq 1 ]; then
+    note=" (NOTE: One failure is allowed b/c '8 4 1' not supported.)"
+fi
+echo "$npass/$ntests tests PASSED$note"
 
-if [ $ntests == 48 ]; then
-    if [ $npass != 47 ]; then
-        echo "ERROR golden_test.sh - should be 47/48 passes"
-        exit 13
-    fi
-elif [ $npass != $ntests ]; then
-    echo "ERROR golden_test.sh - test(s) failed"
+npass_expected=$((ntests-n_allowed_failures))
+
+if [ $npass -ne $npass_expected ]; then
+    printf "ERROR golden_test.sh - $npass_expected/$npass should PASS\n\n"
+    printf "FINAL RESULT = FAIL\n"
     exit 13
 fi
 
@@ -534,6 +535,9 @@ echo
 # echo "Result summary is here: '$summfile'"
 /bin/rm $summfile
 echo "NOTE did not keep result summary file '$summfile'"
+
+printf "FINAL RESULT = PASS\n"
+
 
 # echo ==============================================================================
 # cat $summfile
