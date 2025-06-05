@@ -165,13 +165,14 @@ module `mname`
 
 //; } else { # SRAM_TYPE == 1PORT_DBLPUMP
 
+   // READ on negedge
    always @(negedge clk_i) begin                             // READ 1PORT_DBLPUMP
       $display("`$myname` FOO %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
       if (~ez_i & wz_i) begin
 
          // Double-pump SRAM reads and writes on alternate clock edges.
          //; if ($SRAM_TYPE eq "1PORT_DBLPUMP") {
-         rd_data_o = mem[addr_i];                         
+         rd_data_o <= mem[addr_i];                         
          //; }
          //;
          // READ INFO (historical)
@@ -182,9 +183,10 @@ module `mname`
       end
    end
 
+   // WRITE on negedge
    always @(posedge clk_i) begin                              // WRITE 1PORT_DBLPUMP
       if (~ez_i & ~wz_i) begin
-         mem[addr_i] = wr_data_i;
+         mem[addr_i] <= wr_data_i;
          $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
          $display("%m %1d: Wrote   wr_data_i mem[%1d] <= %16x", $time, addr_i, wr_data_i);
          $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)", $time, addr_i, `ri("wr_data_i")`);

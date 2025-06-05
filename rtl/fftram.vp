@@ -473,15 +473,27 @@ module `mname`
    //;         $wz_value = "suppress_wz_i[$snum]";
    //;     }
    //;
+
+
+//; # here we go...
+//; # my $ass;
+//; # $ass = "=";   # ver:  1port 2port ~dpump;  vcs  1port 2port dpump
+//; # $ass = "<=";  # ver: ~1port 2port  dpump;  vcs ~1port 2port dpump
+//; # if ($SRAM_TYPE eq "TRUE_1PORT"); 
+//; my $ass = ($SRAM_TYPE eq "TRUE_1PORT") ? "=" : "<=";
+
+
+
    always @ (`$wz_event`) begin
-      if (cycle_num == `$nbits_cycle_num`'b0) `${sram}`_wz = 1'b1; else
+      if (cycle_num == `$nbits_cycle_num`'b0) `${sram}`_wz `$ass` 1'b1; else
       if ( fft_started & (
    //;     my $i; for ($i=0; $i < ($nunits-1); $i++) {
    //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum ) |\n";
    //;     }
    //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
    //;     print "      )) begin\n";
-   //;     print "         ${sram}_wz = $wz_value;\n";
+   //;     print "         ${sram}_wz $ass $wz_value ? 1 : 0;\n";
+
    //;     if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
           // \$display(\"FLOOF BOTF %1d okay want to write ${sram}\", \$time);
 
@@ -500,7 +512,7 @@ module `mname`
    //;     }
       end
       else begin
-         `${sram}`_wz = 1'b1;
+         `${sram}`_wz `$ass` 1'b1;
       end
    end
    //; }
