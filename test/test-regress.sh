@@ -117,7 +117,8 @@ if [ "$is_verilator" ]; then
             exit 13
         fi
     fi
-    verilator_caveats; export SKIP_DPUMP=1
+    verilator_caveats
+    # export SKIP_DPUMP=1  # dpump works now maybe woohoo!
 fi
 
 # Run the regressions!
