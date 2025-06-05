@@ -474,15 +474,11 @@ module `mname`
    //;     }
    //;
 
-
-//; # here we go...
-//; # my $ass;
+//; # Yet another terrible hack
+//; # Some configs work only w blocking assignments and others w non-blocking :(
 //; # $ass = "=";   # ver:  1port 2port ~dpump;  vcs  1port 2port dpump
 //; # $ass = "<=";  # ver: ~1port 2port  dpump;  vcs ~1port 2port dpump
-//; # if ($SRAM_TYPE eq "TRUE_1PORT"); 
 //; my $ass = ($SRAM_TYPE eq "TRUE_1PORT") ? "=" : "<=";
-
-
 
    always @ (`$wz_event`) begin
       if (cycle_num == `$nbits_cycle_num`'b0) `${sram}`_wz `$ass` 1'b1; else
