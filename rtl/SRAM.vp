@@ -74,7 +74,7 @@ module `mname`
    input  logic [`$data_width-1`:0] wr_data_i; // Write data IN.
 
    reg [`$data_width-1`:0] mem[0:`$nrows-1`];  // Memory cells
-   reg  [`$data_width-1`:0] wr_data_i_prev;    // Hack to make true-1port work I guess
+   reg [`$data_width-1`:0] wr_data_i_prev;     // Hack to make true-1port work I guess
 
    //; # For debugging
    //; my $real="63:32"; # Real
