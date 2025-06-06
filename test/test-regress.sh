@@ -2,36 +2,10 @@
 bn=$(basename $0)  # E.g. 'test-gold.sh'
 
 NOTES="
-------------------------------------------------------------------------
 At the end of a successful test suite it says '47/48 tests PASSED'.
 This is correct, b/c one test is SUPPOSED to fail on purpose.
 Is this a problem?
 
-------------------------------------------------------------------------
-VCS tests work :)
-
-    function filter { stdbuf -oL -eL awk '/^TR (PASS|FAIL)/{print}'; }
-    ../bin/golden_test.sh --python -sim vcs |& filter
-      TR PASS: 0 mismatched results --- 8 1 1port (vcs)
-      TR PASS: 0 mismatched results --- 8 2 1port (vcs)
-      TR PASS: 0 mismatched results --- 8 1 2port (vcs)
-
-    function filter { stdbuf -oL -eL awk '/^TR (PASS|FAIL)/{print}'; }
-    ../bin/golden_test.sh --python -sim vcs |& filter
-      TR PASS: 0 mismatched results --- 8 1 1port (vcs)
-      TR PASS: 0 mismatched results --- 8 2 1port (vcs)
-      TR PASS: 0 mismatched results --- 8 1 2port (vcs)
-
-------------------------------------------------------------------------
-Verilator only works for 2port configurations :(
-
-    function filter { stdbuf -oL -eL awk '/^TR (PASS|FAIL)/{print}'; }
-    ../bin/golden_test.sh --python -sim verilator |& filter
-    TR FAIL: 9 mismatched results --- 8 1 1port (verilator)
-    TR FAIL: 9 mismatched results --- 8 2 1port (verilator)
-    TR PASS: 0 mismatched results --- 8 1 2port (verilator)
-
-------------------------------------------------------------------------
 TODO:
   - Choose just ONE option, python or perl, and get rid of the other one.
 "
@@ -46,11 +20,11 @@ DESCRIPTION
   python model of the same FFT using the same inputs. 
 
 OPTIONS
-  $bn --python -sim vcs   # You need VCS installed on your system BUT
-  $bn --perl   -sim vcs   # works with all thre sram types 1port, 2port, dpump
+  $bn --python -sim vcs   # You need VCS installed on your system
+  $bn --perl   -sim vcs
 
-  $bn --python -sim ver   # This will install verilator for you if needed BUT
-  $bn --python -sim ver   # '-sim verilator' only works for 2-port srams :(
+  $bn --python -sim ver   # This will try to install verilator if it's missing
+  $bn --python -sim ver
 
   $bn --notes    # For more info
 "  
@@ -117,8 +91,7 @@ if [ "$is_verilator" ]; then
             exit 13
         fi
     fi
-    verilator_caveats
-    # export SKIP_DPUMP=1  # dpump works now maybe woohoo!
+    # verilator_caveats; export SKIP_DPUMP=1  # dpump works now maybe woohoo!
 fi
 
 # Run the regressions!
@@ -131,6 +104,6 @@ fi
         |& $nobuf tee test_results.log \
         |  $nobuf egrep 'PASS|FAIL|ERR| failure is allowed'
 
-    [ "$is_verilator" ] && verilator_caveats
+    # [ "$is_verilator" ] && verilator_caveats
     egrep '^FINAL RESULT.*PASS' test_results.log || exit 13
 )
