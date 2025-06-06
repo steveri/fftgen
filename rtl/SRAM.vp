@@ -73,7 +73,8 @@ module `mname`
    output logic [`$data_width-1`:0] rd_data_o; // Read data OUT.
    input  logic [`$data_width-1`:0] wr_data_i; // Write data IN.
 
-   reg [`$data_width-1`:0] mem[0:`$nrows-1`];           // memory cells
+   reg [`$data_width-1`:0] mem[0:`$nrows-1`];  // Memory cells
+   reg [`$data_width-1`:0] wr_data_i_prev;     // Hack to make true-1port work I guess
 
    //; # For debugging
    //; my $real="63:32"; # Real
@@ -114,21 +115,20 @@ module `mname`
    //////////////////////////////////////////////////////////////////////////////
    // WRITE TRUE_1PORT
    // FIXME use a proper async SRAM (see above)!!! fiddle w/signals outside, in wrapper :(
-   // 
-   // always @(ez_i or wz_i) begin // doesn't work for verilator
-   // always @(ez_i or wz_i) begin // NOT AN EDGE!!!!!!!!!
-   //
-   always @(negedge wz_i) begin // trial/error debugging - saw behavior on (correct) vcs wave
-      if (~ez_i & ~wz_i) begin
+
+   // Want to trigger writes on negedge wz_i
+   always @(negedge clk_i) wr_data_i_prev = wr_data_i; // omg
+   always @(wz_i) begin
+      if (!ez_i && !wz_i) begin
 
          // WRITE TRUE_1PORT
-         mem[addr_i] <= wr_data_i;
+         mem[addr_i] <= wr_data_i_prev;
 
          // WRITE DEBUG
          $display("%m %1d: ez_i=%1d and wz_i=%1d", $time, ez_i, wz_i);
-         $display("%m %1d: Wrote   wr_data_i mem[%1d] <= %16x", $time, addr_i, wr_data_i);
+         $display("%m %1d: Wrote   wr_data_i mem[%1d] <= %16x", $time, addr_i, wr_data_i_prev);
          $display("`$myname` t5 %5d: Wrote(f) wr_data_i mem[%1d] <= (bsr'%08X,bsr'%08X)",
-                       $time, addr_i, `ri("wr_data_i")`);
+                       $time, addr_i, `ri("wr_data_i_prev")`);
          $display("");
       end
    end
