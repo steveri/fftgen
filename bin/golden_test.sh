@@ -84,19 +84,26 @@ DO_GT8K=               #  See below for '-gt8k'
 DO_ABBREV=             # Use "-abbrev" to run only the short tests
 SIMULATOR="verilator"  # simulator can be either vcs or verilator
 PYTHON_OR_PERL="PERL"  # driver can be either python or perl
-for arg in $*; do
-    case "$arg" in
+parms=()
+while [ $# -gt 0 ] ; do
+    case "$1" in
         --help|-h)    HELP; exit ;;
-        --py*)        PYTHON_OR_PERL="PYTHON"; shift ;;  # DEPRECATED!!!
-        --perl|--pl)  PYTHON_OR_PERL="PERL";   shift ;;
-        -sim*|--sim*) SIMULATOR=$2;     shift; shift ;;
-        -alg*|--alg*) swizzalg=$2;      shift; shift ;;
-        -abb*|--abb*) DO_ABBREV=True;          shift ;;
-        -gt8*|--gt8*) DO_GT8K=True;            shift ;;
-        -dbg*|--dbg*) DBG=True;                shift ;;
+        --py*)        PYTHON_OR_PERL="PYTHON" ;;  # DEPRECATED!!!
+        --perl|--pl)  PYTHON_OR_PERL="PERL"   ;;
+        -sim*|--sim*) SIMULATOR=$2; shift     ;;
+        -alg*|--alg*) swizzalg=$2;  shift     ;;
+        -abb*|--abb*) DO_ABBREV=True;         ;;
+        -gt8*|--gt8*) DO_GT8K=True;           ;;
+        -dbg*|--dbg*) DBG=True;               ;;
+        *)            parms+=($1)             ;;  # Preserve non-switch parms
     esac
+    shift
 done
-        
+set -- "${parms[@]}"  # Restore remaining positional parameters
+
+# Convenient abbrev ver == verilator
+[ "$SIMULATOR" == "ver" ] && SIMULATOR=verilator
+
 echo Using $PYTHON_OR_PERL-based drivers...
 echo Using simulator $PYTHON_OR_PERL-based drivers...
 
