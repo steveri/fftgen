@@ -381,11 +381,8 @@ for t in "${tests[@]}"; do
   alias mr='make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR'
   function mr { make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR; }
 
-  # Duh? Why twice?
   [ $DBG ] && echo "  make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR"
-  echo 1. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
-  mr |& egrep -v '^Makefile' >> $tmp
-  echo 2. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
+  echo make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
   mr |& egrep -v '^Makefile' >> $tmp
 
   # If "make run" failed, print out a coherent error message.
