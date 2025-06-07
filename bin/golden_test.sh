@@ -1,45 +1,7 @@
 #!/bin/bash
-    
-cat <<EOF > /dev/null
 
-------------------------------------------------------------------------
-# To test vs. csh version, quick test:
-
-c; golden_test.csh 16 1 1port |& tee tmp.csh
-cp /tmp/test_16_1_1port.log tmplog.csh
-
-c;  golden_test.sh 16 1 1port |& tee tmp.sh
-cp /tmp/test_16_1_1port.log tmplog.sh
-
-c; diff tmp.csh tmp.sh
-c; diff -Bb tmplog.csh tmplog.sh
-
-
-------------------------------------------------------------------------
-# To test vs. csh version, full test:
-
-mkdir tmptest; cd tmptest
-gtcsh='../golden_test.csh --perl -sim verilator'
-gtsh='../golden_test.sh --perl -sim verilator'
-
-
-i=100
-$gtcsh |& head -$i | tee test_results.log.csh$i; \
-$gtsh  |& head -$i | tee test_results.log.sh$i
-diff -Bb -I '2022$' test_results.log.{csh,sh}$i |& less
-
-$gtcsh | tee test_results.log.csh | egrep 'PASS|FAIL|ERR'; \
-$gtsh  | tee test_results.log.sh  | egrep 'PASS|FAIL|ERR' &
-diff -Bb -I '2022$' test_results.log.{csh,sh} |& less
-
-EOF
-
-
-VERBOSE=True
-TRAVIS=''
-
-if [ "$1" == "--help" ]; then cat <<EOF
-
+# FIXME/TODO this is a lot. Maybe put it in README.txt? Then HELP is just cat README.txt?
+function HELP { cat <<EOF
 SYNOPSIS
   $0
   $0 8 1 1port
@@ -110,23 +72,50 @@ EXAMPLES
     $0 32 32 1port
 
 EOF
-exit
-fi
+}
 
-PYTHON_OR_PERL="PERL"
-if [ "$1" == "--python" ]; then
-    PYTHON_OR_PERL="PYTHON" ; shift
-elif [ "$1" == "--perl" ]; then
-    PYTHON_OR_PERL="PERL"   ; shift
+########################################################################
+# Process command-line arguments
+
+# Default swizz alg is 'round7' unless otherwise specified e.g. "-alg mod_bn_combo"
+swizzalg="round7"
+
+DO_GT8K=               #  See below for '-gt8k'
+DO_ABBREV=             # Use "-abbrev" to run only the short tests
+SIMULATOR="verilator"  # simulator can be either vcs or verilator
+PYTHON_OR_PERL="PERL"  # driver can be either python or perl
+parms=()
+while [ $# -gt 0 ] ; do
+    case "$1" in
+        --help|-h)    HELP; exit ;;
+        --py*)        PYTHON_OR_PERL="PYTHON" ;;  # DEPRECATED!!!
+        --perl|--pl)  PYTHON_OR_PERL="PERL"   ;;
+        -sim*|--sim*) SIMULATOR=$2; shift     ;;
+        -alg*|--alg*) swizzalg=$2;  shift     ;;
+        -abb*|--abb*) DO_ABBREV=True;         ;;
+        -gt8*|--gt8*) DO_GT8K=True;           ;;
+        -dbg*|--dbg*) DBG=True;               ;;
+        *)            parms+=($1)             ;;  # Preserve non-switch parms
+    esac
+    shift
+done
+set -- "${parms[@]}"  # Restore remaining positional parameters
+
+# Convenient abbrev ver == verilator
+[ "$SIMULATOR" == "ver" ] && SIMULATOR=verilator
+
+echo Using $PYTHON_OR_PERL-based drivers...
+echo Using simulator $PYTHON_OR_PERL-based drivers...
+
+# If there are four args, last arg is swizzler algorithm (e.g. "round7" or "mod_bn_combo")
+if [ $# == 4 ]; then
+    echo "WARNING setting swizzler algorithm swizzalg='$4'"
+    swizzalg=$4
+    set -- "$1" "$2" "$3"  # Remove arg 4
 fi
 
 [ "$DBG" ] || DBG=  # Can override with env var, see?
 if [ "$DBG" == 1 ]; then echo PYTHON_OR_PERL = $PYTHON_OR_PERL; fi
-
-# # !!? What the hell is this???
-# # I think maybe it was a shortcut for "golden_test -gt8k ... ?"?
-# unset gt8k
-# if [ "$0:t" == "gt8k.csh") gt8k
 
 # Find main $FFTGEN directory  (script lives in $FFTGEN/bin)
 myname=$0
@@ -134,7 +123,6 @@ mydir=`dirname $myname`
 if [ "$mydir" == "$myname" ]; then mydir=.; fi
 # FFTGEN_DIR=`cd $mydir/..; pwd`
 FFTGEN_DIR=$mydir/..
-
 
 # Start in main $FFTGEN directory  (script lives in $FFTGEN/bin)
 # cd $FFTGEN_DIR
@@ -146,12 +134,6 @@ MAKEFILE=$FFTGEN_DIR/Makefile
 tests=()
 ntests=1
 n_allowed_failures=0
-
-# simulator can be either vcs or verilator
-SIMULATOR='verilator'
-if [ "$1" == "-sim" ]; then
-  SIMULATOR=$2; shift; shift;
-fi
 
 # Convenient abbrev ver == verilator
 [ "$SIMULATOR" == "ver" ] && SIMULATOR=verilator
@@ -171,20 +153,6 @@ fi
 w=`which $SIMULATOR`; if [ "$w" == "" ]; then
   echo "ERROR looks like you do not have '$SIMULATOR' in your path"
   exit
-fi
-
-# Default swizz alg is 'round7' unless otherwise specified e.g. with
-#    $0 -alg 'mod_bn_combo'
-swizzalg='round7'
-if [ "$1" == "-alg" ]; then
-  swizzalg=$2
-  shift; shift;
-fi
-
-# If a fourth arg is specified, that will be the swizzler algorithm (e.g. "round7" or "mod_bn_combo")
-if [ $# == 4 ]; then
-  swizzalg=$4
-  argv=($1 $2 $3)
 fi
 
 # Want 'round7' to be the default; should only have to set env var if ne 'round7'
@@ -215,12 +183,10 @@ else
     npoints_array=(8 16 32 64 128 256 512 1024)
 
     # Use "-abbrev" to run only the short tests. See below for '-gt8k'
-    [ "$1" == "-abbrev" ] && npoints_array=(8 16 32)
-    [ "$1" == "-gt8k"   ] && gt8k=1
+    [ "$DO_ABBREV" ] && npoints_array=(8 16 32)
 
     # To infinity...and BEYOND!
-    # if [ $?gt8k)            npoints_array=(8 2048 4096 8192)
-    [ "$gt8k" == 1 ] && npoints_array=(8 8192 4096 2048)
+    [ "$DO_GT8K" ] && npoints_array=(8 8192 4096 2048)
 
     # Throw in a "dpump" here and there.
     dpump=0
@@ -354,9 +320,7 @@ for t in "${tests[@]}"; do
   # Generate the FFT.
   fatal_error=
   dq='"'
-  if [ "$VERBOSE" != "" ]; then
-    echo "  $cmd GENESIS_PARAMS=$dq$parms$dq" >& $tmp
-  fi
+  echo "  $cmd GENESIS_PARAMS=$dq$parms$dq" >& $tmp
   [ $DBG ] && echo "  $cmd GENESIS_PARAMS=$dq$parms$dq"
   $cmd GENESIS_PARAMS="$parms" &>> $tmp || fatal_error=True
 
@@ -364,9 +328,6 @@ for t in "${tests[@]}"; do
   if [ "$fatal_error" ]; then
       echo fatal error
       echo "  ERROR 'make gen' failed. --- $npoints $nunits $nports"
-
-      [ $TRAVIS ] && cat $tmp
-      [ $TRAVIS ] && exit 13
 
       echo "  See $tmp for details"
       echo "  less -r $tmp"
@@ -381,12 +342,17 @@ for t in "${tests[@]}"; do
   alias mr='make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR'
   function mr { make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR; }
 
-  # Duh? Why twice?
   [ $DBG ] && echo "  make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR"
-  echo 1. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
+
+#   # Duh? Why twice?
+#   echo 1. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
+#   mr |& egrep -v '^Makefile' >> $tmp
+#   echo 2. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
+#   mr |& egrep -v '^Makefile' >> $tmp
+
+  echo make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
   mr |& egrep -v '^Makefile' >> $tmp
-  echo 2. make -f $MAKEFILE run TOP=fft SIM=$SIMULATOR >> $tmp
-  mr |& egrep -v '^Makefile' >> $tmp
+
 
   # If "make run" failed, print out a coherent error message.
   if [ ! -e $simlog ]; then
@@ -537,28 +503,3 @@ echo
 echo "NOTE did not keep result summary file '$summfile'"
 
 printf "FINAL RESULT = PASS\n"
-
-
-# echo ==============================================================================
-# cat $summfile
-# echo ==============================================================================
-exit
-
-
-
-
-
-##############################################################################
-## BOOKMARK ##################################################################
-##############################################################################
-if [ $"DBG" == 1 ]; then
-    echo '------------------------------------------------------------------------'
-    set | egrep '^golden_test'
-    echo '------------------------------------------------------------------------'
-fi
-exit
-##############################################################################
-##############################################################################
-##############################################################################
-
-
