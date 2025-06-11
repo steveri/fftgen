@@ -12,7 +12,7 @@ on:
   schedule:
     # Every morning at 3am ( 3am local ~ 10am UTC :( )
     # ( min hr day JAN-DEC MON-SUN )
-    - cron: '0 10 * * *'
+    - cron: '0 3 1 * *'
 
 
 ########################################################################
