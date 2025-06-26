@@ -465,11 +465,6 @@ module `mname`
    //; # DEFAULT values for if n_sram_ports != 1 (see below)
    //; my ($wz_event, $wz_value, $ass) = ("clk_i", "clk_i", "<=");
 
-//; #    //;         $wz_event = "clk_i";
-//; #    //;         $wz_value = "clk_i";
-//; #    //;         $ass = "<=";
-//; #    //; my ($open_paren, $close_paren) = ("(", ")"); # Yeah, this is readable /s
-
    //; # E.g. codeblock1(2, 0) prints this:
    //; # "         (BFLY0_op1_bnum_i == 0 ) | (BFLY0_op2_bnum_i == 0 ) |"
    //; # "         (BFLY1_op1_bnum_i == 0 ) | (BFLY1_op2_bnum_i == 0 )"
@@ -486,7 +481,6 @@ module `mname`
    //;             print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
    //;         }
    //;     }
-   //;     print "      )) begin\n";
    //; }
 
    //; for (my $snum=0; $snum<$nbanks; $snum++) {
@@ -500,18 +494,6 @@ module `mname`
    //;         $wz_assign = sprintf("${sram}_wz = suppress_wz_i[$snum] ? 1 : 0");
    //;     }
 
-
-
-//; #    //;     my $rcb = "";  # Random Code Block
-//; #    //;     my $i; for ($i=0; $i < ($nunits-1); $i++) {
-//; #    //;       $rcb = "${rcb}         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum ) |\n";
-//; #    //;     }
-//; #    //;       $rcb = "${rcb}         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
-//; #    //;       $rcb = "${rcb}      )) begin\n";
-//; #    //;       $rcb = "${rcb}         $wz_assign;\n";
-
-
-
 //; # Yet another terrible hack
 //; # Some configs work only w blocking assignments and others w non-blocking :(
 //; # $ass = "=";   # ver:  1port 2port ~dpump;  vcs  1port 2port dpump
@@ -522,17 +504,16 @@ module `mname`
       if (cycle_num == `$nbits_cycle_num`'b0) `${sram}`_wz `$ass` 1'b1; else
       if ( fft_started & (
 
-   //; #         print $rcb;
+   //; #    (BFLY0_op1_bnum_i == 0 ) | (BFLY0_op2_bnum_i == 0 ) |"
+   //; #    (BFLY1_op1_bnum_i == 0 ) | (BFLY1_op2_bnum_i == 0 )"
+   //; #        )) begin
+   //; #    SRAM000_wz   ? 1 : 0;
 
-   //; # for (my $snum=0; $snum<$nbanks; $snum++) {
-   //; #     my $sram = sprintf("SRAM%03d", $snum);
-   //; #     my $wz_assign = sprintf("${sram}_wz <= clk_i ? 1 : 0");
    //;     codeblock1($nunits, $snum);
-   //;     print("         $wz_assign;\n");
-   //; # }
-
-
-
+       )) begin
+         `$wz_assign`;
+    
+   //;  #   print("         $wz_assign;\n");
 
    //;     if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
           // \$display(\"FLOOF BOTF %1d okay want to write ${sram}\", \$time);
