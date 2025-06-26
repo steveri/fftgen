@@ -57,7 +57,7 @@ source $fftgen/bin/setup_genesis.sh
 
 # Need numpy for comparison with python sim maybe
 # FIXME/TODO when we get rid of the python option this is no longer necessary.
-pip install numpy || echo "Could not install numpy, maybe that's okay"
+python -c 'import numpy' || pip install numpy || echo "Could not install numpy, maybe that's okay"
 
 # See if fpu is up to date
 # TODO/FIXME this (rtl/fpu_snapshot) should really be a submodule, yes?
