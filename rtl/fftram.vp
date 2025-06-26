@@ -458,37 +458,60 @@ module `mname`
    // wz signals.  If Anyone wants to access a given bank n (op1_bnum==1),
    // set wz(n) (to zero), unless suppress_wz says not to.
 
-   //;# The timing changes according to whether we have a 1port or a 2port SRAM.
-   //; my ($wz_event, $wz_value);
-   //;
+   //;# The timing changes according to whether we have a 1port or a 2port SRAM (note dpump = 2 ports)
+   //; my ($wz_event, $wz_value, $ass);
+
+   //;   # DEFAULT for if n_sram_ports != 1 (see below)
+   //;         $wz_event = "clk_i";
+   //;         $wz_value = "clk_i";
+   //;         $ass = "<=";
+
    //; my ($open_paren, $close_paren) = ("(", ")"); # Yeah, this is readable.
    //; for (my $snum=0; $snum<$nbanks; $snum++) {
    //;     my $sram = sprintf("SRAM%03d", $snum);
-   //;     if ($n_sram_ports == 2) {
-   //;         $wz_event = "clk_i";
-   //;         $wz_value = "clk_i";
-   //;     }
-   //;     elsif ($n_sram_ports == 1) {
+
+//; #    //;     # Hum notice this if-elsif loop-invariant :(
+//; #    //;     # Oops not quite there's a $snum down there isnt it
+//; #    //;     # Hum also maybe it should be if-else not if-elsif hum
+//; #    //;     if ($n_sram_ports == 2) {
+//; #    //;         $wz_event = "clk_i";
+//; #    //;         $wz_value = "clk_i";
+//; #    //;         $ass = "<=";
+//; #    //;     }
+
+   //;     if ($n_sram_ports == 1) {
    //;         $wz_event = "posedge clk_i";
    //;         $wz_value = "suppress_wz_i[$snum]";
+   //;         $ass = "=";
    //;     }
+
+
+
+
+   //;     my $rcb = "";  # Random Code Block
+   //;     my $i; for ($i=0; $i < ($nunits-1); $i++) {
+   //;       $rcb = "${rcb}         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum ) |\n";
+   //;     }
+   //;       $rcb = "${rcb}         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
+   //;       $rcb = "${rcb}      )) begin\n";
+   //;       $rcb = "${rcb}         ${sram}_wz $ass $wz_value ? 1 : 0;\n";
    //;
+   //;     # E.g. rcb=
+   //;     #      (BFLY0_op1_bnum_i == 0 ) | (BFLY0_op2_bnum_i == 0 ) |
+   //;     #      (BFLY1_op1_bnum_i == 0 ) | (BFLY1_op2_bnum_i == 0 )
+   //;     #   )) begin
+   //;     #      SRAM000_wz   ? 1 : 0;
 
 //; # Yet another terrible hack
 //; # Some configs work only w blocking assignments and others w non-blocking :(
 //; # $ass = "=";   # ver:  1port 2port ~dpump;  vcs  1port 2port dpump
 //; # $ass = "<=";  # ver: ~1port 2port  dpump;  vcs ~1port 2port dpump
-//; my $ass = ($SRAM_TYPE eq "TRUE_1PORT") ? "=" : "<=";
+//; # my $ass = ($SRAM_TYPE eq "TRUE_1PORT") ? "=" : "<=";
 
    always @ (`$wz_event`) begin
       if (cycle_num == `$nbits_cycle_num`'b0) `${sram}`_wz `$ass` 1'b1; else
       if ( fft_started & (
-   //;     my $i; for ($i=0; $i < ($nunits-1); $i++) {
-   //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum ) |\n";
-   //;     }
-   //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
-   //;     print "      )) begin\n";
-   //;     print "         ${sram}_wz $ass $wz_value ? 1 : 0;\n";
+   //;         print $rcb;
 
    //;     if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
           // \$display(\"FLOOF BOTF %1d okay want to write ${sram}\", \$time);
