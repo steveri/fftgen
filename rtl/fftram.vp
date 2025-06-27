@@ -144,39 +144,34 @@ module `mname`
    logic [`$rbits`] `$sname`_ix;   logic [`$op_width-1`:0] `$sname`_rd_data;   logic [`$op_width-1`:0] `$sname`_wr_data;   logic `$sname`_ez;   logic `$sname`_wz;
    //; }
 
-   // Trying something new for bypasses: BOTF (bypass on the fly)
-   // (For now) BOTF: must duplicate fftctl's 'cycle_num' signal so we
-   // can conservatively BYPASS ALL FINAL-CYCLE WRITES in a each stage.
-   // FIXME Really shouldn't bypass final-stage writes!!!
-   // FIXME Later, can just bring 'cycle_num' (below) in from fftctl as a signal.
-   // FIXME Or something smarter.
-   // Need to count from 0 to [log2(npoints) x (npoints/2) / (nbutts)]
-   // plus at least one beyond that.
    logic [`$nbits_cycle_num-1`:0] cycle_num;
 
-//; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
+   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
+   //;
+   //    Trying something new for bypasses: BOTF (bypass on the fly)
+   //    (For now) BOTF: must duplicate fftctl's 'cycle_num' signal so we
+   //    can conservatively BYPASS ALL FINAL-CYCLE WRITES in a each stage.
+   //    FIXME Really shouldn't bypass final-stage writes!!!
+   //    FIXME Later, can just bring 'cycle_num' (below) in from fftctl as a signal.
+   //    FIXME Or something smarter.
+   //    Need to count from 0 to [log2(npoints) x (npoints/2) / (nbutts)]
+   //    plus at least one beyond that.
    logic bypass_time;              // Bypass_time==1 when cycle_time says it is time to bypass.
-//; }
 
-   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
-   // E.g. SRAM001_active=1 during any cycle that we're accessing SRAM001 (BOTF).
-   //; for (my $i=0; $i<$nbanks; $i++) {
-   //;    my $sname = sprintf("SRAM%03d", $i);  # "000", "001", ... "015" etc.
+   //    BOTF: E.g. SRAM001_active=1 during any cycle that we're accessing SRAM001
+   //;   for (my $i=0; $i<$nbanks; $i++) {
+   //;     my $sname = sprintf("SRAM%03d", $i);  # "000", "001", ... "015" etc.
    logic `$sname`_active;
-   //;     }
-   //; } else {
-   // Placeholder for optional BOTF signals, unused in this configuration (SRAM003_active).
-   //; }
-
-   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
-   // BOTF: At end of each stage, there is possibility of read/write
-   // conflict where one butterfly wants to write to the (single ported)
-   // SRAM at the same time another one wants to read from the SRAM.
-   // When this happens, bypass the write data to the 'bypassed_data' buffer.
-   //; my $nsrams = $nbanks;
-   //; my $r1 = sprintf("%-6s", "");
-   //; my $r2 = sprintf("%-6s", "[$rbits]");
-   //; my $r3 = sprintf("%-6s", "[$obits]");
+   //;   }
+   //;
+   //    BOTF: At end of each stage, there is possibility of read/write
+   //    conflict where one butterfly wants to write to the (single ported)
+   //    SRAM at the same time another one wants to read from the SRAM.
+   //    When this happens, bypass the write data to the 'bypassed_data' buffer.
+   //;   my $nsrams = $nbanks;
+   //;   my $r1 = sprintf("%-6s", "");
+   //;   my $r2 = sprintf("%-6s", "[$rbits]");
+   //;   my $r3 = sprintf("%-6s", "[$obits]");
    //; 
    logic `$r1` bypass_valid[0:`$nsrams-1`];  // True (1) iff bypassed_data is valid
    logic `$r2` bypassed_rnum[0:`$nsrams-1`]; // Use target row number (index) of valid data as an ID.
@@ -230,22 +225,6 @@ module `mname`
    // LOOK MA NO BYPASS BUFFER
    //; }
 
-//;#   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
-//;#   // Initialize BOTF (bypass on the fly) signals
-//;#   //; # SRAM000_wants_to_read_then_write <= 0; 
-//;#   //; # SRAM001_wants_to_read_then_write <= 0; 
-//;#   //; # SRAM002_wants_to_read_then_write <= 0; 
-//;#   //; # ...
-//;#   initial begin
-//;#   //; for (my $i=0; $i<$nbanks; $i++) {
-//;#   //;     my $sname = sprintf("SRAM%03d", $i);  # "000", "001", ... "015" etc.
-//;#      `$sname`_wants_to_read_then_write <= 0; 
-//;#   //; }
-//;#   end
-//;#   //; } else {
-//;#   // Placeholder for initialization of optional BOTF signals, unused in this configuration (sram_wants...).
-//;#   //; }
-
    //; # FIXME cycle_num no longer optional i guess...
    //; # if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    //; if (1 == 1) {
@@ -255,20 +234,20 @@ module `mname`
    // Placeholder for initialization of optional BOTF signals, unused in this configuration (cycle_num).
    //; }
 
-   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
-   // Initialize BOTF (bypass on the fly) signals
-   // bypass_valid:  True (1) iff bypassed_data is valid
-   // bypassed_rnum: Use target row number (index) of valid data as an ID.
-   // bypassed_data: Valid data lives here instead of 'rnum' in SRAM.
-   //; # ...
-   // 'x means "set all bits to x", or so I'm told.
+   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
+   //    Initialize BOTF (bypass on the fly) signals
+   //    bypass_valid:  True (1) iff bypassed_data is valid
+   //    bypassed_rnum: Use target row number (index) of valid data as an ID.
+   //    bypassed_data: Valid data lives here instead of 'rnum' in SRAM.
+   //;   # ...
+   //    'x means "set all bits to x", or so I'm told.
    initial begin
-   //; for (my $i=0; $i<$nbanks; $i++) {
+   //;   for (my $i=0; $i<$nbanks; $i++) {
       bypass_valid[`$i`]=1'b0;  bypassed_rnum[`$i`]=`$rwidth`'b0;  bypassed_data[`$i`]='x;
-   //; }
+   //;   }
    end
    //; } else {
-   // Placeholder for initialization of optional BOTF signals, unused in this configuration.
+   //    Placeholder for initialization of optional BOTF signals, unused in this configuration.
    //; }
 
    // END WIRE DECLARATIONS____________________________________________________
