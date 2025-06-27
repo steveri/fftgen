@@ -144,10 +144,7 @@ module `mname`
    logic [`$rbits`] `$sname`_ix;   logic [`$op_width-1`:0] `$sname`_rd_data;   logic [`$op_width-1`:0] `$sname`_wr_data;   logic `$sname`_ez;   logic `$sname`_wz;
    //; }
 
-
-   //; # no longer optional i guess, everyone needs cycle_num...right? FIXME
-   //; # if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
-   //; if (1 == 1) {
+   // Trying something new for bypasses: BOTF (bypass on the fly)
    // (For now) BOTF: must duplicate fftctl's 'cycle_num' signal so we
    // can conservatively BYPASS ALL FINAL-CYCLE WRITES in a each stage.
    // FIXME Really shouldn't bypass final-stage writes!!!
@@ -156,12 +153,10 @@ module `mname`
    // Need to count from 0 to [log2(npoints) x (npoints/2) / (nbutts)]
    // plus at least one beyond that.
    logic [`$nbits_cycle_num-1`:0] cycle_num;
+
 //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
    logic bypass_time;              // Bypass_time==1 when cycle_time says it is time to bypass.
 //; }
-   //; } else {
-   // Placeholder for optional BOTF signals, unused in this configuration (cycle_num).
-   //; }
 
    //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    // E.g. SRAM001_active=1 during any cycle that we're accessing SRAM001 (BOTF).
@@ -172,20 +167,6 @@ module `mname`
    //; } else {
    // Placeholder for optional BOTF signals, unused in this configuration (SRAM003_active).
    //; }
-
-//;#   //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
-//;#   // Trying something new for bypasses: BOTF (bypass on the fly)
-//;#   //; # logic SRAM000_wants_to_read_then_write;
-//;#   //; # logic SRAM001_wants_to_read_then_write;
-//;#   //; # logic SRAM002_wants_to_read_then_write;
-//;#   //; # ...
-//;#   //;     for (my $i=0; $i<$nbanks; $i++) {
-//;#   //;         my $sname = sprintf("SRAM%03d", $i);  # "000", "001", ... "015" etc.
-//;#   logic `$sname`_wants_to_read_then_write; 
-//;#   //;     }
-//;#   //; } else {
-//;#   // Placeholder for optional BOTF signals, unused in this configuration.
-//;#   //; }
 
    //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
    // BOTF: At end of each stage, there is possibility of read/write
@@ -418,41 +399,6 @@ module `mname`
    //; } else {
    // Placeholder for optional BOTF signals, unused in this configuration.
    //; }
-
-
-//;# unused/old?
-//;#    //; if ($BYPASS_MECHANISM eq 'old') {
-//;#    //////////////////////////////////////////////////////////////////////////////////
-//;#    // If suppress_wz was set (at posedge clk above), we suppress write to the
-//;#    // indicated SRAM.  Contents originally destined for SRAM now go to bypass_buffer.
-//;# 
-//;#    // If I were more paranoid, maybe each case would get its own "@ (negedge clk)"?
-//;#    always @ (posedge clk_i) begin
-//;#       //;#
-//;#       //;#  if (suppress_wz[ 0]) bypass_buffer[bufnum_i[ 0]] <= SRAM000_wr_data;
-//;#       //;#  if (suppress_wz[ 1]) bypass_buffer[bufnum_i[ 1]] <= SRAM001_wr_data;
-//;#       //;#  ...
-//;#       //;#  if (suppress_wz[15]) bypass_buffer[bufnum_i[15]] <= SRAM015_wr_data;
-//;# 
-//;#       // TODO again, replace ugly repetitive $display w/a task.
-//;#       // if nunits == 1 this (suppress_wz) is one-hot (or zero)
-//;#       //; for (my $i = 0; $i < $nbanks; $i++) {
-//;#       //;     my $nn  = sprintf("%2d", $i);
-//;#       //;     my $nnn = sprintf("%03d", $i);
-//;#       //;     my $bufnum = ($nunits==1) ? "" : "[bufnum_i[$nn]]";
-//;#       //;     my $bufnum2 = ($nunits==1) ? "0" : "bufnum_i[$nn]";
-//;#       if (suppress_wz_i[`$nn`]) begin
-//;#          bypass_buffer`$bufnum` <= SRAM`$nnn`_wr_data;
-//;#          $display("fftram %6d Bypassed SRAM `$i`, wrote (bsr'%08X,bsr'%08X) to bypass_buffer[%1d]",
-//;#                $time, `ri("SRAM${nnn}_wr_data")`, `$bufnum2`);
-//;#       end
-//;#       //; }
-//;#     end
-//;#    //; } else {
-//;#    // LOOK MA NO BYPASS BUFFER mano mano
-//;#    //; }
-//;# unused/old?
-   // LOOK MA NO BYPASS BUFFER mano mano
 
    //////////////////////////////////////////////////////////////////////////////
    // wz signals.  If Anyone wants to access a given bank n (op1_bnum==1),
