@@ -225,14 +225,7 @@ module `mname`
    // LOOK MA NO BYPASS BUFFER
    //; }
 
-   //; # FIXME cycle_num no longer optional i guess...
-   //; # if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {
-   //; if (1 == 1) {
-   // Initialize BOTF (bypass on the fly) signals (cycle_num)
    initial cycle_num = `$nbits_cycle_num`'b0;
-   //; } else {
-   // Placeholder for initialization of optional BOTF signals, unused in this configuration (cycle_num).
-   //; }
 
    //; if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
    //    Initialize BOTF (bypass on the fly) signals
@@ -404,15 +397,15 @@ module `mname`
    //;     my $sram = sprintf("SRAM%03d", $snum);
 
    //;     # async for 2port (inc. dpump)
-   //;     my ($wz_event, $wz_value) = ("clk_i", "clk_i");
-   //;     my $wz_assign = "${sram}_wz <= $wz_value ? 1 : 0";
-   //;     my $wz_reset  = "${sram}_wz <= 1'b1";
+   //;     my $wz_event = "clk_i";
+   //;     my $wz_set   = "${sram}_wz <= clk_i ? 1 : 0";
+   //;     my $wz_reset = "${sram}_wz <= 1'b1";
 
    //;     # sync for 1port
    //;     if ($n_sram_ports == 1) {
-   //;         ($wz_event, $wz_value) = ("posedge clk_i", "suppress_wz_i[$snum]");
-   //;         $wz_assign = "${sram}_wz = $wz_value ? 1 : 0";
-   //;         $wz_reset  = "${sram}_wz = 1'b1";
+   //;         $wz_event = "posedge clk_i";
+   //;         $wz_set   = "${sram}_wz = suppress_wz_i[$snum] ? 1 : 0";
+   //;         $wz_reset = "${sram}_wz = 1'b1";
    //;     }
 
    always @ (`$wz_event`) begin
@@ -422,10 +415,10 @@ module `mname`
    //; #    (BFLY1_op1_bnum_i == 0 ) | (BFLY1_op2_bnum_i == 0 )"
    //;     codeblock1($nunits, $snum);
        )) begin
-         `$wz_assign`;
+         `$wz_set`;
     
    //;     if (($PRECOMPUTED_BYPASS == 0) && ($n_sram_ports == 1)) {    # BOTF
-          // \$display(\"FLOOF BOTF %1d okay want to write ${sram}\", \$time);
+         // \$display(\"FLOOF BOTF %1d okay want to write ${sram}\", \$time);
 
          if (bypass_time == 1) begin
             // FIXME really need a task here, no?
@@ -611,17 +604,3 @@ endmodule
 // Genesis2 is patent pending. For information regarding the patent please
 // contact the Stanford Technology Licensing Office.
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
-
-//; #    //;     # Hum notice this if-elsif loop-invariant :(
-//; #    //;     # Oops not quite there's a $snum down there isnt it
-//; #    //;     # Hum also maybe it should be if-else not if-elsif hum
-//; #    //;     if ($n_sram_ports == 2) {
-//; #    //;         $wz_event = "clk_i";
-//; #    //;         $wz_value = "clk_i";
-//; #    //;         $ass = "<=";
-//; #    //;     }
-
-                          
