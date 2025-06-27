@@ -460,28 +460,29 @@ module `mname`
 
    //;# The timing changes according to whether we have a 1port or a 2port SRAM (note dpump = 2 ports)
 
-
-
    //; # DEFAULT values for if n_sram_ports != 1 (see below)
    //; my ($wz_event, $wz_value, $ass) = ("clk_i", "clk_i", "<=");
 
    //; # E.g. codeblock1(2, 0) prints this:
    //; # "         (BFLY0_op1_bnum_i == 0 ) | (BFLY0_op2_bnum_i == 0 ) |"
    //; # "         (BFLY1_op1_bnum_i == 0 ) | (BFLY1_op2_bnum_i == 0 )"
-   //; # "      )) begin"
-   //; # "         SRAM000_wz   ? 1 : 0;"
    //; 
    //; sub codeblock1 {
-   //;     my $nunits = shift; # E.g. 0, 1, 2, ...
-   //;     my $snum   = shift; # E.g. 0, 1, 2, ...
-   //;     for (my $i=0; $i < $nunits; $i++) {
-   //;         if ($i < $nunits-1) {
-   //;             print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum ) |\n";
-   //;         } else {
-   //;             print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
-   //;         }
-   //;     }
+   //;   my ($nunits, $snum) = @_;
+
+//; #    //;   for (my $i=0; $i < $nunits-1; $i++) {
+//; #    //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum ) |\n";
+//; #    //;   }
+//; #    //;     print "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )\n";
+
+   //;   my @codeblock;
+   //;   for (my $i=0; $i < $nunits; $i++) {
+   //;     @codeblock[$i] = "         (BFLY${i}_op1_bnum_i == $snum ) | (BFLY${i}_op2_bnum_i == $snum )";
+   //;   }
+   //;   print join(" |\n", @codeblock);
+
    //; }
+
 
    //; for (my $snum=0; $snum<$nbanks; $snum++) {
    //;     my $sram = sprintf("SRAM%03d", $snum);
