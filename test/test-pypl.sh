@@ -63,7 +63,7 @@ fftgen=$(cd $test/..; pwd)
 
 # Need numpy for python part of perl v. python tests
 # FIXME/TODO when we get rid of the python option this is no longer necessary.
-pip install numpy || echo "Could not install numpy, maybe that's okay"
+python -c 'import numpy' || pip install numpy || echo "Could not install numpy, maybe that's okay"
 
 ##########################################################################
 # --gold  =>  8-point fft with summary results
