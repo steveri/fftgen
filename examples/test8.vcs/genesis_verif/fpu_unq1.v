@@ -72,18 +72,30 @@ module fpu_unq1 (
 
 
 endmodule
-//////////////////////////////////////////////////////////////////////////////
-// Copyright Stephen Richardson and Stanford University.  All rights reserved.
-//              Exclusively Licensed by Chip Genesis Inc.
-//
-// The code, the algorithm, or any part of it is not to be copied/reproduced.
-// The code, the algorithm, or results from running this code may not be used
-// for any commercial use unless legally licensed.
-//
+
+/////////////////////////////////////////////////////////////////////////////////
+// MIT License
+// 
+// Copyright (c) 2013 Stephen E. Richardson and Stanford University
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IM-
+// PLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNEC-
+// TION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
 // For more information please contact
-//   Ofer Shacham (Stanford Univ./Chip Genesis)   shacham@alumni.stanford.edu
-//   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu
-//
-// Genesis2 is patent pending. For information regarding the patent please
-// contact the Stanford Technology Licensing Office.
-///////////////////////////////////////////////////////////////////////////////
+// Stephen E. Richardson  steveri@stanford.edu (Stanford University)
+// Prof. Mark Horowitz   horowitz@stanford.edu (Stanford University)
+/////////////////////////////////////////////////////////////////////////////////

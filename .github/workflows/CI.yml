@@ -10,9 +10,10 @@ on:
 
   # Schedule NOTE ONLY WORKS FOR MAIN BRANCH :(
   schedule:
-    # Every morning at 3am ( 3am local ~ 10am UTC :( )
+    # Once a month at 3am ( 3am UTC ~ 10am (yesterday) PDT :( )
+    # Once a month at 3am ( 11pm UTC ~ 6am PDT )
     # ( min hr day JAN-DEC MON-SUN )
-    - cron: '0 3 1 * *'
+    - cron: '0 23 1 * *'
 
 
 ########################################################################
